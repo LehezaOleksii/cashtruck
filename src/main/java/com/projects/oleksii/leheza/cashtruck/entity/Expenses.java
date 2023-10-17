@@ -14,31 +14,26 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@ToString
+@NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
 @Table
 public final class Expenses {
 
-	@Id
-	@SequenceGenerator(name = "expenses_sequence", sequenceName = "expenses_sequence", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "expenses_sequence")
-	private final Long id;
-	@OneToOne
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_expense_category"))
-	@NotNull
-	private final ExpensesCategory expenseCategory;
-	@NotNull
-	private final LocalDateTime time;
-	@Size(min = 0)
-	private final BigDecimal sum;
+    @Id
+    @SequenceGenerator(name = "expenses_sequence", sequenceName = "expenses_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "expenses_sequence")
+    private Long id;
+    @OneToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_expense_category"))
+    @NotNull
+    private ExpensesCategory expenseCategory;
+    @NotNull
+    private LocalDateTime time;
+    @Size(min = 0)
+    private BigDecimal sum;
 }

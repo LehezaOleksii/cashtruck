@@ -30,24 +30,24 @@ import lombok.ToString;
 @Table
 public final class Client {
 
-	@Id
-	@SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence")
-	private Long id;
-	@Column(name = "first_name")
-	private String firstname;
-	@Column(name = "last_name")
-	private String lastname;
-	@NotEmpty
-	@NotBlank
-	private String email;
-	@OneToOne
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_saving"))
-	private Saving saving;
-	@ManyToOne
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_income"))
-	private Income income;
-	@ManyToOne
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_expense"))
-	private Expenses expenses;
+    @Id
+    @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence")
+    private Long id;
+    @Column(name = "first_name", length = 50)
+    private String firstname;
+    @Column(name = "last_name", length = 50)
+    private String lastname;
+    @NotEmpty
+    @NotBlank
+    private String email;
+    @OneToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_saving"))
+    private Saving saving;
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_income"))
+    private Income income;
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_expense"))
+    private Expenses expenses;
 }

@@ -8,26 +8,21 @@ import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@ToString
+@NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "income_category")
+@Table
 public final class IncomeCategory {
 
-	@Id
-	@SequenceGenerator(name = "income_category_sequence", sequenceName = "income_category_sequence", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "income_category_sequence")
-	private final Long id;
-	@NotBlank
-	@NotEmpty
-	private final String categoryName;
+    @Id
+    @SequenceGenerator(name = "income_category_sequence", sequenceName = "income_category_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "income_category_sequence")
+    private Long id;
+    @NotBlank
+    @NotEmpty
+    private String categoryName;
 }

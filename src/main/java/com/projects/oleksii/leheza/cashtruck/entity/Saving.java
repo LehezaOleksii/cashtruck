@@ -12,27 +12,22 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
-@ToString
+@NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
 @Table
 public final class Saving {
 
-	@Id
-	@SequenceGenerator(name = "saving_sequence", sequenceName = "saving_sequence", allocationSize = 1)
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "saving_sequence")
-	private final Long id;
-	private final BigDecimal cash;
-	@OneToMany
-	@JoinColumn(foreignKey = @ForeignKey(name = "fk_bank_card"))
-	private Set<BankCard> bankCards;
+    @Id
+    @SequenceGenerator(name = "saving_sequence", sequenceName = "saving_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "saving_sequence")
+    private Long id;
+    private BigDecimal cash;
+    @OneToMany
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_bank_card"))
+    private Set<BankCard> bankCards;
 }
