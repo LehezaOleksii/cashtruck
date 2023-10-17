@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.service;
+package com.projects.oleksii.leheza.cashtruck.services;
 
 import java.util.List;
 import java.util.Optional;

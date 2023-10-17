@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.api;
+package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.projects.oleksii.leheza.cashtruck.entity.Client;
-import com.projects.oleksii.leheza.cashtruck.service.ClientService;
+import com.projects.oleksii.leheza.cashtruck.services.ClientService;
 
 @RestController
 @RequestMapping(path = "/client")
