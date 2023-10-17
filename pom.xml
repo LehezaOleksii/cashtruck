@@ -15,6 +15,7 @@
     <description>CashTruck application</description>
     <properties>
         <java.version>17</java.version>
+        <json.web.token.version>0.12.3</json.web.token.version>
     </properties>
     <dependencies>
         <dependency>
@@ -34,6 +35,11 @@
             <artifactId>spring-boot-devtools</artifactId>
             <scope>runtime</scope>
             <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt</artifactId>
+            <version>${json.web.token.version}</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
