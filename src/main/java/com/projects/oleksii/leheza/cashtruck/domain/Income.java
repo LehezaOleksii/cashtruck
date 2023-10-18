@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.entity;
+package com.projects.oleksii.leheza.cashtruck.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.entity;
+package com.projects.oleksii.leheza.cashtruck.domain;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
