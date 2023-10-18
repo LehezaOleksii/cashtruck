@@ -1,9 +1,9 @@
-package com.projects.oleksii.leheza.cashtruck.services;
+package com.projects.oleksii.leheza.cashtruck.service;
 
 import java.util.List;
 import java.util.Optional;
 
-import com.projects.oleksii.leheza.cashtruck.entity.Client;
+import com.projects.oleksii.leheza.cashtruck.domain.Client;
 
 public interface ClientService {
 
