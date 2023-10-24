@@ -1,18 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
+import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -32,7 +23,7 @@ public final class Client {
 
     @Id
     @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence") //strategy Auto
     private Long id;
     @Column(name = "first_name", length = 50)
     private String firstname;
@@ -41,6 +32,9 @@ public final class Client {
     @NotEmpty
     @NotBlank
     private String email;
+    @NotEmpty
+    @NotBlank
+    private String password;
     @OneToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_saving"))
     private Saving saving;
@@ -50,4 +44,6 @@ public final class Client {
     @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_expense"))
     private Expenses expenses;
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
 }
