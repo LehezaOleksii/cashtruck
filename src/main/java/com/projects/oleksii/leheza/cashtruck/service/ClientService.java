@@ -7,13 +7,14 @@ import com.projects.oleksii.leheza.cashtruck.domain.Client;
 
 public interface ClientService {
 
+	public void saveClient(Client client);
 	public List<Client> findAll();
 
-	void addNewClient(Client client);
+	public Client findByEmail(String email);
 
-	public Optional<Client> findByEmail(String email);
-
-	public void deleteClientById(Long clientId);
+	public void deleteById(Long clientId);
 
 	public void updateClient(Long clientId, Client client);
+
+	public Client getClient(Long clientId);
 }
