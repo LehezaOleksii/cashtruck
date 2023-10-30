@@ -1,7 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck;
 
+import com.projects.oleksii.leheza.cashtruck.config.MainEntitiesGenerator;
 import com.projects.oleksii.leheza.cashtruck.config.RandomUsersGenerator;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.*;
 import net.datafaker.Faker;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -17,10 +18,18 @@ public class CashtruckApplication {
     public static void main(String[] args) {
         SpringApplication.run(CashtruckApplication.class, args);
     }
+
     @Bean
-    CommandLineRunner commandLineRunner(RandomUsersGenerator randomUsersGenerator, ClientRepository clientRepository) {
+    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator,
+                             ClientRepository clientRepository,
+                             ManagerRepository managerRepository,
+                             AdminRepository adminRepository,
+                             IncomeCategoryRepository incomeCategoryRepository,
+                             ExpensesCategoryRepository expensesCategoryRepository) {
         return args -> {
-            randomUsersGenerator.generateRandomClients(30, clientRepository, getRandom(), dataFaker());
+            mainEntitiesGenerator.generateMainEntities(expensesCategoryRepository, incomeCategoryRepository);
+            randomUsersGenerator.generateRandomUsers(100, 10, 1,
+                    clientRepository, managerRepository, adminRepository, dataFaker());
         };
     }
 
@@ -29,7 +38,7 @@ public class CashtruckApplication {
 //		return new BCryptPasswordEncoder();
 //	}
     @Bean
-    @Scope("singleton")
+    @Scope("prototype")
     Random getRandom() {
         return new Random();
     }
@@ -39,6 +48,4 @@ public class CashtruckApplication {
     Faker dataFaker() {
         return new Faker();
     }
-
-
 }
