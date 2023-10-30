@@ -25,4 +25,9 @@ public final class IncomeCategory {
     @NotBlank
     @NotEmpty
     private String categoryName;
+    private String categoryImage;
+
+    public IncomeCategory(String categoryName){
+
+    }
 }

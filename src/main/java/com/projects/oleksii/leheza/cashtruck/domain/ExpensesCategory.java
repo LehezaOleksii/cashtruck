@@ -27,4 +27,9 @@ public final class ExpensesCategory {
     @NotBlank
     @Column(name = "category_name", length = 50)
     private String categoryName;
+    private String categoryImage;
+
+    public ExpensesCategory(String categoryName) {
+        this.categoryName = categoryName;
+    }
 }
