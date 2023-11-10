@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -38,12 +40,14 @@ public final class Client {
     @OneToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_saving"))
     private Saving saving;
-    @ManyToOne
+    @OneToMany
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_income"))
-    private Income income;
-    @ManyToOne
+    private List<Income> incomes;
+    @OneToMany
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_expense"))
-    private Expenses expenses;
+    private List<Expense> expenses;
     @Enumerated(EnumType.STRING)
     private UserRole role;
+    //TODO add user image
+    //TODO add phone number
 }

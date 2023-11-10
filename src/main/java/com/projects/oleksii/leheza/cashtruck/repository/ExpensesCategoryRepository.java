@@ -1,8 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.repository;
 
 import com.projects.oleksii.leheza.cashtruck.domain.ExpensesCategory;
-import com.projects.oleksii.leheza.cashtruck.domain.IncomeCategory;
-import com.projects.oleksii.leheza.cashtruck.service.ExpensesCategoryService;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

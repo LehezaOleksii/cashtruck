@@ -1,9 +1,12 @@
-package com.projects.oleksii.leheza.cashtruck.service;
+package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.IncomeCategory;
 import com.projects.oleksii.leheza.cashtruck.repository.IncomeCategoryRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.IncomeCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +38,11 @@ public class IncomeCategoryServiceImpl implements IncomeCategoryService {
             throw new IllegalStateException("Category doesn`t exist");
         }
         incomeCategoryRepository.deleteById(incomeCategoryId);
+    }
+
+    @Override
+    public List<IncomeCategory> findAll() {
+        return incomeCategoryRepository.findAll();
     }
 
     private boolean existByCategoryName(String categoryName) {

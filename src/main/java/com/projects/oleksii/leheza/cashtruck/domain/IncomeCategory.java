@@ -28,6 +28,6 @@ public final class IncomeCategory {
     private String categoryImage;
 
     public IncomeCategory(String categoryName){
-
+this.categoryName=categoryName;
     }
 }

@@ -6,7 +6,7 @@ import com.projects.oleksii.leheza.cashtruck.repository.ExpensesCategoryReposito
 import com.projects.oleksii.leheza.cashtruck.repository.IncomeCategoryRepository;
 import org.springframework.context.annotation.Configuration;
 
-@Configuration //?
+@Configuration //TODO?
 public class MainEntitiesGenerator {
 
     public void generateMainEntities(ExpensesCategoryRepository expensesCategoryRepository, IncomeCategoryRepository incomeCategoryRepository) {
