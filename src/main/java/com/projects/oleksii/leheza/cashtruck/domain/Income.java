@@ -2,16 +2,9 @@ package com.projects.oleksii.leheza.cashtruck.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -27,10 +20,10 @@ public final class Income {
     @SequenceGenerator(name = "income_sequence", sequenceName = "income_sequence", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "income_sequence")
     private Long id;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_income_category"))
     private IncomeCategory incomeCategory;
-    private LocalDateTime time;
-    @Size(min = 0)
-    private BigDecimal sum;
+    @OneToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_income_transaction"))
+    private Transaction transaction;
 }

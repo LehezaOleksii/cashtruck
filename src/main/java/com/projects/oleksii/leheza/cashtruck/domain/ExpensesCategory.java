@@ -16,7 +16,7 @@ import lombok.*;
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table(name = "expenses_category")
+@Table
 public final class ExpensesCategory {
 
     @Id

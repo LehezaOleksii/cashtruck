@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.service;
+package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Admin;
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
@@ -8,11 +8,15 @@ import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
 import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.AdminRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.AdminService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,6 +39,17 @@ public class AdminServiceImpl implements AdminService {
                 .email(adminDto.getEmail())
                 .password(adminDto.getPassword())
                 .role(UserRole.Admin).build();
+        adminRepository.save(admin);
+    }
+
+    @Override
+    public void saveAdmin(Admin admin) {
+        if(!Optional.ofNullable(admin).isPresent()){
+            throw  new IllegalStateException("Admin is empty");
+        }
+        if (existByEmail(admin.getEmail())) {
+            throw new IllegalStateException("Email taken");
+        }
         adminRepository.save(admin);
     }
 

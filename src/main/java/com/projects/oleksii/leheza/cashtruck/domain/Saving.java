@@ -3,15 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.domain;
 import java.math.BigDecimal;
 import java.util.Set;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.ForeignKey;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Data
@@ -27,7 +19,7 @@ public final class Saving {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "saving_sequence")
     private Long id;
     private BigDecimal cash;
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER)
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_bank_card"))
     private Set<BankCard> bankCards;
 }

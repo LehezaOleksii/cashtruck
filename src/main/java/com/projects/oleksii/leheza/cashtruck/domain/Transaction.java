@@ -3,12 +3,8 @@ package com.projects.oleksii.leheza.cashtruck.domain;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -26,6 +22,12 @@ public final class Transaction {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_sequence")
     private Long id;
     private LocalDateTime time;
-    @Size(min = 0)
+    @DecimalMin(value = "0", inclusive = true)
     private BigDecimal sum;
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_from_bc"))
+    private BankCard from;
+    @ManyToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_to_bc"))
+    private BankCard to;
 }

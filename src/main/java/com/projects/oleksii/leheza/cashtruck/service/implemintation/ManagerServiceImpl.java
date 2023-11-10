@@ -1,9 +1,10 @@
-package com.projects.oleksii.leheza.cashtruck.service;
+package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
 import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
 import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,17 @@ public class ManagerServiceImpl implements ManagerService {
                 .email(managerDto.getEmail())
                 .password(managerDto.getPassword())
                 .role(UserRole.Manager).build();
+        managerRepository.save(manager);
+    }
+
+    @Override
+    public void saveManager(Manager manager) {
+        if(!Optional.ofNullable(manager).isPresent()){
+            throw  new IllegalStateException("Manager is empty");
+        }
+        if (existByEmail(manager.getEmail())) {
+            throw new IllegalStateException("Email taken");
+        }
         managerRepository.save(manager);
     }
 

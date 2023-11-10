@@ -1,13 +1,10 @@
-package com.projects.oleksii.leheza.cashtruck.service;
+package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Admin;
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
 import com.projects.oleksii.leheza.cashtruck.dto.AdminDto;
 import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
-import com.projects.oleksii.leheza.cashtruck.repository.AdminRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -15,6 +12,8 @@ import java.util.List;
 public interface AdminService {
 
     public void saveAdmin(AdminDto adminDto);
+
+    public void saveAdmin(Admin admin);
 
     List<Manager> findAllManagers();
 
