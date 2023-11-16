@@ -77,6 +77,7 @@ public class RandomUsersGenerator {
                     .role(UserRole.Client)
                     .build();
             clientService.saveClient(client);
+            savingService.assignBankCardsToClient((long)index,saving.getBankCards().stream().toList());
         });
     }
 
@@ -117,7 +118,8 @@ public class RandomUsersGenerator {
     }
     private Set<BankCard> getRandomCards(List<BankCard>bankCards,int minSize, int maxSize){
         int clientBankCards = random.nextInt(maxSize - minSize + 1) + minSize;
-        return new HashSet<>(bankCards.subList(0, Math.min(clientBankCards, bankCards.size())));
+        int randomCardNumber = random.nextInt(bankCards.size()-maxSize);
+        return new HashSet<>(bankCards.subList(randomCardNumber, randomCardNumber+Math.min(clientBankCards, bankCards.size())));
     }
 
     private void generateBankCards(Integer bankCardsNumber){
