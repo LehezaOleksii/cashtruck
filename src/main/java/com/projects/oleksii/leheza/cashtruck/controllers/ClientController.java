@@ -1,12 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
+import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
-import com.projects.oleksii.leheza.cashtruck.service.ManagerService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
-import com.projects.oleksii.leheza.cashtruck.service.ClientService;
 import org.springframework.web.servlet.ModelAndView;
 
 @RestController
@@ -18,7 +16,7 @@ public class ClientController {
 
     @GetMapping(path = "/all")
     public ModelAndView showAllClients() {
-        ModelAndView modelAndView = new ModelAndView("client/all");//TODO first 20 than next 20 (front)
+        ModelAndView modelAndView = new ModelAndView("client/all");
         modelAndView.addObject("clients", clientService.findAll());
         return modelAndView;
     }
@@ -39,29 +37,22 @@ public class ClientController {
         return modelAndView;
     }
 
-    @GetMapping(path = "/inforamtion/{clientId}")
-    public ModelAndView showClientInfo(@PathVariable(value = "clientId") Long clientId) {
-        ModelAndView modelAndView = new ModelAndView("client/information");
+    @GetMapping(path = {"/{clientId}/dashboard", "/{clientId}"})
+    public ModelAndView showClientDashboard(@PathVariable(value = "clientId") Long clientId) {
+        ModelAndView modelAndView;
         Client client = clientService.getClient(clientId);
-//        modelAndView.addObject("clientId", client.getId());
-        ClientDto clientDto = ClientDto.builder()
-                .firstname(client.getFirstname())
-                .lastname(client.getLastname())
-                .email(client.getEmail())
-                .password(client.getPassword())
-                .build();
-        modelAndView.addObject("client", clientDto);
+        if(client==null) {
+            return new ModelAndView("login");
+        }
+        modelAndView = new ModelAndView("client/dashboard");
+//      modelAndView.addObject("clientId", client.getId());
+        modelAndView.addObject("bank_cards",clientService.getBankCardsByClientId(clientId));
+        modelAndView.addObject("client", client);
+        modelAndView.addObject("client_statistic", clientService.getClientStatisticByClientId(clientId));
         return modelAndView;
     }
 
-    @GetMapping(path = "/dashboard/{clientId}")
-    public ModelAndView showClientDashboard(@PathVariable(value = "clientId") Long clientId) {
-        ModelAndView modelAndView = new ModelAndView("client/dashboard");
-        Client client = clientService.getClient(clientId);
-//        modelAndView.addObject("clientId", client.getId());
-        modelAndView.addObject("client", client);
-        return modelAndView;
-    }
+
 
     @PutMapping(path = {"/update/{clientId}"})
     public ModelAndView updateClientInfo(@PathVariable("clientId") Long clientId, @ModelAttribute("client") ClientDto clientDto) {
