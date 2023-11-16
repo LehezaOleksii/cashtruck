@@ -1,9 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.dto.AdminDto;
-import com.projects.oleksii.leheza.cashtruck.service.AdminService;
-import com.projects.oleksii.leheza.cashtruck.service.ClientService;
-import com.projects.oleksii.leheza.cashtruck.service.ManagerService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.AdminService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
