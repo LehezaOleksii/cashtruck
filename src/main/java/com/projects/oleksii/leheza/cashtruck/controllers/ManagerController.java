@@ -1,8 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
-import com.projects.oleksii.leheza.cashtruck.service.ClientService;
-import com.projects.oleksii.leheza.cashtruck.service.ManagerService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -14,7 +14,7 @@ public class ManagerController {
     @Autowired // TODO     @Resource
     private ManagerService managerService;
     @Autowired
-    private ClientService clientService;//TODO or use client controller
+    private ClientService clientService;
 
     @PostMapping(path = "/create")
     ModelAndView createManager(@RequestBody ManagerDto managerDto) {
