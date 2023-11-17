@@ -16,7 +16,7 @@
  
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
     <link th:href="@{/css/client/client_dashboard_syles.css}" rel="stylesheet" /> 
-    <script type="text/javascript" th:src="@{/js/script.js}"></script> 
+    <script type="text/javascript" th:src="@{/js/client/script.js}"></script> 
     <title>Dashboard</title>
   </head> 
   <body th:object="${client}">
@@ -172,17 +172,21 @@
             <div class="row">
                             <h5 class="mt-2">  Bank cards </h5>    
                             <div class="row mt-2">                    
-                        <div class="dropdown col-8 ">
-                            <button class="btn btn-secondary dropdown-toggle custom-back-violet bold col-12" type="button"
-        data-bs-toggle="dropdown" aria-expanded="false"
-        th:text="${card != null ? card.bankName : 'Bank card'}">
-</button> 
-                            <ul class="dropdown-menu">
-                                <li th:each="card : ${bank_cards}">
-                                    <button class="dropdown-item" th:text="${card.bankName}" type="button"></button>
-                                </li>
-                            </ul> 
-                           </div>
+<div class="dropdown col-8">
+    <button class="btn btn-secondary dropdown-toggle custom-back-violet bold col-12" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false"
+            id="selectedBankButton"
+            th:text="${card != null ? card.bankName : 'Bank card'}">
+    </button>
+    <ul class="dropdown-menu">
+        <li th:each="card : ${bank_cards}">
+            <button class="dropdown-item" type="button"
+                    onclick="selectBank(this)"
+                    th:text="${card.bankName}">
+            </button>
+        </li>
+    </ul>
+</div>
                         <button class="btn btn-primary custom-back-violet col-4">Add Card</button>
 </div> 
 
@@ -202,11 +206,16 @@
                 </div>
                 <!-- card data -->
                 <div class="col-sm-5">
-                    <div class="additional-info mt-4">
-                   <div> Balance: <span th:text="${card != null ? card.cardNumber : '-'}"></span></div>
-                        <div>Exp date: <span th:text="${card != null ? card.expiringDate : '-'}"></span></div>
-                        <div> Own: <span th:text="${card != null ? card.nameOnCard : '-'}"></span></div>
-                       <div>  CVV: <span th:text="${card != null ? card.cvv : '-'}"></span></div>
+                    <div class="additional-info mt-4"> 
+         <!-- ... Your existing HTML ... -->
+<div> Balance: <span id="balance" th:text="${card != null ? card.balance : '-'}"></span></div>
+<div class="bank-name" id="bankName" th:text="${card.bankName}"></div>
+<div class="card-number" id="cardNumber" th:text="${card.cardNumber}"></div>
+<div class="card-holder" id="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}" data-max-length="10"></div>
+<div class="expiry" id="expiringDate" th:text="${card.expiringDate}"></div>
+<div> CVV: <span id="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
+<!-- ... Your existing HTML ... -->
+
                     </div>
                 </div>
             </div>
@@ -245,6 +254,28 @@
         </div>
     </div>
 </div>
+
+<script th:inline="javascript">
+    function selectBank(button) {
+        var selectedBankName = button.innerText;
+        var cards = /*[[${bank_cards}]]*/ [];
+
+        // Find the selected bank card from the list
+        var selectedCard = cards.find(function (card) {
+            return card.bankName === selectedBankName;
+        });
+
+        // Update card details
+        document.getElementById('bankName').innerText = selectedCard.bankName;
+        document.getElementById('cardNumber').innerText = selectedCard.cardNumber;
+        document.getElementById('nameOnCard').innerText = selectedCard.nameOnCard;
+        document.getElementById('expiringDate').innerText = selectedCard.expiringDate;
+        document.getElementById('balance').innerText = selectedCard.balance;
+        document.getElementById('cvv').innerText = selectedCard.cvv;
+    }
+</script>
+
+ 
 
 
         <!-- 4 squares -->
