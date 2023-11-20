@@ -153,38 +153,39 @@
   </header>
 
      <!-- Credit card form -->
-      <section>
-        <div class="row">
+      <section class="info-card-container"> 
           <div class="col-md-8 mb-4">
             <div class="card mb-4">
               <div class="card-header py-3">
-                <h5 class="mb-0">Billing details</h5>
+                <h5 class="mb-0">Card details</h5>
               </div>
               <div class="card-body">
                 <form>
                   
  <!-- choose bank -->
-         <div class="dropdown">
-            <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
-                Select a bank
-            </button>
-            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                <li><div class="dropdown-item">Monobank</div></li>
-                <li><div class="dropdown-item">Privat bank</div></li>
-                <li><div class="dropdown-item">Alpha bank</div></li>
-            </ul>
-        </div>   <script src="js/script.js"></script>
+<div class="dropdown mb-3">
+    <button class="btn btn-primary dropdown-toggle custom-back-violet" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+        Select a bank
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="bankDropdown">
+        <li><div class="dropdown-item" onclick="changeBankName('Monobank')">Monobank</div></li>
+        <li><div class="dropdown-item" onclick="changeBankName('Privat bank')">Privat bank</div></li>
+        <li><div class="dropdown-item" onclick="changeBankName('Alfa bank')">Alfa bank</div></li>
+    </ul>
+</div> 
+
+        
                   <!-- 2 column grid layout with text inputs for the first and last names -->
                   <div class="row mb-4">
                     <div class="col">
                       <div class="form-outline">
-                        <input type="text" id="form6Example1" class="form-control" />
+                        <input type="text" id="form6Example1" placeholder="First name" class="form-control" />
                         <label class="form-label" for="form6Example1">First name</label>
                       </div>
                     </div>
                     <div class="col">
                       <div class="form-outline">
-                        <input type="text" id="form6Example2" class="form-control" />
+                        <input type="text" id="form6Example2" placeholder="Last name" class="form-control" />
                         <label class="form-label" for="form6Example2">Last name</label>
                       </div>
                     </div>
@@ -195,34 +196,35 @@
                   <div class="row mb-4">
                     <div class="col">
                       <div class="form-outline">
-                        <input type="text" id="formNameOnCard" class="form-control" />
+                        <input type="text" id="formNameOnCard"  placeholder="Name on card" class="form-control" />
                         <label class="form-label" for="formNameOnCard">Name on card</label>
                       </div>
                     </div>
                     <div class="col">
                       <div class="form-outline">
-                        <input type="text" id="formCardNumber" class="form-control" />
+                    <input type="text" class="form-control" id="creditCardNumber" placeholder="Credit card number" pattern="\d{16}" required>
                         <label class="form-label" for="formCardNumber">Credit card number</label>
                       </div>
                     </div>
                   </div>
 
+                  
                   <div class="row mb-4">
-                    <div class="col-3">
+                    <div class="col-6">
                       <div class="form-outline">
-                        <input type="text" id="formExpiration" class="form-control" />
-                        <label class="form-label" for="formExpiration">Expiration</label>
+                        <input type="text" class="form-control" id="cvv" placeholder="MM/YYYY" pattern="(0[1-9]|1[0-2])\/\d{4}" required>
+                        <label class="form-label" for="formCVV">Expiration date</label>
                       </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-6">
                       <div class="form-outline">
-                        <input type="text" id="formCVV" class="form-control" />
+                        <input type="text" class="form-control" id="cvv" placeholder="CVV" pattern="\d{3}" required>
                         <label class="form-label" for="formCVV">CVV</label>
                       </div>
                     </div>
                   </div>
 
-                  <button class="btn btn-primary btn-lg btn-block" type="submit">
+                  <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit">
                     add bank card
                   </button>
                 </form>
@@ -230,8 +232,7 @@
             </div>
           </div> 
         </div>
-      </section> 
-    </section>
+      </section>  
       <script
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
