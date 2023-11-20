@@ -21,7 +21,7 @@ public final class BankCard {
     private Long id;
     @Column(length = 100)
     private String bankName;
-    @Column(length = 12)
+    @Column(length = 16)
     private String cardNumber;
     @Column(length = 50)
     private String nameOnCard;
