@@ -126,42 +126,23 @@
         </nav> 
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
     <!-- header --> 
-     <header class="py-3 mb-3 border-bottom">
-    <div class="container-fluid d-grid gap-3 align-items-center" style="grid-template-columns: 1fr 2fr;">
-      <div class="dropdown">
-        <a href="#" class="d-flex align-items-center col-lg-4 mb-2 mb-lg-0 link-dark text-decoration-none dropdown-toggle" id="dropdownNavLink" data-bs-toggle="dropdown" aria-expanded="false">
-          <svg class="bi me-2" width="40" height="32"><use xlink:href="#bootstrap"/></svg>
-        </a>
-        <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownNavLink">
-          <li><a class="dropdown-item active" href="#" aria-current="page">Overview</a></li>
-          <li><a class="dropdown-item" href="#">Inventory</a></li>
-          <li><a class="dropdown-item" href="#">Customers</a></li>
-          <li><a class="dropdown-item" href="#">Products</a></li>
-          <li><hr class="dropdown-divider"></li>
-          <li><a class="dropdown-item" href="#">Reports</a></li>
-          <li><a class="dropdown-item" href="#">Analytics</a></li>
-        </ul>
-      </div>
+     <header class="py-3 mb-3 border-bottom"> 
+      
 
-      <div class="d-flex align-items-center">
-        <form class="w-100 me-3">
-          <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
-        </form>
-
-        <div class="flex-shrink-0 dropdown">
-          <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+  <div class="flex-shrink-0 dropdown">
+    <a href="#" class="d-flex flex-row-reverse link-dark text-decoration-none" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+        <span class="ms-1 d-none d-sm-inline">
             <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-          </a>
-          <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-            <li><a class="dropdown-item" href="#">New project...</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Sign out</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+        </span>
+    </a>
+    <ul class="dropdown-menu text-small shadow dropdown-menu-end" aria-labelledby="dropdownUser2">
+        <li><a class="dropdown-item" href="#">Profile</a></li>
+        <li><a class="dropdown-item" href="#">Email</a></li>
+        <li><a class="dropdown-item" href="#">Settings</a></li>
+        <li><hr class="dropdown-divider"></li>
+        <li><a class="dropdown-item" href="#">Sign out</a></li>
+    </ul>
+</div>
   </header> 
   
     <div class="container">
@@ -517,6 +498,11 @@
       <div class="my-container">
         <div class="card-body">
           <h5 class="card-title text-center">Transactions</h5>
+          
+              <div th:each="expense : ${client_statistic.expenses}">
+        <div class="info-card-font bold" th:text="${expense.transaction.sum}"></div>
+    </div> 
+
           <button class="btn btn-primary custom-back-violet">Details</button>
         </div>
       </div>
@@ -524,6 +510,7 @@
   </div>
 </div>
 </div>
+    </div>
 </main>
      <script
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
