@@ -26,6 +26,7 @@ public interface ClientService {
 
 	Client getClient(Long clientId);
 
+	//For UI
 	  ClientStatisticDto getClientStatisticByClientId(Long clientId) ;
 
 	//TODO use only one method (update) use tranisction

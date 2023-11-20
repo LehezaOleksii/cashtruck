@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -118,6 +119,7 @@ public class ClientServiceImpl implements ClientService {
         clientRepository.save(currentClient);
     }
 
+    //For UI
     @Override
     public ClientStatisticDto getClientStatisticByClientId(Long clientId) {
         Optional<Client> optionalClient = clientRepository.findById(clientId);
@@ -173,24 +175,15 @@ public class ClientServiceImpl implements ClientService {
 
     private ClientStatisticDto createStatisticDto(Client client){
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
-        BigDecimal expenses = client.getExpenses().stream()
-                .map(expense -> expense.getTransaction().getSum())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal incomes = client.getIncomes().stream()
-                .map(income -> income.getTransaction().getSum())
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        Saving saving = client.getSaving();
-        BigDecimal totalCash = saving.getCash();
-        BigDecimal totalCardBalance = saving.getBankCards()
-                .stream()
-                .map(BankCard::getBalance)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal totalSavings = totalCash.add(totalCardBalance);
-        clientStatisticDto.setExpenses(expenses);
-        clientStatisticDto.setProfit(incomes.subtract(expenses));
-        clientStatisticDto.setIncome(incomes);
-        clientStatisticDto.setSaving(totalSavings);
-
+        List<Expense> expenses = client.getExpenses();
+        List<Income> incomes = client.getIncomes();
+        Long clientId =client.getId();
+        LocalDateTime endDate = LocalDateTime.now();
+        LocalDateTime startDate = endDate.minusYears(1);
+        List<Expense> lastYearExpenses = clientRepository.findExpensesForLastYear(clientId,startDate,endDate);
+        clientStatisticDto.setExpenses(lastYearExpenses);
+        List<Income> lastYearIncomes = clientRepository.findIncomesForLastYear(clientId,startDate,endDate);
+        clientStatisticDto.setIncomes(lastYearIncomes);
        return  clientStatisticDto;
     }
     private boolean existByEmail(String email) {

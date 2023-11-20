@@ -109,7 +109,6 @@ public class RandomUsersGenerator {
                 .mapToObj(index -> {
                     Set<BankCard> selectedBankCards = getRandomCards(bankCards, 1, 3);
                     return Saving.builder()
-                            .cash(new BigDecimal(random.nextDouble() * 10000 + 50))
                             .bankCards(selectedBankCards)
                             .build();
                 })
@@ -128,7 +127,7 @@ public class RandomUsersGenerator {
         IntStream.range(1, bankCardsNumber+1).mapToObj(index -> BankCard.builder()
                 .balance(new BigDecimal(random.nextDouble(5000)+5000))
                 .bankName(faker.company().name())
-                .cardNumber(faker.number().digits(12))
+                .cardNumber(faker.number().digits(16))
                 .expiringDate(faker.date().between(
                         Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
                         Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant())))
