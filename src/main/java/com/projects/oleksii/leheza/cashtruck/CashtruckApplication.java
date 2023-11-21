@@ -28,7 +28,7 @@ public class CashtruckApplication {
                              ExpensesCategoryRepository expensesCategoryRepository) {
         return args -> {
             mainEntitiesGenerator.generateMainEntities(expensesCategoryRepository, incomeCategoryRepository);
-            randomUsersGenerator.generateRandomUsers(100,300,10,1,1000);
+            randomUsersGenerator.generateRandomUsers(50,150,10,1,1000);
         };
     }
 

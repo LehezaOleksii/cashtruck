@@ -36,7 +36,7 @@ public class RandomUsersGenerator {
     private final Faker faker;
 
     public void generateRandomUsers(int clientsNumber,int bankCardsNumber,int managersNumber,int adminNumber,int transactionNumber){
-//    prepear for client generation
+//    prepare for client generation
         generateBankCards(bankCardsNumber);
         generateRandomSavings(clientsNumber);
         generateRandomTransactions(transactionNumber);
@@ -139,14 +139,14 @@ public class RandomUsersGenerator {
         List<BankCard> allBankCards = bankCardService.findAll();
         List<BankCard> bankCardsFrom = allBankCards.subList(0, allBankCards.size() / 2);
         List<BankCard> bankCardsTo = allBankCards.subList(allBankCards.size() / 2, allBankCards.size());
-
+        LocalDateTime now = LocalDateTime.now();
         List<Transaction> transactions = IntStream.range(1, transactionsNumber)
                 .mapToObj(index ->
                       Transaction.builder()
                             .sum(new BigDecimal(random.nextDouble() * 1000 + 50))
                             .from(bankCardsFrom.get(random.nextInt(bankCardsFrom.size())))
                             .to(bankCardsTo.get(random.nextInt(bankCardsTo.size())))
-                            .time(generateRandomLocalDateTime())
+                            .time(now.minus(random.nextInt(60), ChronoUnit.DAYS))
                             .build()).toList();
         transactionService.saveAll(transactions);
     }

@@ -320,7 +320,7 @@
               </div>
             </div>
             <div>Total balance</div>
-            <!-- <div class="info-card-font bold" th:text = "${client_statistic!=null?client_statistic.ex:'-'}">$</div> -->
+            <div class="info-card-font bold" th:text="${client_statistic!=null?client_statistic.totalBalance:'-'}">$</div>
             <!-- arrow up short -->
             <div class="d-flex align-items-center">
               <svg
@@ -349,8 +349,10 @@
               </div>
             </div>
             <div>Income</div>
-            <!-- <div class="info-card-font bold" th:text="${client_statistic!=null?client_statistic.income:'-'}">$</div> -->
-            <!-- arrow up short -->
+            <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekIncome}"></div>
+            <div class="info-card-font bold last_month_info_card" th:text="${client_statistic.lastMonthIncome}" style="display: none;"></div>
+            <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearIncome}" style="display: none;"></div>           
+              <!-- arrow up short -->
             <div class="d-flex align-items-center">
               <svg
                 class="custom-green bi bi-arrow-up-short"
@@ -378,7 +380,9 @@
               </div>
             </div>
             <div>Profit</div>
-            <!-- <div class="info-card-font bold" th:text="${client_statistic!=null?client_statistic.profit:'-'}">$</div> -->
+            <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekIncome-client_statistic.lastWeekExpense}"></div>
+            <div class="info-card-font bold last_month_info_card" th:text="${client_statistic.lastMonthIncome-client_statistic.lastMonthExpense}" style="display: none;"></div>
+            <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearIncome-client_statistic.lastYearExpense}" style="display: none;"></div>   
             <!-- arrow up short -->
             <div class="d-flex align-items-center">
               <svg
@@ -406,8 +410,10 @@
               <div class="d-flex justify-content-end align-items-center"> 
               </div>
             </div>
-            <div>Expenses</div>
-            <!-- <div class="info-card-font bold" th:text="${client_statistic!=null?client_statistic.expenses:'-'}">$</div> -->
+            <div>Expenses</div> 
+            <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekExpense}"></div>
+            <div class="info-card-font bold last_month_info_card" th:text="${client_statistic.lastMonthExpense}" style="display: none;"></div>
+            <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearExpense}" style="display: none;"></div> 
             <!-- arrow down short -->
             <div class="d-flex align-items-center">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
@@ -420,12 +426,11 @@
               </svg>
               <div class="custom-red ml-2">-14.82%</div>
             </div>
-          </div>
-          </div>
-
+          </div> 
       </div>
     </div>
   </div>
+</div>
 </div>
  
 <div class="container mt-4">
@@ -451,7 +456,38 @@
     <div class="col-sm-6">
   <div class="my-container">
     <div class="card-body">
-      
+                  <script> 
+                var dur1 = document.getElementById('dur1');
+                var dur2 = document.getElementById('dur2');
+                var dur3 = document.getElementById('dur3'); 
+                
+                dur1.addEventListener('change', function () {
+                    toggleVisibility('last_week_info_card');
+                });
+
+                dur2.addEventListener('change', function () {
+                    toggleVisibility('last_month_info_card');
+                });
+
+                dur3.addEventListener('change', function () {
+                    toggleVisibility('last_year_info_card');
+                });
+
+                // Function to toggle visibility
+                function toggleVisibility(selectedDiv) {
+                    // Hide all divs
+                    document.querySelectorAll('.last_week_info_card, .last_month_info_card, .last_year_info_card')
+                        .forEach(function (div) {
+                            div.style.display = 'none';
+                        });
+
+                    // Show the selected div 
+                    var divsWithClass = document.querySelectorAll('.' + selectedDiv);
+                    divsWithClass.forEach(function(div) {
+                      div.style.display = 'block';
+                    });
+                }
+            </script>
       <!-- Check box -->
 <input type="radio" class="btn-check custom-back-white" name="options" id="option1" autocomplete="off" checked>
 <label class="btn" style="width: 40%;" for="option1">Income</label>

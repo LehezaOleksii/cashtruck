@@ -126,8 +126,7 @@ public class ClientServiceImpl implements ClientService {
         if (!optionalClient.isPresent()) {
             return new ClientStatisticDto();
         }
-        Client client = optionalClient.get();
-        return createStatisticDto(client);
+        return createStatisticDto(optionalClient.get());
     }
 
     @Override//TODO use only one method (update) se tranisction
@@ -175,16 +174,58 @@ public class ClientServiceImpl implements ClientService {
 
     private ClientStatisticDto createStatisticDto(Client client){
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
-        List<Expense> expenses = client.getExpenses();
-        List<Income> incomes = client.getIncomes();
-        Long clientId =client.getId();
+        Long clientId = client.getId();
         LocalDateTime endDate = LocalDateTime.now();
-        LocalDateTime startDate = endDate.minusYears(1);
-        List<Expense> lastYearExpenses = clientRepository.findExpensesForLastYear(clientId,startDate,endDate);
+        setLastYearTransactions(clientId,endDate,clientStatisticDto);
+        setLastMonthTransactions(clientId,endDate,clientStatisticDto);
+        setLastWeekTransactions(clientId,endDate,clientStatisticDto);
+        clientStatisticDto.setTotalBalance(getTotalBalance(client));
+        return  clientStatisticDto;
+    }
+
+    private BigDecimal getTotalBalance(Client client){
+        return client.getSaving().getBankCards().stream()
+                .map(BankCard::getBalance)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+    private void setLastYearTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto){
+        LocalDateTime oneYearStartDate = endDate.minusYears(1);
+        List<Expense> lastYearExpenses = expensesRepository.findExpensesForPeriod(clientId,oneYearStartDate,endDate);
         clientStatisticDto.setExpenses(lastYearExpenses);
-        List<Income> lastYearIncomes = clientRepository.findIncomesForLastYear(clientId,startDate,endDate);
+        clientStatisticDto.setLastYearExpense(getAllExpenseSum(lastYearExpenses));
+        List<Income> lastYearIncomes = clientRepository.findIncomesForPeriod(clientId,oneYearStartDate,endDate);
         clientStatisticDto.setIncomes(lastYearIncomes);
-       return  clientStatisticDto;
+        clientStatisticDto.setLastYearIncome(getAllIncomeSum(lastYearIncomes));
+    }
+
+    private void setLastMonthTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto){
+        LocalDateTime oneMonthStartDate = endDate.minusMonths(1);
+        List<Expense> lastMonthExpenses = expensesRepository.findExpensesForPeriod(clientId,oneMonthStartDate,endDate);
+        clientStatisticDto.setLastMonthExpense(getAllExpenseSum(lastMonthExpenses));
+        List<Income> lastMonthIncomes = clientRepository.findIncomesForPeriod(clientId,oneMonthStartDate,endDate);
+        clientStatisticDto.setLastMonthIncome(getAllIncomeSum(lastMonthIncomes));
+    }
+
+    private void setLastWeekTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto){
+        LocalDateTime oneWeekStartDate = endDate.minusWeeks(1);
+        List<Expense> lastWeekExpenses = expensesRepository.findExpensesForPeriod(clientId,oneWeekStartDate,endDate);
+        clientStatisticDto.setLastWeekExpense(getAllExpenseSum(lastWeekExpenses));
+        List<Income> lastWeekIncomes = clientRepository.findIncomesForPeriod(clientId,oneWeekStartDate,endDate);
+        clientStatisticDto.setLastWeekIncome(getAllIncomeSum(lastWeekIncomes));
+    }
+
+    private BigDecimal getAllExpenseSum(List<Expense>expenses){
+        return expenses.stream()
+                .map(Expense::getTransaction)
+                .map(Transaction::getSum)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    private BigDecimal getAllIncomeSum(List<Income>incomes){
+        return incomes.stream()
+                .map(Income::getTransaction)
+                .map(Transaction::getSum)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
     private boolean existByEmail(String email) {
         return clientRepository.findByEmail(email) != null;

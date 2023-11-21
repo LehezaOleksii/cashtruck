@@ -18,8 +18,14 @@ import java.util.List;
 @Builder(toBuilder = true)
 //For UI
 public class ClientStatisticDto {
-    @Pattern(regexp = "^[0-9]")
+
     private List<Expense> expenses;
-    @Pattern(regexp = "^[0-9]")
     private List<Income> incomes;
+    private BigDecimal totalBalance;
+    private BigDecimal lastYearExpense;
+    private BigDecimal lastMonthExpense;
+    private BigDecimal lastWeekExpense;
+    private BigDecimal lastYearIncome;
+    private BigDecimal lastMonthIncome;
+    private BigDecimal lastWeekIncome;
 }
