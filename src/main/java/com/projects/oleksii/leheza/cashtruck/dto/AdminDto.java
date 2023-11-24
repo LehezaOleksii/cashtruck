@@ -1,9 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -17,7 +14,7 @@ public class AdminDto {
     private String firstname;
     @Size(max=50)
     private String lastname;
-    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$")
+    @Email
     @NotEmpty
     @NotBlank
     private String email;
