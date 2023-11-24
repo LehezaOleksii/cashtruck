@@ -4,20 +4,20 @@ import com.projects.oleksii.leheza.cashtruck.dto.AdminDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.AdminService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-@RestController
-@RequestMapping(path = "/admin")
+@Controller
+@RequiredArgsConstructor
+@RequestMapping(path = "/admins")
 public class AdminController {
 
-    @Autowired
-    AdminService adminService;
-    @Autowired
-    ClientService clientService;
-    @Autowired
-    ManagerService managerService;
+    private final AdminService adminService;
+    private final ClientService clientService;
+    private final ManagerService managerService;
 
     @PostMapping(path = "/create/admin")
     ModelAndView createAdmin(@RequestBody AdminDto adminDto) {

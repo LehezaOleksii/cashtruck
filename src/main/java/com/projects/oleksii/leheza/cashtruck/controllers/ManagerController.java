@@ -3,18 +3,20 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-@RestController
-@RequestMapping(path = "/manager")
+@Controller
+@RequiredArgsConstructor
+@RequestMapping(path = "/managers")
 public class ManagerController {
 
-    @Autowired // TODO     @Resource
-    private ManagerService managerService;
-    @Autowired
-    private ClientService clientService;
+    // TODO     @Resource
+    private final ManagerService managerService;
+    private final ClientService clientService;
 
     @PostMapping(path = "/create")
     ModelAndView createManager(@RequestBody ManagerDto managerDto) {
@@ -37,7 +39,7 @@ public class ManagerController {
         return modelAndView;
     }
 
-    @DeleteMapping(path = "/delete/{managerId}")
+    @DeleteMapping(path = "/{managerId}")
     ModelAndView deleteManager(@PathVariable("managerId") Long managerId) {
         ModelAndView modelAndView = new ModelAndView();
         managerService.deleteManagerById(managerId);

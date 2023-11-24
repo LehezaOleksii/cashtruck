@@ -17,10 +17,4 @@ public interface ClientRepository extends JpaRepository<Client, Long> {
 
     @Query("SELECT c FROM Client c where c.email = ?1")
     Client findByEmail(String email); // Optional<Client>
-
-    @Query("SELECT i FROM Income i WHERE i.transaction.time >= :startDate AND i.transaction.time <= :endDate AND i.transaction.from.id = :clientId")
-    List<Income> findIncomesForPeriod(@Param("clientId") Long clientId,
-                                      @Param("startDate") LocalDateTime startDate,
-                                      @Param("endDate") LocalDateTime endDate
-    );
 }

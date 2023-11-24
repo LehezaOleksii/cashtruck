@@ -3,16 +3,18 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
-@RestController
-@RequestMapping(path = "/client")
+@Controller
+@RequiredArgsConstructor
+@RequestMapping(path = "/clients")
 public class ClientController {
 
-    @Autowired
-    private ClientService clientService;
+    private final ClientService clientService;
 
     @GetMapping(path = "/all")
     public ModelAndView showAllClients() {
@@ -37,7 +39,7 @@ public class ClientController {
         return modelAndView;
     }
 
-    @GetMapping(path = {"/{clientId}/dashboard", "/{clientId}"})
+    @GetMapping(path = "/{clientId}")
     public ModelAndView showClientDashboard(@PathVariable(value = "clientId") Long clientId) {
         ModelAndView modelAndView;
         Client client = clientService.getClient(clientId);
@@ -54,7 +56,7 @@ public class ClientController {
 
 
 
-    @PutMapping(path = {"/update/{clientId}"})
+    @PutMapping(path = "/{clientId}/update")
     public ModelAndView updateClientInfo(@PathVariable("clientId") Long clientId, @ModelAttribute("client") ClientDto clientDto) {
         try {
             clientService.updateClientInfo(clientId, clientDto);
@@ -65,7 +67,7 @@ public class ClientController {
         return new ModelAndView("redirect:/client/dashboard/{clientId}");
     }
 
-    @DeleteMapping(path = "/delete/{clientId}")
+    @DeleteMapping(path = "/{clientId}")
     public ModelAndView deleteClientById(@PathVariable(value = "clientId") Long clientId) {
         clientService.deleteById(clientId);
         return new ModelAndView("client/all");

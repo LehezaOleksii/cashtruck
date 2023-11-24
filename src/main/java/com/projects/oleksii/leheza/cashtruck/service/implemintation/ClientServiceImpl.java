@@ -179,8 +179,22 @@ public class ClientServiceImpl implements ClientService {
         setLastYearTransactions(clientId,endDate,clientStatisticDto);
         setLastMonthTransactions(clientId,endDate,clientStatisticDto);
         setLastWeekTransactions(clientId,endDate,clientStatisticDto);
+        setTotalIncomeSum(clientId,endDate,clientStatisticDto);
+        setTotalExpenseSum(clientId,endDate,clientStatisticDto);
         clientStatisticDto.setTotalBalance(getTotalBalance(client));
         return  clientStatisticDto;
+    }
+
+    private void setTotalIncomeSum(Long clientId,LocalDateTime endDate,ClientStatisticDto clientStatisticDto){
+        LocalDateTime tenYearsStartDate = endDate.minusYears(10);
+        List<Income> lastTenYearsIncome = incomeRepository.findIncomesForPeriod(clientId,tenYearsStartDate,endDate);
+        clientStatisticDto.setTotalIncomeSum(getAllIncomeSum(lastTenYearsIncome));
+    }
+
+    private void setTotalExpenseSum(Long clientId,LocalDateTime endDate,ClientStatisticDto clientStatisticDto){
+        LocalDateTime tenYearsStartDate = endDate.minusYears(10);
+        List<Expense> lastTenYearsExpense = expensesRepository.findExpensesForPeriod(clientId,tenYearsStartDate,endDate);
+        clientStatisticDto.setTotalExpenseSum(getAllExpenseSum(lastTenYearsExpense));
     }
 
     private BigDecimal getTotalBalance(Client client){
@@ -193,7 +207,7 @@ public class ClientServiceImpl implements ClientService {
         List<Expense> lastYearExpenses = expensesRepository.findExpensesForPeriod(clientId,oneYearStartDate,endDate);
         clientStatisticDto.setExpenses(lastYearExpenses);
         clientStatisticDto.setLastYearExpense(getAllExpenseSum(lastYearExpenses));
-        List<Income> lastYearIncomes = clientRepository.findIncomesForPeriod(clientId,oneYearStartDate,endDate);
+        List<Income> lastYearIncomes = incomeRepository.findIncomesForPeriod(clientId,oneYearStartDate,endDate);
         clientStatisticDto.setIncomes(lastYearIncomes);
         clientStatisticDto.setLastYearIncome(getAllIncomeSum(lastYearIncomes));
     }
@@ -202,7 +216,7 @@ public class ClientServiceImpl implements ClientService {
         LocalDateTime oneMonthStartDate = endDate.minusMonths(1);
         List<Expense> lastMonthExpenses = expensesRepository.findExpensesForPeriod(clientId,oneMonthStartDate,endDate);
         clientStatisticDto.setLastMonthExpense(getAllExpenseSum(lastMonthExpenses));
-        List<Income> lastMonthIncomes = clientRepository.findIncomesForPeriod(clientId,oneMonthStartDate,endDate);
+        List<Income> lastMonthIncomes = incomeRepository.findIncomesForPeriod(clientId,oneMonthStartDate,endDate);
         clientStatisticDto.setLastMonthIncome(getAllIncomeSum(lastMonthIncomes));
     }
 
@@ -210,7 +224,7 @@ public class ClientServiceImpl implements ClientService {
         LocalDateTime oneWeekStartDate = endDate.minusWeeks(1);
         List<Expense> lastWeekExpenses = expensesRepository.findExpensesForPeriod(clientId,oneWeekStartDate,endDate);
         clientStatisticDto.setLastWeekExpense(getAllExpenseSum(lastWeekExpenses));
-        List<Income> lastWeekIncomes = clientRepository.findIncomesForPeriod(clientId,oneWeekStartDate,endDate);
+        List<Income> lastWeekIncomes = incomeRepository.findIncomesForPeriod(clientId,oneWeekStartDate,endDate);
         clientStatisticDto.setLastWeekIncome(getAllIncomeSum(lastWeekIncomes));
     }
 

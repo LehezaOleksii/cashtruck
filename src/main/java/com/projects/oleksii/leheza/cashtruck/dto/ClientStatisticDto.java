@@ -21,6 +21,8 @@ public class ClientStatisticDto {
 
     private List<Expense> expenses;
     private List<Income> incomes;
+    private BigDecimal totalIncomeSum;
+    private BigDecimal totalExpenseSum;
     private BigDecimal totalBalance;
     private BigDecimal lastYearExpense;
     private BigDecimal lastMonthExpense;
