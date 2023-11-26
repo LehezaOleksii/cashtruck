@@ -365,7 +365,7 @@
 </div>
 
 <!-- zero statistic -->
-<div  class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) == 0 || client_statistic.totalBalance == null}">
+<div  class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) == 0 || client_statistic.totalBalance == 0}">
     <div class="ml-2"> 
        <span>0</span>%
     </div>
@@ -378,7 +378,7 @@
         <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
         </svg>
-        + <span  th:text="${(client_statistic.lastMonthIncome - client_statistic.lastMonthExpense)/totalBalance * 100}"></span>%
+        + <span  th:text="${(client_statistic.lastMonthIncome - client_statistic.lastMonthExpense)/client_statistic.totalBalance * 100}"></span>%
     </div>
 </div>
 
@@ -388,12 +388,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
         </svg>
-        - <span th:text="${(client_statistic.lastMonthIncome - client_statistic.lastMonthExpense)/client_statistic.totalBalance * 100}"></span>%
+        - <span th:text="${( client_statistic.lastMonthExpense - client_statistic.lastMonthIncome)/client_statistic.totalBalance * 100}"></span>%
     </div>
 </div>
 
 <!-- zero statistic -->
-<div class="last_month_info_card" style="display: none;"  th:if="${client_statistic != null || (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) == 0 || client_statistic.totalBalance == null}">
+<div class="last_month_info_card" style="display: none;"  th:if="${client_statistic != null && (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) == 0 || client_statistic.totalBalance == 0}">
     <div class="ml-2"> 
        <span>0</span>%
     </div>
@@ -416,12 +416,12 @@
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
         </svg>
-        - <span th:text="${(client_statistic.lastYearIncome - client_statistic.lastYearExpense)/client_statistic.totalBalance * 100}"></span>%
+        - <span th:text="${(client_statistic.lastYearExpense - client_statistic.lastYearIncome )/client_statistic.totalBalance * 100}"></span>%
     </div>
 </div>
 
 <!-- zero statistic -->
-<div class="last_year_info_card" style="display: none;"  th:if="${client_statistic != null || (client_statistic.lastYearIncome - client_statistic.lastYearExpense) == 0 || client_statistic.totalBalance == null}">
+<div class="last_year_info_card" style="display: none;"  th:if="${client_statistic != null && (client_statistic.lastYearIncome - client_statistic.lastYearExpense) == 0 || client_statistic.totalBalance == 0}">
     <div class="ml-2"> 
        <span>0</span>%
     </div>
@@ -506,23 +506,28 @@
             <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearIncome-client_statistic.lastYearExpense}" style="display: none;"></div>   
          
             <!-- last week -->
-<div class="last_week_info_card"  th:if="${client_statistic != null && ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekExpense < client_statistic.lastWeekIncome}">
+<div class="last_week_info_card"  th:if="${client_statistic != null && ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekExpense < client_statistic.lastWeekIncome && ((client_statistic.totalBalance - client_statistic.lastWeekExpense)!=0)}">
     <div class="custom-green ml-2">
         <!-- arrow up short -->
         <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
         </svg>
-        + <span th:text="${#numbers.abs((client_statistic.lastWeekExpense - client_statistic.lastWeekIncome) / (client_statistic.lastWeekIncome - client_statistic.lastWeekExpense))*100}"></span>%
+        + <span th:if="${(client_statistic.totalBalance - client_statistic.lastWeekIncome) > 0}"> 
+            <span th:text="${( client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) / (client_statistic.totalBalance - client_statistic.lastWeekIncome)*100 }"></span>
+         </span>
+          <span th:if="${( client_statistic.lastWeekIncome - client_statistic.totalBalance) > 0}"> 
+            <span th:text="${( client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) / (client_statistic.lastWeekIncome - client_statistic.totalBalance)*100}"></span>
+         </span>% 
     </div>
 </div>
 
-<div class="last_week_info_card" th:if="${client_statistic != null&& ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekExpense > client_statistic.lastWeekIncome}">
+<div class="last_week_info_card" th:if="${client_statistic != null&& ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekExpense > client_statistic.lastWeekIncome  && ((client_statistic.totalBalance + client_statistic.lastWeekExpense)!=0)}">
     <div class="custom-red ml-2">
         <!-- arrow down short -->
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
         </svg>
-        - <span th:text="${#numbers.abs(client_statistic.lastWeekExpense > client_statistic.lastWeekIncome ? (client_statistic.lastWeekExpense - client_statistic.lastWeekIncome) / (client_statistic.lastWeekIncome - client_statistic.lastWeekExpense))*100}"></span>%
+        - <span th:text="${(client_statistic.lastWeekExpense - client_statistic.lastWeekIncome) / (client_statistic.totalBalance+client_statistic.lastWeekExpense)*100}"></span>%
     </div>
 </div>
 
@@ -532,55 +537,59 @@
 </div>
 
 <!-- last month --> 
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastMonthExpense >= 0 && client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome >= 0)) && client_statistic.lastMonthExpense < client_statistic.lastMonthIncome}">
+<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastMonthExpense >= 0 && client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome >= 0)) && client_statistic.lastMonthIncome > client_statistic.lastMonthExpense && ((client_statistic.totalBalance - client_statistic.lastMonthExpense)!=0)}">
     <div class="custom-green ml-2">
-        <!-- arrow up short -->
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${#numbers.abs((client_statistic.lastMonthExpense - client_statistic.lastMonthIncome) / (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense))*100}"></span>%
-    </div>
+        <!-- arrow up short --> 
+        + <span th:if="${(client_statistic.totalBalance - client_statistic.lastMonthIncome) > 0}"> 
+            <span th:text="${( client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) / (client_statistic.totalBalance - client_statistic.lastMonthIncome)*100 }"></span>
+         </span>
+          <span th:if="${( client_statistic.lastMonthIncome - client_statistic.totalBalance) > 0}"> 
+            <span th:text="${( client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) / (client_statistic.lastMonthIncome - client_statistic.totalBalance)*100}"></span>
+         </span>% 
+        </div>
 </div>
 
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null&& ((client_statistic.lastMonthExpense >= 0 && client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome >= 0)) && client_statistic.lastWeekExpense > client_statistic.lastMonthIncome}">
+<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null&& ((client_statistic.lastMonthExpense >= 0 && client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome >= 0)) && client_statistic.lastMonthExpense > client_statistic.lastMonthIncome  && ((client_statistic.totalBalance + client_statistic.lastMonthExpense)!=0)}">
     <div class="custom-red ml-2">
         <!-- arrow down short -->
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
         </svg>
-        - <span th:text="${#numbers.abs(client_statistic.lastMonthExpense > client_statistic.lastMonthIncome ? (client_statistic.lastMonthExpense - client_statistic.lastMonthIncome) / (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense))*100}"></span>%
+        - <span th:text="${(client_statistic.lastMonthExpense - client_statistic.lastMonthIncome) / (client_statistic.totalBalance+client_statistic.lastMonthExpense)*100}"></span>%
     </div>
 </div>
 
 <!-- zero statistic -->
 <div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastMonthExpense == 0 && client_statistic.lastMonthIncome == 0)}">
-    <div class="ml-2"> 0 </div>
+    <div class="ml-2"> 0%</div>
 </div>
 
 <!-- last year -->
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastYearExpense >= 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense < client_statistic.lastYearIncome}">
+<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastYearExpense >= 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense < client_statistic.lastYearIncome && ((client_statistic.totalBalance - client_statistic.lastYearExpense)!=0)}">
     <div class="custom-green ml-2">
-        <!-- arrow up short -->
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${#numbers.abs((client_statistic.lastYearExpense - client_statistic.lastYearIncome) / (client_statistic.lastYearIncome - client_statistic.lastYearExpense))*100}"></span>%
-    </div>
+        <!-- arrow up short --> 
+        + <span th:if="${(client_statistic.totalBalance - client_statistic.lastYearIncome) > 0}"> 
+            <span th:text="${( client_statistic.lastYearIncome - client_statistic.lastYearExpense) / (client_statistic.totalBalance-client_statistic.lastYearIncome)*100 }"></span>
+         </span>
+          <span th:if="${( client_statistic.lastYearIncome - client_statistic.totalBalance) > 0}"> 
+            <span th:text="${( client_statistic.lastYearIncome - client_statistic.lastYearExpense) / (client_statistic.lastYearIncome - client_statistic.totalBalance)*100}"></span>
+         </span>% 
+        </div>
 </div>
 
-<div class="last_week_info_card" style="display: none;" th:if="${client_statistic != null&& ((client_statistic.lastYearExpense >= 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense > client_statistic.lastWeekIncome}">
+<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null&& ((client_statistic.lastYearExpense >= 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense > client_statistic.lastYearIncome && ((client_statistic.totalBalance + client_statistic.lastYearExpense)!=0)}">
     <div class="custom-red ml-2">
         <!-- arrow down short -->
         <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
         </svg>
-        - <span th:text="${#numbers.abs(client_statistic.lastYearExpense > client_statistic.lastYearIncome ? (client_statistic.lastYearExpense - client_statistic.lastYearkIncome) / (client_statistic.lastYearIncome - client_statistic.lastYearExpense))*100}"></span>%
+        - <span th:text="${(client_statistic.lastYearExpense - client_statistic.lastYearIncome) / (client_statistic.totalBalance+client_statistic.lastYearExpense)*100}"></span>%
     </div>
 </div>
 
 <!-- zero statistic -->
 <div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastYearExpense == 0 && client_statistic.lastYearIncome == 0)}">
-    <div class="ml-2"> 0 </div>
+    <div class="ml-2"> 0%</div>
 </div>
           </div>
           </div>
@@ -600,9 +609,9 @@
             
 <!-- last week -->
 <div class="last_week_info_card" th:if="${client_statistic != null && client_statistic.lastWeekExpense > 0 && client_statistic.totalExpenseSum!=0}">
-    <div class="custom-green ml-2">
+    <div class="custom-red ml-2">
         <!-- arrow up short -->
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+        <svg class="custom-red bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
         </svg>
         + <span th:text="${client_statistic.lastWeekExpense/client_statistic.totalExpenseSum*100}"></span>%
@@ -617,9 +626,9 @@
 
 <!-- last month -->
 <div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && client_statistic.lastMonthExpense > 0 && client_statistic.totalExpenseSum!=0}">
-    <div class="custom-green ml-2">
+    <div class="custom-red ml-2">
         <!-- arrow up short -->
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+        <svg class="custom-red bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
         </svg>
         + <span th:text="${client_statistic.lastMonthExpense/client_statistic.totalExpenseSum*100}"></span>%
@@ -634,9 +643,9 @@
 
 <!-- last year -->
 <div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && client_statistic.lastYearExpense > 0 && client_statistic.totalExpenseSum!=0}">
-    <div class="custom-green ml-2">
+    <div class="custom-red ml-2">
         <!-- arrow up short -->
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+        <svg class="custom-red bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
             <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
         </svg>
         + <span th:text="${client_statistic.lastYearExpense/client_statistic.totalExpenseSum*100}"></span>%
@@ -653,6 +662,7 @@
 
     </div>
   </div>
+</div>
 </div>
  
 <div class="container mt-4">
