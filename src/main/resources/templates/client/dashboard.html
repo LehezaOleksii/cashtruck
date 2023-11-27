@@ -506,7 +506,7 @@
             <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearIncome-client_statistic.lastYearExpense}" style="display: none;"></div>   
          
             <!-- last week -->
-<div class="last_week_info_card"  th:if="${client_statistic != null && ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekExpense < client_statistic.lastWeekIncome && ((client_statistic.totalBalance - client_statistic.lastWeekExpense)!=0)}">
+<div class="last_week_info_card"  th:if="${client_statistic != null && ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekIncome > client_statistic.lastWeekExpense && ((client_statistic.totalBalance - client_statistic.lastWeekIncome)!=0)}">
     <div class="custom-green ml-2">
         <!-- arrow up short -->
         <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
@@ -682,12 +682,7 @@
 </div>
 
       </div> 
-    </div>
-    
-    <div class="row mt-3">
-    <div class="col-sm-6">
-  <div class="my-container">
-    <div class="card-body">
+    </div> 
                   <script> 
                 var dur1 = document.getElementById('dur1');
                 var dur2 = document.getElementById('dur2');
@@ -720,65 +715,81 @@
                     });
                 }
             </script>
-      <!-- Check box -->
-<input type="radio" class="btn-check custom-back-white" name="options" id="option1" autocomplete="off" checked>
-<label class="btn" style="width: 40%;" for="option1">Income</label>
+ 
 
-<input type="radio" class="btn-check custom-back-white" name="options" id="option2" autocomplete="off">
-<label class="btn" style="width: 40%;"  for ="option2">Expenses</label> 
-
-      <div class="row">
-        <div class="col-2">
-          <img th:src="@{/images/client/wallet.png}" class="info-card-img">
-        </div>
-        <div class="col-5">
-          <div>
-            Total Balance
-            <div class="d-flex align-items-center">
-                   <div class="info-card-font  custom-font-size-cli-dash  bold">$14,857</div>
-            <!-- arrow up short -->
-            <div class="d-flex align-items-center bi bi-arrow-up-short">
-              <svg
-                class="custom-green"
-                xmlns="http://www.w3.org/2000/svg"
-                width="22"
-                height="22"
-                fill="currentColor" 
-                viewBox="0 0 16 16"
-              >
-                <path
-                  fill-rule="evenodd"
-                  d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"
-                />
-              </svg> 
-                <div class="custom-green  custom-font-size-cli-dash"> +28.14%</div>
-            </div> 
-          </div>
-        </div>
-      </div>
-      </div>
-      <button class="btn btn-primary custom-back-violet">Details</button>
-    </div>
-  </div>
-</div>
-
-      <div class="col-sm-6 mb-5">
+      <div class="col-sm-12 mb-5">
       <div class="my-container">
         <div class="card-body">
           <h5 class="card-title text-center">Transactions</h5>
+              <div class="disp d-flex justify-content-center">
+                  <input type="radio" class="btn-check custom-back-white" name="options" id="income_switch" autocomplete="off" checked>
+                  <label class="btn" style="width: 25%;" for="income_switch">Income</label>
+                  <input type="radio" class="btn-check custom-back-white" name="options" id="expenses_switch" autocomplete="off">
+                  <label class="btn" style="width: 25%;"  for="expenses_switch">Expenses</label> 
+                </div>
           
-              <div th:each="expense : ${client_statistic.expenses}">
-        <div class="info-card-font bold" th:text="${expense.transaction.sum}"></div>
-    </div> 
-
-          <button class="btn btn-primary custom-back-violet">Details</button>
-        </div>
+                <div class="income_transactions">
+                <div class="mb-2 "  style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
+                <div  th:each="income : ${client_statistic.incomes}">
+                    <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
+                    <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
+                    <span th:text="${income.transaction.name}"></span><br> 
+                    <span th:text="${income.transaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br> 
+                    <span th:text="${#temporals.format(income.transaction.time, 'dd.MM.yy')}"></span>
+                    </div> 
+                </div>
+                </div>
+                <div class="expense_transactions" style="display: none;">
+                <div class="mb-2"  style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
+                <div th:each="expense : ${client_statistic.expenses}">
+                    <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
+                    <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
+                    <span th:text="${expense.transaction.name}"></span><br> 
+                    <span th:text="${expense.transaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br> 
+                    <span th:text="${#temporals.format(expense.transaction.time, 'dd.MM.yy')}"></span>
+                    </div> 
+                </div> 
+                </div>
+            <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions" >
+           <div class="d-flex justify-content-center align-items-center ">
+            <button class="btn btn-primary custom-back-violet" style="width: 30%;">Details</button>
+           </div>
+           </div>
+           <div th:if="${client_statistic.expenses.size() > 0} "  class = "expense_transactions" style="display: none;">
+           <div class="d-flex justify-content-center align-items-center ">
+            <button class="btn btn-primary custom-back-violet" style="width: 30%;">Details</button>
+           </div>
+          </div>
+          </div>
       </div>
-    </div>
-  </div>
-</div>
-</div>
-    </div>
+      </div>
+      <script> 
+                var income = document.getElementById('income_switch');
+                var expense = document.getElementById('expenses_switch'); 
+                
+                income.addEventListener('change', function () {
+                    income_expense_switch('income_transactions');
+                });
+
+                expense.addEventListener('change', function () {
+                    income_expense_switch('expense_transactions');
+                }); 
+
+                // Function to toggle visibility
+                function income_expense_switch(selectedDiv) {
+                    // Hide all divs
+                    document.querySelectorAll('.income_transactions, .expense_transactions')
+                        .forEach(function (div) {
+                            div.style.display = 'none';
+                        });
+
+                    // Show the selected div 
+                    var divsWithClass = document.querySelectorAll('.' + selectedDiv);
+                    divsWithClass.forEach(function(div) {
+                      div.style.display = 'block';
+                    });
+                }
+            </script>
 </main>
      <script
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

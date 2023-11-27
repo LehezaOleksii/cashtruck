@@ -35,14 +35,14 @@ public class RandomUsersGenerator {
     private final Random random;
     private final Faker faker;
 
-    public void generateRandomUsers(int clientsNumber,int bankCardsNumber,int managersNumber,int adminNumber,int transactionNumber){
+    public void generateRandomUsers(int clientsNumber, int bankCardsNumber, int managersNumber, int adminNumber, int transactionNumber) {
 //    prepare for client generation
         generateBankCards(bankCardsNumber);
         generateRandomSavings(clientsNumber);
         generateRandomTransactions(transactionNumber);
         List<Transaction> allTransactions = transactionService.findAll();
-        List<Transaction> firstTransactions = allTransactions.subList(1,allTransactions.size()/2);
-        List<Transaction> lastTransactions = allTransactions.subList(allTransactions.size()/2,allTransactions.size());
+        List<Transaction> firstTransactions = allTransactions.subList(1, allTransactions.size() / 2);
+        List<Transaction> lastTransactions = allTransactions.subList(allTransactions.size() / 2, allTransactions.size());
         generateRandomIncomes(firstTransactions);
         generateRandomExpenses(lastTransactions);
 //
@@ -50,22 +50,23 @@ public class RandomUsersGenerator {
         generateRandomManagers(managersNumber);
         generateRandomAdmins(adminNumber);
     }
+
     private void generateRandomClients(int clientsNumber) {
         List<String> firstnames = Stream.generate(() -> faker.name().firstName()).distinct().limit(clientsNumber).toList();
         List<String> lastnames = Stream.generate(() -> faker.name().lastName()).distinct().limit(clientsNumber).toList();
         List<Saving> savings = savingService.findAll();
         List<Income> allIncomes = incomeService.findAll();
         List<Expense> allExpenses = expenseService.findAll();
-        int incomesPerClient = allIncomes.size()/clientsNumber;
-        int expensesPerClient = allExpenses.size()/clientsNumber;
+        int incomesPerClient = allIncomes.size() / clientsNumber;
+        int expensesPerClient = allExpenses.size() / clientsNumber;
         IntStream.range(1, clientsNumber).forEach(index -> {
-            List<Income> incomes = allIncomes.subList(index*(incomesPerClient)-incomesPerClient+1,index*incomesPerClient);
-            List<Expense> expenses = allExpenses.subList(index*(expensesPerClient)-expensesPerClient+1,index*expensesPerClient);
-            String firstname=firstnames.get(index - 1);
+            List<Income> incomes = allIncomes.subList(index * (incomesPerClient) - incomesPerClient + 1, index * incomesPerClient);
+            List<Expense> expenses = allExpenses.subList(index * (expensesPerClient) - expensesPerClient + 1, index * expensesPerClient);
+            String firstname = firstnames.get(index - 1);
             String lastname = lastnames.get(index - 1);
-            String fullName =  firstname+lastname;
+            String fullName = firstname + lastname;
             Saving saving = savings.get(index - 1);
-            saveBankCardHolderName(fullName,saving);
+            saveBankCardHolderName(fullName, saving);
             Client client = Client.builder()
                     .firstname(firstname)
                     .lastname(lastname)
@@ -77,7 +78,7 @@ public class RandomUsersGenerator {
                     .role(UserRole.Client)
                     .build();
             clientService.saveClient(client);
-            savingService.assignBankCardsToClient((long)index,saving.getBankCards().stream().toList());
+            savingService.assignBankCardsToClient((long) index, saving.getBankCards().stream().toList());
         });
     }
 
@@ -115,17 +116,18 @@ public class RandomUsersGenerator {
                 .toList();
         savingService.saveAll(savings);
     }
-    private Set<BankCard> getRandomCards(List<BankCard>bankCards,int minSize, int maxSize){
+
+    private Set<BankCard> getRandomCards(List<BankCard> bankCards, int minSize, int maxSize) {
         int clientBankCards = random.nextInt(maxSize - minSize + 1) + minSize;
-        int randomCardNumber = random.nextInt(bankCards.size()-maxSize);
-        return new HashSet<>(bankCards.subList(randomCardNumber, randomCardNumber+Math.min(clientBankCards, bankCards.size())));
+        int randomCardNumber = random.nextInt(bankCards.size() - maxSize);
+        return new HashSet<>(bankCards.subList(randomCardNumber, randomCardNumber + Math.min(clientBankCards, bankCards.size())));
     }
 
-    private void generateBankCards(Integer bankCardsNumber){
+    private void generateBankCards(Integer bankCardsNumber) {
         LocalDate startDate = LocalDate.of(2025, 1, 1);
         LocalDate endDate = LocalDate.of(2032, 1, 1);
-        IntStream.range(1, bankCardsNumber+1).mapToObj(index -> BankCard.builder()
-                .balance(new BigDecimal(random.nextDouble(5000)+5000))
+        IntStream.range(1, bankCardsNumber + 1).mapToObj(index -> BankCard.builder()
+                .balance(new BigDecimal(random.nextDouble(5000) + 5000))
                 .bankName(faker.company().name())
                 .cardNumber(faker.number().digits(16))
                 .expiringDate(faker.date().between(
@@ -142,17 +144,18 @@ public class RandomUsersGenerator {
         LocalDateTime now = LocalDateTime.now();
         List<Transaction> transactions = IntStream.range(1, transactionsNumber)
                 .mapToObj(index ->
-                      Transaction.builder()
-                            .sum(new BigDecimal(random.nextDouble() * 1000 + 50))
-                            .from(bankCardsFrom.get(random.nextInt(bankCardsFrom.size())))
-                            .to(bankCardsTo.get(random.nextInt(bankCardsTo.size())))
-                            .time(now.minus(random.nextInt(60), ChronoUnit.DAYS))
-                            .build()).toList();
+                        Transaction.builder()
+                                .sum(new BigDecimal(random.nextDouble() * 1000 + 50))
+                                .from(bankCardsFrom.get(random.nextInt(bankCardsFrom.size())))
+                                .to(bankCardsTo.get(random.nextInt(bankCardsTo.size())))
+                                .name(faker.commerce().productName())
+                                .time(now.minus(random.nextInt(60), ChronoUnit.DAYS))
+                                .build()).toList();
         transactionService.saveAll(transactions);
     }
 
 
-    private void generateRandomIncomes( List<Transaction> transactions ){
+    private void generateRandomIncomes(List<Transaction> transactions) {
         List<IncomeCategory> incomeCategories = incomeCategoryService.findAll();
         transactions.stream()
                 .skip(1)
@@ -164,7 +167,7 @@ public class RandomUsersGenerator {
                 .forEach(incomeService::save);
     }
 
-    private void generateRandomExpenses( List<Transaction> transactions ){
+    private void generateRandomExpenses(List<Transaction> transactions) {
         List<ExpensesCategory> expenseCategories = expensesCategoryService.findAll();
         transactions.stream()
                 .skip(1)
@@ -176,7 +179,7 @@ public class RandomUsersGenerator {
                 .forEach(expenseService::save);
     }
 
-    private LocalDateTime generateRandomLocalDateTime(){
+    private LocalDateTime generateRandomLocalDateTime() {
         LocalDateTime start = LocalDateTime.of(2020, 1, 1, 0, 0);
         LocalDateTime end = LocalDateTime.now();
         long randomSeconds = ThreadLocalRandom.current().nextLong(start.until(end, ChronoUnit.SECONDS));
