@@ -43,7 +43,6 @@ public class CashtruckApplication {
     }
 
     @Bean
-    @Scope("prototype")
     Faker dataFaker() {
         return new Faker();
     }

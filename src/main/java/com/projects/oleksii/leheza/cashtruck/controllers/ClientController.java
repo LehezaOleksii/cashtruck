@@ -1,13 +1,19 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
+import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Client;
+import com.projects.oleksii.leheza.cashtruck.dto.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.SavingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -15,6 +21,8 @@ import org.springframework.web.servlet.ModelAndView;
 public class ClientController {
 
     private final ClientService clientService;
+    private final BankCardService bankCardService;
+    private final SavingService savingService;
 
     @GetMapping(path = "/all")
     public ModelAndView showAllClients() {
@@ -71,5 +79,26 @@ public class ClientController {
     public ModelAndView deleteClientById(@PathVariable(value = "clientId") Long clientId) {
         clientService.deleteById(clientId);
         return new ModelAndView("client/all");
+    }
+    @GetMapping("/{bankCardId}")
+    public ModelAndView getClientBankCards(@PathVariable("bankCardId") Long bankCardId, @ModelAttribute("bank card")BankCardDto){
+        List<BankCard> bankCards = bankCardService.getBankCardsByClientId(clientId);
+        ModelAndView modelAndView = new ModelAndView("dasdas");
+        modelAndView.addObject("bank cards",bankCards);
+        return modelAndView;
+    }
+
+    @PutMapping("")
+    public ModelAndView saveBankCardToClient(@ModelAttribute("bankCard") BankCardDto bankCard){
+        savingService.assignBankCardDtoToClient(clientId,bankCard);
+//         redirect ?
+        return modelAndView;
+    }
+
+    @DeleteMapping("/{bankCardId}")
+    public ModelAndView deleteBankCardForClient(){
+        bankCardService.g
+//         redirect ?
+        return modelAndView;
     }
 }

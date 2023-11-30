@@ -11,29 +11,29 @@ import java.util.List;
 
 public interface AdminService {
 
-    public void saveAdmin(AdminDto adminDto);
+    void saveAdmin(AdminDto adminDto);
 
-    public void saveAdmin(Admin admin);
+    void saveAdmin(Admin admin);
 
     List<Manager> findAllManagers();
 
-    public List<Admin> findAllAdmins();
+    List<Admin> findAllAdmins();
 
-    public Admin findAdminByEmail(String email);
+    Admin findAdminByEmail(String email);
 
-    public void updateAdminInfo(Long id, AdminDto adminDto);
+    void updateAdminInfo(Long id, AdminDto adminDto);
 
     Manager findManagerByEmail(String email) throws IllegalStateException;
 
-    public void createManager(ManagerDto managerDto);
+    void createManager(ManagerDto managerDto);
 
-    public void updateManagerInfo(Long id,ManagerDto managerDto);
+    void updateManagerInfo(Long id,ManagerDto managerDto);
 
-    public void deleteManagerById(Long id);
+    void deleteManagerById(Long id);
 
-    public void deleteClientById(Long id);
+    void deleteClientById(Long id);
 
-    public void changeClientInfoById(Long clientId, ClientDto clientDto);
+    void changeClientInfoById(Long clientId, ClientDto clientDto);
 
-    public void changeManagerInfoById(Long managerId, ManagerDto managerDto);
+    void changeManagerInfoById(Long managerId, ManagerDto managerDto);
 }

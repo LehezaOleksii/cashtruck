@@ -11,17 +11,17 @@ import java.util.List;
 
 public interface ManagerService {
 
-    public void saveManager(ManagerDto managerDto);
+    void saveManager(ManagerDto managerDto);
 
-    public void saveManager(Manager manager);
+    void saveManager(Manager manager);
 
-    public List<Manager> findAllManagers();
+    List<Manager> findAllManagers();
 
-    public Manager findManagerByEmail(String email);
+    Manager findManagerByEmail(String email);
 
-    public Manager findManagerById(Long managerId);
+    Manager findManagerById(Long managerId);
 
-    public void updateManagerInfo(Long managerId, ManagerDto managerDto);
+    void updateManagerInfo(Long managerId, ManagerDto managerDto);
 
-    public void deleteManagerById(Long id);
+    void deleteManagerById(Long id);
 }

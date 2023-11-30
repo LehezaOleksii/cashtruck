@@ -6,9 +6,9 @@ import java.util.List;
 
 public interface BankCardService {
 
-    public void save(BankCard bankCard);
+    void save(BankCard bankCard);
 
-    public List<BankCard> getBankCardsByClientId(Long clientId);
+    List<BankCard> getBankCardsByClientId(Long clientId);
 
-    public List<BankCard> findAll();
+    List<BankCard> findAll();
 }
