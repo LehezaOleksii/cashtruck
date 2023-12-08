@@ -1,21 +1,24 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head> 
+<html lang="en" xmlns:th="https://www.thymeleaf.org">
+  <head>
+    <meta charset="utf-8" />
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1, shrink-to-fit=no"
     />
     <link
-      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
       integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
       crossorigin="anonymous"
     /> 
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-        <link th:href="@{/css/client/client_dashboard_syles.css}" rel="stylesheet" /> 
-    <title>Add card</title> 
-  </head>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet">
+ 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link th:href="@{/css/client/client_dashboard_syles.css}" rel="stylesheet" /> 
+    <script type="text/javascript" th:src="@{/js/client/script.js}"></script> 
+    <title>Update card info</title>
+  </head> 
   <body>
   <!-- Left Sidebar Menu -->
     <div class="container-fluid">
@@ -137,114 +140,177 @@
         <li><a class="dropdown-item" href="#">Sign out</a></li>
     </ul>
 </div>
-  </header> 
-  
-<script th:inline="javascript">
-    function validateForm() {
-        var selectedBankName = document.getElementById('hiddenBankName').value;
-        if (!selectedBankName || selectedBankName.trim() === '') {
-            alert('Please select a bank name');
-            return false;
-        }
-        return true;
-    }
-</script>
- 
+  </header>  
+
      <!-- Credit card form -->
       <section class="info-card-container d-flex justify-content-center align-items-center"> 
           <div class="col-md-10 mb-4">
-            <div class="card mb-4">
+            <div class="card mb-4  my-container">
               <div class="card-header py-3">
                 <h5 class="mb-0">Card details</h5>
               </div>
               <div class="card-body">
-<form method="post"  th:object="${bank_card}"  th:action="@{'/clients/' + ${client.id} + '/bank_cards'}" onsubmit="return validateForm();">
+<form th:object="${bank_cards}">
                   
  <!-- choose bank -->
-<div class="dropdown mb-3">
-    <button id="bankNameButton" th:field="*{bankName}" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select a bank
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="bankDropdown">
-        <li><div class="dropdown-item" onclick="changeBankName('Monobank')">Monobank</div></li>
-        <li><div class="dropdown-item" onclick="changeBankName('Privat bank')">Privat bank</div></li>
-        <li><div class="dropdown-item" onclick="changeBankName('Alfa bank')">Alfa bank</div></li>
-    </ul>
-</div>
-<input type="hidden" th:field="*{bankName}" id="hiddenBankName" />
-<script>
-    function changeBankName(bankName) { 
-        $('#bankNameButton').text(bankName); 
-        $('#bankNameButton').val(bankName);
+              <div class="card-body" th:if="${not #lists.isEmpty(bank_cards)}" th:with="card=${bank_cards[0]}">
+           <div class="row">
+    <!-- Bank cards dropdown on the left -->
+    <div class="col-5">
+        <h5>Bank cards</h5>
+        <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle custom-back-violet bold col-12"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                    id="selectedBankButton"
+                    th:text="${'Bank card'}">
+            </button>
+
+<ul class="dropdown-menu">
+    <li th:each="card : ${bank_cards}">
+        <button class="dropdown-item"
+                type="button"
+                onclick="selectBank(this)" 
+                th:text="${card.bankName}"
+                th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
+                th:attr="card-number=${card.cardNumber}">
+        </button>
+    </li>
+</ul>
+
+<!-- Hidden input field to store the selected bank card ID -->
+<input type="hidden" id="hiddenId" th:value="${bank_cards[0].id}" />
+
+<!-- Button with Thymeleaf link using the selected bank card ID -->
+<a th:href="@{'/clients/' + ${clientId} + '/bank_cards/' + ${id} + '/remove'}" class="btn custom-back-red col-12 mt-2">
+    Remove Bank Card
+</a>
+
+<script th:inline="javascript">
+    function selectBank(button) {
+        // Get the selected bank card ID from the button's data attribute
+        var selectedId = button.getAttribute('data-id');
+
+        // Update the hidden input field with the selected bank card ID
+        document.getElementById('hiddenId').value = selectedId;
     }
 </script>
-<script>
-    function changeBankName(bankName) { 
-        $('#bankNameButton').text(bankName); 
-        $('#hiddenBankName').val(bankName);
-    }
-</script>
-
-   
-                  <div class="row mb-4">
-                    <div class="col">
-                      <div class="form-outline">
-                        <input id="nameOnCard"  type="text"  placeholder="Name on card" class="form-control"   th:field="*{nameOnCard}" required/> 
-                        <label class="form-label" for="nameOnCard">Name on card</label>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="form-outline">
-                    <input id="cardNumber" type="text" class="form-control"  placeholder="Credit card number" pattern="\d{16}"  th:field="*{cardNumber}"  required>
-                        <label class="form-label" for="formCardNumber">Credit card number</label> 
-                      </div>
-                    </div>
-                  </div>
-
-                  
-                  <div class="row mb-4">
-                    <div class="col-6">
-    <div class="form-outline">
-        <!-- Hidden input field to store expiringDate in ISO format -->
-        <input type="hidden" th:field="*{expiringDate}" id="hiddenExpiringDate"/>
-
-        <!-- Visible input field for user input in MM/YYYY format -->
-        <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY" pattern="(0[1-9]|1[0-2])\/\d{4}" required>
-        <label class="form-label" for="formExpiringDate">Expiration date</label>
+        </div>
+        
+       <div class="additional-info mt-4">       
+              <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div> 
+              <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
+              <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
+              <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
+                        
+              <a th:href="@{'/clients/' + ${clientId} + '/bank_cards/save'}" class="btn btn-primary custom-back-violet col-12 mt-2">
+                Change bank card information
+              </a> 
+                  <a th:href="@{'/clients/' + ${clientId} + '/bank_cards/' + ${hiddenId} + '/remove'}" class="btn custom-back-red col-12 mt-2">
+        Delete current bank card
+              </a>   
+            </div>
     </div>
-</div>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var expiringDateInput = document.getElementById('expiringDate');
-        var hiddenExpiringDateInput = document.getElementById('hiddenExpiringDate');
+    <!-- Bank card details on the right -->
+    <div class="col-md-7">
+         <div class="bank-card card-container mt-4">
+                        <div class="bank-name-and-currency-name">
+                        <div class="bank-name bankName" th:text="${card != null ? #strings.length(card.bankName) > 22 ? #strings.substring(card.bankName, 0, 22) : card.bankName : '-'}"></div>
+                            <div class="currency-name">USD</div>
+                        </div>
+                        <div class="card-number cardNumber"></div>
+                        <div class="card-holder-and-expiry">
+                        <div class="card-holder nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></div>
+                        <div class="expiry expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></div>
+                        </div>
+                    </div> 
 
-        expiringDateInput.addEventListener('input', function () {
-            // Parse the input value and set it in ISO format in the hidden input field
-            var parts = expiringDateInput.value.split('/');
-            var isoDate = parts[1] + '-' + parts[0] + '-01'; // Assuming day is always 01
-            hiddenExpiringDateInput.value = isoDate;
-        });
-    });
-</script>
-
-                    
-                    <div class="col-6">
-                      <div class="form-outline">
-                        <input id="cvv" type="text" class="form-control"  placeholder="cvv" pattern="\d{3}" th:field="*{cvv}" required>
-                        <label class="form-label" for="formCVV">CVV</label>
-                      </div>
-                    </div>
-                  </div>
-
-                <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit">  Add Bank Card </button>
+                </div>
+            </div>  
+            
+        <div class="card-body" th:if="${#lists.isEmpty(bank_cards)}"> 
+        </div>
+    </div>  
 </form>
               </div>
             </div>
           </div> 
         </div>
-      </section>  
-      <script
+      </section> 
+      <script th:inline="javascript"> 
+       function formatCardNumber(cardNumber) {
+        // Add a space after every 4 digits
+        return cardNumber.replace(/(\d{4})/g, '$1 ').trim();
+    }
+
+    function updateCardNumber() {
+        var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
+        var cards = /*[[${bank_cards}]]*/ [];
+
+        // Assuming you want to format the first card in the list
+        if (cards.length > 0) {
+            var formattedCardNumber = formatCardNumber(cards[0].cardNumber);
+
+            for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
+                elementsWithCardNumberClass[i].innerText = formattedCardNumber;
+            }
+        }
+    }
+
+    window.onload = function () {
+        // Call the updateCardNumber function when the page is loaded
+        updateCardNumber();
+    };
+ function selectBank(button) {
+    var selectedBankName = button.innerText;
+    var cards = /*[[${bank_cards}]]*/ [];
+
+    // Find the selected bank card from the list using a unique identifier (card ID)
+    var selectedCard = cards.find(function (card) {
+        return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
+    });
+
+        // Update card details
+        var elementsWithBalanceClass = document.getElementsByClassName('balance');
+        for (var i = 0; i < elementsWithBalanceClass.length; i++) {
+            elementsWithBalanceClass[i].innerText = selectedCard.balance;
+        }
+
+        var elementsWithCvvClass = document.getElementsByClassName('cvv');
+        for (var i = 0; i < elementsWithCvvClass.length; i++) {
+            elementsWithCvvClass[i].innerText = selectedCard.cvv;
+        }
+
+        var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
+        for (var i = 0; i < elementsWithExpiringDateClass.length; i++) {
+            // Format the date as "year month day"
+            var formattedDate = new Date(selectedCard.expiringDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit'
+            });
+            elementsWithExpiringDateClass[i].innerText = formattedDate;
+        }
+
+          var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
+        for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
+            var formattedCardNumber = formatCardNumber(selectedCard.cardNumber);
+            elementsWithCardNumberClass[i].innerText = formattedCardNumber;
+        }
+        var elementsWithBankNameClass = document.getElementsByClassName('bankName');
+        for (var i = 0; i < elementsWithBankNameClass.length; i++) {
+            // Display only the first 22 characters of the bank name
+            elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
+        }
+
+        var elementsWithNameOnCardClass = document.getElementsByClassName('nameOnCard');
+        for (var i = 0; i < elementsWithNameOnCardClass.length; i++) {
+            elementsWithNameOnCardClass[i].innerText = selectedCard.nameOnCard;
+        }
+    }
+</script> 
+     <script
         src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
         integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
         crossorigin="anonymous"
@@ -253,12 +319,7 @@
         src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"
         integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
         crossorigin="anonymous"
-      ></script>
-      <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js"
-        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
-        crossorigin="anonymous"
-      ></script>
+      ></script> 
     </div>
   </body>
 </html>

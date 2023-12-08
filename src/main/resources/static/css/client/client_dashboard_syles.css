@@ -122,11 +122,19 @@ body {
   background-color: #696CFF;
   border-color: #696CFF;
 }
- 
-.custom-back-violet:hover {
+
+ .custom-back-violet:hover {
   background-color: #696CFF;
   border-color: #696CFF;
 }
+ 
+.custom-back-red:hover {
+  background-color: #FF3E1D;
+  border-color: #FF3E1D;
+  color: white;
+} 
+
+
 
 
 /* --- Custom colors --- */
@@ -138,9 +146,10 @@ body {
     color: #71DD37;
 }
 
-.custom-back-violet {
-    background-color: #696CFF;
-}
+.custom-back-red {
+    background-color: #FF3E1D;
+     color: #fff;
+} 
 
 .custom-back-white {
     background-color: white;
@@ -177,7 +186,7 @@ height: 50px;
   .custom-violet-bg {
     background-color: #696CFF;
     color: #fff;  
-  }
+  } 
 
   /* Style the unchecked radio buttons and labels */
   input[type="radio"].btn-check:not(:checked).custom-back-white + label {

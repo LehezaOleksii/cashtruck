@@ -197,11 +197,16 @@ public class ClientServiceImpl implements ClientService {
         clientStatisticDto.setTotalExpenseSum(getAllExpenseSum(lastTenYearsExpense));
     }
 
-    private BigDecimal getTotalBalance(Client client){
+    private BigDecimal getTotalBalance(Client client) {
+        if (client == null || client.getSaving() == null || client.getSaving().getBankCards() == null) {
+            return BigDecimal.ZERO;
+        }
         return client.getSaving().getBankCards().stream()
                 .map(BankCard::getBalance)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
+
     private void setLastYearTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto){
         LocalDateTime oneYearStartDate = endDate.minusYears(1);
         List<Expense> lastYearExpenses = expensesRepository.findExpensesForPeriod(clientId,oneYearStartDate,endDate);

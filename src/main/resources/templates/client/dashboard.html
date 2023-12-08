@@ -57,7 +57,7 @@
               </li>
 
                    <li class="nav-item">
-      <a class="nav-link" href="#">
+      <a class="nav-link" th:href="@{/clients/{clientId}(clientId = ${client.id})}">
                     <!-- add card   -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-credit-card-2-back" viewBox="0 0 16 16">
   <path d="M11 5.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1-.5-.5v-1z"/>
@@ -68,13 +68,13 @@
               </li>
 
               <li class="nav-item">
-      <a class="nav-link" href="#">
+      <a class="nav-link" th:href="@{'/clients/' + ${client.id} + '/bank_cards/update'}">
                     <!-- change card   -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
   <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
   <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
 </svg>
-                  Change card
+                  Change card  
                 </a>
               </li>
 
@@ -182,20 +182,28 @@
                                 id="selectedBankButton"
                                 th:text="${'Bank card'}">
                         </button>
-                        <ul class="dropdown-menu">
-                            <li th:each="card : ${bank_cards}">
-                                <button class="dropdown-item" type="button"
-                                        onclick="selectBank(this)"
-                                        th:text="${card.bankName}"
-                                        th:classappend="${card == bank_cards[0] ? 'selected' : ''}">
-                                </button>
-                            </li>
-                        </ul>
+                       <ul class="dropdown-menu">
+    <li th:each="card : ${bank_cards}">
+        <button class="dropdown-item"
+                type="button"
+                onclick="selectBank(this)"
+                th:text="${card.bankName}"
+                th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
+                th:attr="card-number=${card.cardNumber}">
+        </button>
+    </li>
+</ul>
                     </div>   
-<button class="btn btn-primary custom-back-violet col-4">Add Card</button>
-</div> 
-                <div class="col-sm-7">
+                  <div class="col-4">
+                    <a style="width:100%;" th:href="@{'/clients/' + ${client.id} + '/bank_cards/save'}">
+                      <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card</button>
+                    </a>
+                  </div>
+
+                    </div> 
+                    
               <!-- bank card -->
+                <div class="col-sm-7">
                     <div class="bank-card card-container mt-4">
                         <div class="bank-name-and-currency-name">
                         <div class="bank-name bankName" th:text="${card != null ? #strings.length(card.bankName) > 22 ? #strings.substring(card.bankName, 0, 22) : card.bankName : '-'}"></div>
@@ -212,10 +220,9 @@
                 <!-- card data -->
                 <div class="col-sm-5">
                     <div class="additional-info mt-4">        
-                      
               <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div> 
               <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
-              <div> Holder: <span th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
+              <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
                     </div>
                 </div>
@@ -242,7 +249,11 @@
                 
                 <div class="col-sm-5">
                     <div> 
-                            <button class="btn btn-primary custom-back-violet col-12 mt-2">Add Card</button> 
+                        <a th:href="@{'/clients/' + ${client.id} + '/bank_cards/save'}">
+                            <button class="btn btn-primary custom-back-violet col-12 mt-2" >
+                                Add Card
+                            </button> 
+                        </a>
                     </div>
                     <div class="additional-info mt-5">
                        <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div>
@@ -280,14 +291,14 @@
         // Call the updateCardNumber function when the page is loaded
         updateCardNumber();
     };
-    function selectBank(button) {
-        var selectedBankName = button.innerText;
-        var cards = /*[[${bank_cards}]]*/ [];
+ function selectBank(button) {
+    var selectedBankName = button.innerText;
+    var cards = /*[[${bank_cards}]]*/ [];
 
-        // Find the selected bank card from the list
-        var selectedCard = cards.find(function (card) {
-            return card.bankName === selectedBankName;
-        });
+    // Find the selected bank card from the list using a unique identifier (card ID)
+    var selectedCard = cards.find(function (card) {
+        return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
+    });
 
         // Update card details
         var elementsWithBalanceClass = document.getElementsByClassName('balance');

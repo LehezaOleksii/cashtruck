@@ -20,15 +20,10 @@ public class CashtruckApplication {
     }
 
     @Bean
-    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator,
-                             ClientRepository clientRepository,
-                             ManagerRepository managerRepository,
-                             AdminRepository adminRepository,
-                             IncomeCategoryRepository incomeCategoryRepository,
-                             ExpensesCategoryRepository expensesCategoryRepository) {
+    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator) {
         return args -> {
-            mainEntitiesGenerator.generateMainEntities(expensesCategoryRepository, incomeCategoryRepository);
-            randomUsersGenerator.generateRandomUsers(50,150,10,1,1000);
+            mainEntitiesGenerator.generateMainEntities();
+            randomUsersGenerator.generateRandomUsers(10,30,5,1,200);
         };
     }
 

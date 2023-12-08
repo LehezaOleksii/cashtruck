@@ -133,11 +133,12 @@ body {
 .custom-red {
     color: red;
 } 
-
+.custom-back-red {
+    background-color: #FF3E1D;
+}
 .custom-green {
     color: #71DD37;
-}
-
+} 
 .custom-back-violet {
     background-color: #696CFF;
 }

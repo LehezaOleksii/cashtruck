@@ -12,5 +12,5 @@ import java.util.Set;
 public interface SavingRepository extends JpaRepository<Saving, Long> {
 
     @Query("SELECT s.bankCards FROM Saving s WHERE s.id = :clientId")
-    public Set<BankCard> findBankCardsByClientId(Long clientId);
+    Set<BankCard> findBankCardsByClientId(Long clientId);
 }

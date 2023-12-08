@@ -1,0 +1,31 @@
+package com.projects.oleksii.leheza.cashtruck.dto;
+
+import jakarta.persistence.Column;
+import jakarta.validation.constraints.Pattern;
+import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import java.math.BigDecimal;
+import java.util.Date;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder(toBuilder = true)
+public class BankCardDto {
+
+    @Column(length = 100)
+    private String bankName;
+    @Column(length = 16)
+    @Pattern(regexp = "^[0-9]+$", message = "Only numbers are allowed")
+    private String cardNumber;
+    @Column(length = 50)
+    @Pattern(regexp = "^[A-Za-z]+$", message = "Only letters are allowed")
+    private String nameOnCard;
+    @Column(length = 3)
+    @Pattern(regexp = "^[0-9]+$", message = "Only numbers are allowed")
+    private String cvv;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date expiringDate;
+}

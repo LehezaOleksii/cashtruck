@@ -24,7 +24,7 @@ public interface ClientService {
 
 	  void updateClient(Long clientId, Client client);
 
-	Client getClient(Long clientId);
+	 Client getClient(Long clientId);
 
 	//For UI
 	  ClientStatisticDto getClientStatisticByClientId(Long clientId) ;
@@ -36,5 +36,5 @@ public interface ClientService {
 
 	void addExpense(Long clientId, Expense expense);
 
-	  List<BankCard> getBankCardsByClientId(Long clientId);
+	List<BankCard> getBankCardsByClientId(Long clientId);
 }
