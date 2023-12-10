@@ -13,7 +13,11 @@ public interface BankCardService {
 
     BankCard getBankCardByBankNumber(String bankNumber);
 
+    BankCard getById(Long id);
+
     List<BankCard> findAll();
+
+    boolean isClientHasCard(Long clientId,BankCardDto bankCardDto);
 
     void removeBankCardForClient(Long bankCardId, Long clientId);
 }

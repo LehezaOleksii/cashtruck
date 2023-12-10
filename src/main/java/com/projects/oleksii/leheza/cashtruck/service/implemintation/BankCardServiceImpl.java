@@ -8,9 +8,11 @@ import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -21,6 +23,7 @@ public class BankCardServiceImpl implements BankCardService {
 
     private final BankCardRepository bankCardRepository;
     private final ClientRepository clientRepository;
+    private final ClientService clientService;
 
 
     @Override
@@ -30,16 +33,17 @@ public class BankCardServiceImpl implements BankCardService {
 
     @Override
     public void save(BankCardDto bankCardDto) {
-        if (bankCardRepository.findCardByNumber(bankCardDto.getCardNumber()).isPresent()) {
-            return;
-        }
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())
                 .cardNumber(bankCardDto.getCardNumber())
                 .nameOnCard(bankCardDto.getNameOnCard())
+                .balance(BigDecimal.valueOf(bankCardDto.getBalance()))
                 .expiringDate(bankCardDto.getExpiringDate())
                 .build();
+        if (bankCardDto.getId() != null) {
+            bankCard.setId(bankCardDto.getId());
+        }
         bankCardRepository.save(bankCard);
     }
 
@@ -51,8 +55,20 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
+    public BankCard getById(Long id) {
+        return bankCardRepository.findById(id).get();
+    }
+
+    @Override
     public List<BankCard> findAll() {
         return bankCardRepository.findAll();
+    }
+
+    @Override
+    public boolean isClientHasCard(Long clientId, BankCardDto bankCardDto) {
+        return clientService.getBankCardsByClientId(clientId)
+                .stream()
+                .anyMatch(card -> card.getCardNumber().equals(bankCardDto.getCardNumber()));
     }
 
     @Override

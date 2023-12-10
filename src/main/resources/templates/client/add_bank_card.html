@@ -158,56 +158,17 @@
                 <h5 class="mb-0">Card details</h5>
               </div>
               <div class="card-body">
-<form method="post"  th:object="${bank_card}"  th:action="@{'/clients/' + ${client.id} + '/bank_cards'}" onsubmit="return validateForm();">
-                  
- <!-- choose bank -->
-<div class="dropdown mb-3">
-    <button id="bankNameButton" th:field="*{bankName}" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select a bank
-    </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="bankDropdown">
-        <li><div class="dropdown-item" onclick="changeBankName('Monobank')">Monobank</div></li>
-        <li><div class="dropdown-item" onclick="changeBankName('Privat bank')">Privat bank</div></li>
-        <li><div class="dropdown-item" onclick="changeBankName('Alfa bank')">Alfa bank</div></li>
-    </ul>
-</div>
-<input type="hidden" th:field="*{bankName}" id="hiddenBankName" />
-<script>
-    function changeBankName(bankName) { 
-        $('#bankNameButton').text(bankName); 
-        $('#bankNameButton').val(bankName);
-        $('#hiddenBankName').val(bankName);
-    }
-</script> 
-   
-                  <div class="row mb-4">
-                    <div class="col">
-                      <div class="form-outline">
-                        <input id="nameOnCard"  type="text"  placeholder="Name on card" class="form-control"   th:field="*{nameOnCard}" required/> 
-                        <label class="form-label" for="nameOnCard">Name on card</label>
-                      </div>
-                    </div>
-                    <div class="col">
-                      <div class="form-outline">
-                    <input id="cardNumber" type="text" class="form-control"  placeholder="Credit card number" pattern="\d{16}"  th:field="*{cardNumber}"  required>
-                        <label class="form-label" for="formCardNumber">Credit card number</label> 
-                      </div>
-                    </div>
-                  </div>
-
-                  
-                  <div class="row mb-4">
-                    <div class="col-6">
-    <div class="form-outline">
-        <!-- Hidden input field to store expiringDate in ISO format -->
-        <input type="hidden" th:field="*{expiringDate}" id="hiddenExpiringDate"/>
-
-        <!-- Visible input field for user input in MM/YYYY format -->
-        <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY" pattern="(0[1-9]|1[0-2])\/\d{4}" required>
-        <label class="form-label" for="formExpiringDate">Expiration date</label>
-    </div>
-</div>
-
+<form method="post" th:object="${bank_card}" th:action="@{'/clients/' + ${client.id} + '/bank_cards'}" onsubmit="return validateForm();">
+ <!-- choose bank --> 
+<div class="dropdown mb-3">  
+    <select id="bankNameButton" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:field="*{bankName}" text="Select a bank">
+    <option class="dropdown-item custom-back-white" style="color:black" value="Monobank">Monobank</option>
+    <option class="dropdown-item custom-back-white" style="color:black" value="Privat bank">Privat bank</option>
+    <option class="dropdown-item custom-back-white" style="color:black" value="Alfa bank">Alfa bank</option>
+</select> 
+</div> 
+<input type="hidden" th:field="*{id}" style="display: none;"/>
+<input type="hidden" th:field="*{balance}" style="display: none;"/>  
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var expiringDateInput = document.getElementById('expiringDate');
@@ -222,17 +183,44 @@
     });
 </script>
 
-                    
-                    <div class="col-6">
-                      <div class="form-outline">
-                        <input id="cvv" type="text" class="form-control"  placeholder="cvv" pattern="\d{3}" th:field="*{cvv}" required>
-                        <label class="form-label" for="formCVV">CVV</label>
-                      </div>
-                    </div>
-                  </div>
+    <!-- Input for bankName --> 
+    <div class="row mb-4">
+        <div class="col">
+            <div class="form-outline">
+                <input id="nameOnCard" type="text" placeholder="Name on card" class="form-control" th:field="*{nameOnCard}" required/>
+                <label class="form-label" for="nameOnCard">Name on card</label>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-outline">
+                <input id="cardNumber" type="text" class="form-control" placeholder="Credit card number" pattern="\d{16}" th:field="*{cardNumber}" required>
+                <label class="form-label" for="formCardNumber">Credit card number</label>
+            </div>
+        </div>
+    </div>
 
-                <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit">  Add Bank Card </button>
+    <div class="row mb-4">
+        <div class="col-6">
+            <div class="form-outline">
+                <input type="hidden" th:field="*{expiringDate}" id="hiddenExpiringDate"/>
+                <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY" pattern="(0[1-9]|1[0-2])\/\d{4}" required th:value="${#dates.format(bank_card.expiringDate, 'MM/yyyy')}">
+                <label class="form-label" for="formExpiringDate">Expiration date</label>
+            </div>
+        </div>
+
+        <!-- Your existing script for handling expiringDate -->
+
+        <div class="col-6">
+            <div class="form-outline">
+                <input id="cvv" type="text" class="form-control" placeholder="cvv" pattern="\d{3}" th:field="*{cvv}" required>
+                <label class="form-label" for="formCVV">CVV</label>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit">Save bank card</button>
 </form>
+
               </div>
             </div>
           </div> 

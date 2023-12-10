@@ -1,5 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
+import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.dto.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
@@ -8,9 +9,14 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.SavingService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.swing.text.html.Option;
+import java.util.List;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,8 +49,6 @@ public class ClientController {
         if(client==null) {
             return new ModelAndView("login");
         }
-        System.out.println("test : " + client.getSaving().getBankCards().size());
-        System.out.println("test all: "+ bankCardService.findAll().size());
         ModelAndView modelAndView = new ModelAndView("client/dashboard");
         modelAndView.addObject("bank_cards",clientService.getBankCardsByClientId(clientId));
         modelAndView.addObject("client", client);
@@ -63,18 +67,32 @@ public class ClientController {
         return new ModelAndView("redirect:/clients/{clientId}");
     }
 
-    @GetMapping("/{clientId}/bank_cards/save")
-    public ModelAndView clientBankCardsForm(@PathVariable Long clientId){
+    @GetMapping({"/{clientId}/bank_cards/save","/{clientId}/bank_cards/{bankCardId}/save"})
+    public ModelAndView clientBankCardsForm(@PathVariable Long clientId, @PathVariable(required = false) Long bankCardId){
         ModelAndView modelAndView = new ModelAndView("client/add_bank_card");
         modelAndView.addObject("client", clientService.getClient(clientId));//TODO use DTO
-        modelAndView.addObject("bank_card", new BankCardDto());
+        if(Optional.ofNullable(bankCardId).isPresent()){
+            BankCard bankCard = bankCardService.getById(bankCardId);
+            modelAndView.addObject("bank_card", BankCardDto.builder().bankName(bankCard.getBankName())
+                    .nameOnCard(bankCard.getNameOnCard())
+                    .id(bankCardId)
+                    .expiringDate(bankCard.getExpiringDate())
+                    .cardNumber(bankCard.getCardNumber())
+                    .balance(Double.parseDouble(bankCard.getBalance().toString()))
+                    .cvv(bankCard.getCvv()).build());
+        }
+        else {
+            modelAndView.addObject("bank_card", new BankCardDto());
+        }
         return modelAndView;
     }
 
     @PostMapping("/{clientId}/bank_cards")
     public ModelAndView saveBankCardToClient(@PathVariable Long clientId, @Valid @ModelAttribute("bank_card") BankCardDto bankCardDto) {
         bankCardService.save(bankCardDto);
-        savingService.assignBankCardToClient(clientId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
+        if (!bankCardService.isClientHasCard(clientId,bankCardDto)) {
+            savingService.assignBankCardToClient(clientId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
+        }
         return new ModelAndView("redirect:/clients/" + clientId);
     }
 
@@ -99,4 +117,4 @@ public class ClientController {
         bankCardService.removeBankCardForClient(bankCardId,clientId);
         return new ModelAndView("redirect:/clients/" + clientId);
     }
-}
+    }
