@@ -94,7 +94,7 @@ public class ClientController {
         return new ModelAndView("redirect:/clients/" + clientId);
     }
 
-    @PostMapping("/{clientId}/bank_cards/{bankCardId}/remove")
+    @GetMapping("/{clientId}/bank_cards/{bankCardId}/remove")
     public ModelAndView removeBankCard(@PathVariable Long clientId, @PathVariable Long bankCardId){
         bankCardService.removeBankCardForClient(bankCardId,clientId);
         return new ModelAndView("redirect:/clients/" + clientId);

@@ -166,39 +166,40 @@
                     id="selectedBankButton"
                     th:text="${'Bank card'}">
             </button>
-
+<!-- <div class="dropdown mb-3">
+    <button id="bankNameButton" th:field="*{bankName}" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Select a bank
+    </button>
+    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" id="bankDropdown">
+        <li><div class="dropdown-item" onclick="changeBankName('Monobank')">Monobank</div></li>
+        <li><div class="dropdown-item" onclick="changeBankName('Privat bank')">Privat bank</div></li>
+        <li><div class="dropdown-item" onclick="changeBankName('Alfa bank')">Alfa bank</div></li>
+    </ul>
+</div>
+<input type="hidden" th:field="*{bankName}" id="hiddenBankName" />
+<script>
+    function changeBankName(bankName) { 
+        $('#bankNameButton').text(bankName); 
+        $('#bankNameButton').val(bankName);
+        $('#hiddenBankName').val(bankName);
+    }
+</script>  -->
 <ul class="dropdown-menu">
+
     <li th:each="card : ${bank_cards}">
         <button class="dropdown-item"
                 type="button"
                 onclick="selectBank(this)" 
                 th:text="${card.bankName}"
                 th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
-                th:attr="card-number=${card.cardNumber}">
+                th:attr="card-number=${card.cardNumber}, card-id=${card.id}">
         </button>
     </li>
-</ul>
-
-<!-- Hidden input field to store the selected bank card ID -->
-<input type="hidden" id="hiddenId" th:value="${bank_cards[0].id}" />
-
-<!-- Button with Thymeleaf link using the selected bank card ID -->
-<a th:href="@{'/clients/' + ${clientId} + '/bank_cards/' + ${id} + '/remove'}" class="btn custom-back-red col-12 mt-2">
-    Remove Bank Card
-</a>
-
-<script th:inline="javascript">
-    function selectBank(button) {
-        // Get the selected bank card ID from the button's data attribute
-        var selectedId = button.getAttribute('data-id');
-
-        // Update the hidden input field with the selected bank card ID
-        document.getElementById('hiddenId').value = selectedId;
-    }
-</script>
+</ul>  
         </div>
         
        <div class="additional-info mt-4">       
+        <div type="hidden" class="cardId" id = "cardId" th:text="${card != null ? card.id : '-'}"></div>  
               <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div> 
               <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
@@ -207,7 +208,7 @@
               <a th:href="@{'/clients/' + ${clientId} + '/bank_cards/save'}" class="btn btn-primary custom-back-violet col-12 mt-2">
                 Change bank card information
               </a> 
-                  <a th:href="@{'/clients/' + ${clientId} + '/bank_cards/' + ${hiddenId} + '/remove'}" class="btn custom-back-red col-12 mt-2">
+                  <a th:href="@{'/clients/' + ${clientId} + '/bank_cards/' + ${id} + '/remove'}" class="btn custom-back-red col-12 mt-2">
         Delete current bank card
               </a>   
             </div>
@@ -259,8 +260,7 @@
         }
     }
 
-    window.onload = function () {
-        // Call the updateCardNumber function when the page is loaded
+    window.onload = function () { 
         updateCardNumber();
     };
  function selectBank(button) {
@@ -281,6 +281,11 @@
         var elementsWithCvvClass = document.getElementsByClassName('cvv');
         for (var i = 0; i < elementsWithCvvClass.length; i++) {
             elementsWithCvvClass[i].innerText = selectedCard.cvv;
+        }
+
+         var elementsWithIdClass = document.getElementsByClassName('card-id');
+        for (var i = 0; i < elementsWithIdClass.length; i++) {
+            elementsWithIdClass[i].innerText = selectedCard.id;
         }
 
         var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
@@ -308,6 +313,15 @@
         for (var i = 0; i < elementsWithNameOnCardClass.length; i++) {
             elementsWithNameOnCardClass[i].innerText = selectedCard.nameOnCard;
         }
+
+         var elementsWithCardIdClass = document.getElementsByClassName('cardId');
+        for (var i = 0; i < elementsWithCardIdClass.length; i++) {
+            elementsWithCardIdClass[i].innerText = selectedCard.id;
+        } 
+
+        $('cardId').text(button.getAttribute('card-id')); 
+        $('cardId').val(button.getAttribute('card-id'));
+        $('cardId').val(button.getAttribute('card-id')); 
     }
 </script> 
      <script

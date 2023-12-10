@@ -62,6 +62,7 @@ public class BankCardServiceImpl implements BankCardService {
                     Saving saving = client.getSaving();
                     saving.getBankCards()
                             .removeIf(bc -> Objects.equals(bc.getId(), bankCardId));
+                    clientRepository.save(client);
                 });
     }
 }
