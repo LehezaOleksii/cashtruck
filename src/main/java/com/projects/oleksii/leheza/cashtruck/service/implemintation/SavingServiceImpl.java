@@ -3,7 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
-import com.projects.oleksii.leheza.cashtruck.dto.BankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
@@ -60,7 +59,7 @@ public class SavingServiceImpl implements SavingService {
     }
 
     @Override
-    public void assignBankCardDtoToClient(Long clientId, BankCardDto bankCardDto) {
+    public void assignBankCardDtoToClient(Long clientId, CreateBankCardDto bankCardDto) {
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())

@@ -1,11 +1,14 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.ExpensesCategory;
+import com.projects.oleksii.leheza.cashtruck.dto.view.IncomeExpenseCategoryDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.IncomeExpensesDto;
 import com.projects.oleksii.leheza.cashtruck.repository.ExpensesCategoryRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ExpensesCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -44,6 +47,7 @@ public class ExpensesCategoryServiceImpl implements ExpensesCategoryService {
     public List<ExpensesCategory> findAll() {
         return expensesCategoryRepository.findAll();
     }
+
 
     private boolean existByCategoryName(String categoryName) {
         return expensesCategoryRepository.findByCategoryName(categoryName).isPresent();

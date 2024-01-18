@@ -51,7 +51,6 @@ public class MainEntitiesGenerator {
         IncomeCategory InvestmentsInvestments = new IncomeCategory("Investments");
         IncomeCategory incomeCategoryDonations = new IncomeCategory("Gifts & Donations");
         IncomeCategory incomeCategoryBusiness = new IncomeCategory("Business");
-        IncomeCategory incomeCategoryTaxes = new IncomeCategory("Taxes");
         IncomeCategory incomeCategoryReceiveMoney  = new IncomeCategory("Recive money");
         IncomeCategory incomeCategoryGetCash  = new IncomeCategory("Get cash");
         incomeCategoryRepository.save(incomeCategorySalary);
@@ -60,7 +59,6 @@ public class MainEntitiesGenerator {
         incomeCategoryRepository.save(InvestmentsInvestments);
         incomeCategoryRepository.save(incomeCategoryDonations);
         incomeCategoryRepository.save(incomeCategoryBusiness);
-        incomeCategoryRepository.save(incomeCategoryTaxes);
         incomeCategoryRepository.save(incomeCategoryReceiveMoney);
         incomeCategoryRepository.save(incomeCategoryGetCash);
     }

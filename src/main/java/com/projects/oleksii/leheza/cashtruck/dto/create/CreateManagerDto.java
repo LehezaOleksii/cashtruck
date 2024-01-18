@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.dto;
+package com.projects.oleksii.leheza.cashtruck.dto.create;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class ClientDto {
+public class CreateManagerDto {
 
     @Size(max=50)
     private String firstname;

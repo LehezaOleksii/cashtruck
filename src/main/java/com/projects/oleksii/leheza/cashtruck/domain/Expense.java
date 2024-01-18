@@ -1,7 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 @Data

@@ -1,11 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
-import com.projects.oleksii.leheza.cashtruck.dto.AdminDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateAdminDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.AdminService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -20,22 +19,22 @@ public class AdminController {
     private final ManagerService managerService;
 
     @PostMapping(path = "/create/admin")
-    ModelAndView createAdmin(@RequestBody AdminDto adminDto) {
+    ModelAndView createAdmin(@RequestBody CreateAdminDto createAdminDto) {
         ModelAndView modelAndView;
-        if (adminService.findAdminByEmail(adminDto.getEmail()) != null) {
+        if (adminService.findAdminByEmail(createAdminDto.getEmail()) != null) {
             modelAndView = new ModelAndView("redirect:/admin/create/admin");
-            modelAndView.addObject("admin", adminDto);
+            modelAndView.addObject("admin", createAdminDto);
             return modelAndView;
         }
-        adminService.saveAdmin(adminDto);
+        adminService.saveAdmin(createAdminDto);
         modelAndView = new ModelAndView("admin/dashboard");
         return modelAndView;
     }
 
     @PutMapping(path = "/change/admin/{adminId}")
-    ModelAndView changeAdminInfo(@PathVariable("adminId") Long adminId, @RequestBody AdminDto adminDto) {
+    ModelAndView changeAdminInfo(@PathVariable("adminId") Long adminId, @RequestBody CreateAdminDto createAdminDto) {
         try {
-            adminService.updateAdminInfo(adminId, adminDto);
+            adminService.updateAdminInfo(adminId, createAdminDto);
             System.out.println("UPDATE admin");
         } catch (Exception e) {
             return new ModelAndView("admin/dashboard/{adminId}");

@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.dto;
+package com.projects.oleksii.leheza.cashtruck.dto.view;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Expense;
 import com.projects.oleksii.leheza.cashtruck.domain.Income;
@@ -11,10 +11,10 @@ import lombok.*;
 import java.math.BigDecimal;
 import java.util.List;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 @Builder(toBuilder = true)
 //For UI
 public class ClientStatisticDto {

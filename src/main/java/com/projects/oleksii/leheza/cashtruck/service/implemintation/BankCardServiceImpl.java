@@ -1,12 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
-import com.projects.oleksii.leheza.cashtruck.dto.BankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import lombok.RequiredArgsConstructor;
@@ -15,7 +13,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -32,7 +29,7 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public void save(BankCardDto bankCardDto) {
+    public void save(CreateBankCardDto bankCardDto) {
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())
@@ -65,7 +62,7 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public boolean isClientHasCard(Long clientId, BankCardDto bankCardDto) {
+    public boolean isClientHasCard(Long clientId, CreateBankCardDto bankCardDto) {
         return clientService.getBankCardsByClientId(clientId)
                 .stream()
                 .anyMatch(card -> card.getCardNumber().equals(bankCardDto.getCardNumber()));

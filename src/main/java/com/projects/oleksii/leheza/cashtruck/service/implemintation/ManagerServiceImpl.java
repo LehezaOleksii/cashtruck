@@ -1,7 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
-import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
 import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
@@ -19,16 +19,16 @@ public class ManagerServiceImpl implements ManagerService {
     private final ManagerRepository managerRepository;
 
     @Override
-    public void saveManager(ManagerDto managerDto) {
-        if (existByEmail(managerDto.getEmail())) {
+    public void saveManager(CreateManagerDto createManagerDto) {
+        if (existByEmail(createManagerDto.getEmail())) {
             throw new IllegalStateException("Email taken");
         }
         Manager manager = new Manager();
         manager.toBuilder()
-                .firstname(managerDto.getFirstname())
-                .lastname(managerDto.getLastname())
-                .email(managerDto.getEmail())
-                .password(managerDto.getPassword())
+                .firstname(createManagerDto.getFirstname())
+                .lastname(createManagerDto.getLastname())
+                .email(createManagerDto.getEmail())
+                .password(createManagerDto.getPassword())
                 .role(UserRole.Manager).build();
         managerRepository.save(manager);
     }
@@ -65,16 +65,16 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public void updateManagerInfo(Long managerId, ManagerDto managerDto) throws IllegalStateException {
+    public void updateManagerInfo(Long managerId, CreateManagerDto createManagerDto) throws IllegalStateException {
         Manager currentManager = managerRepository.findById(managerId)
                 .orElseThrow(() -> new IllegalStateException("Manager with id " + managerId + " not found"));
-        String updatedEmail = managerDto.getEmail();
+        String updatedEmail = createManagerDto.getEmail();
         String currentEmail = currentManager.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        currentManager.toBuilder().firstname(managerDto.getFirstname())
-                .lastname(managerDto.getLastname()).build();
+        currentManager.toBuilder().firstname(createManagerDto.getFirstname())
+                .lastname(createManagerDto.getLastname()).build();
         managerRepository.save(currentManager);
     }
 

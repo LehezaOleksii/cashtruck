@@ -1,40 +1,39 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
-import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
-import com.projects.oleksii.leheza.cashtruck.domain.Expense;
-import com.projects.oleksii.leheza.cashtruck.domain.Income;
-import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
-import com.projects.oleksii.leheza.cashtruck.dto.ClientStatisticDto;
+import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 
 import java.util.List;
 
 public interface ClientService {
 
-	  void saveClient(ClientDto clientDto);
+    void saveClient(CreateClientDto createClientDto);
 
-	  void saveClient(Client client);
-	  List<Client> findAll();
+    void saveClient(Client client);
 
-	  Client findByEmail(String email);
+    List<Client> findAll();
 
-	  void deleteById(Long clientId);
+    Client findByEmail(String email);
 
-	  void updateClientInfo(Long clientId, ClientDto clientDto);
+    void deleteById(Long clientId);
 
-	  void updateClient(Long clientId, Client client);
+    void updateClientInfo(Long clientId, CreateClientDto createClientDto);
 
-	 Client getClient(Long clientId);
+    void updateClient(Long clientId, Client client);
 
-	//For UI
-	  ClientStatisticDto getClientStatisticByClientId(Long clientId) ;
+    ClientDto getClient(Long clientId);
 
-	//TODO use only one method (update) use tranisction
+    //For UI
+    ClientStatisticDto getClientStatisticByClientId(Long clientId);
 
-	void addIncome(Long clientId, Income income);
-	//TODO use only one method (update) use tranisction
+    //TODO use only one method (update) use tranisction
 
-	void addExpense(Long clientId, Expense expense);
+    void addIncome(Long clientId, Income income);
+    //TODO use only one method (update) use tranisction
 
-	List<BankCard> getBankCardsByClientId(Long clientId);
+    void addExpense(Long clientId, Expense expense);
+
+    List<BankCard> getBankCardsByClientId(Long clientId);
 }

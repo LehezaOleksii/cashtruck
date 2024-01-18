@@ -1,17 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
-import com.projects.oleksii.leheza.cashtruck.dto.ClientDto;
-import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
-import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
-import org.springframework.stereotype.Service;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
 
 import java.util.List;
 
 public interface ManagerService {
 
-    void saveManager(ManagerDto managerDto);
+    void saveManager(CreateManagerDto createManagerDto);
 
     void saveManager(Manager manager);
 
@@ -21,7 +17,7 @@ public interface ManagerService {
 
     Manager findManagerById(Long managerId);
 
-    void updateManagerInfo(Long managerId, ManagerDto managerDto);
+    void updateManagerInfo(Long managerId, CreateManagerDto createManagerDto);
 
     void deleteManagerById(Long id);
 }

@@ -14,4 +14,5 @@ public interface IncomeCategoryService {
     void deleteCategory(Long incomeCategoryId);
 
     List<IncomeCategory> findAll();
+
 }

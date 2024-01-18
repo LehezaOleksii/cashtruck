@@ -1,10 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
-import com.projects.oleksii.leheza.cashtruck.dto.ManagerDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
@@ -19,23 +18,23 @@ public class ManagerController {
     private final ClientService clientService;
 
     @PostMapping(path = "/create")
-    ModelAndView createManager(@RequestBody ManagerDto managerDto) {
+    ModelAndView createManager(@RequestBody CreateManagerDto createManagerDto) {
         ModelAndView modelAndView;
-        if (managerService.findManagerByEmail(managerDto.getEmail()) != null) {
+        if (managerService.findManagerByEmail(createManagerDto.getEmail()) != null) {
             modelAndView = new ModelAndView("redirect:/manager/create");
-            modelAndView.addObject("manager", managerDto);
+            modelAndView.addObject("manager", createManagerDto);
             //TODO error email is already taken
             return modelAndView;
         }
-        managerService.saveManager(managerDto);
+        managerService.saveManager(createManagerDto);
         modelAndView = new ModelAndView("manager/dashboard/{managerId}");
         return modelAndView;
     }
 
     @PutMapping(path = "/update/{managerId}")
-    ModelAndView updateManagerInfo(@PathVariable("managerId") Long managerId, @ModelAttribute("manager") ManagerDto managerDto) {
+    ModelAndView updateManagerInfo(@PathVariable("managerId") Long managerId, @ModelAttribute("manager") CreateManagerDto createManagerDto) {
         ModelAndView modelAndView = new ModelAndView();
-        managerService.updateManagerInfo(managerId, managerDto);
+        managerService.updateManagerInfo(managerId, createManagerDto);
         return modelAndView;
     }
 

@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.dto;
+package com.projects.oleksii.leheza.cashtruck.dto.create;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
@@ -6,7 +6,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -14,7 +13,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class BankCardDto {
+public class CreateBankCardDto {
 
     @Min(0)
     Long id;
