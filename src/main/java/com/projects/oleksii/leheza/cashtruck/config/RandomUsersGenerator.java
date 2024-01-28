@@ -27,10 +27,8 @@ public class RandomUsersGenerator {
     private final SavingService savingService;
     private final BankCardService bankCardService;
     private final TransactionService transactionService;
-    private final IncomeCategoryService incomeCategoryService;
-    private final IncomeService incomeService;
-    private final ExpensesCategoryService expensesCategoryService;
-    private final ExpenseService expenseService;
+    private final BankTransactionService bankTransactionService;
+    private final CategoryService categoryService;
 
     private final Random random;
     private final Faker faker;
@@ -39,12 +37,12 @@ public class RandomUsersGenerator {
 //    prepare for client generation
         generateBankCards(bankCardsNumber);
         generateRandomSavings(clientsNumber);
-        generateRandomTransactions(transactionNumber);
-        List<Transaction> allTransactions = transactionService.findAll();
-        List<Transaction> firstTransactions = allTransactions.subList(1, allTransactions.size() / 2);
-        List<Transaction> lastTransactions = allTransactions.subList(allTransactions.size() / 2, allTransactions.size());
-        generateRandomIncomes(firstTransactions);
-        generateRandomExpenses(lastTransactions);
+        generateRandomBankTransactions(transactionNumber);
+        List<BankTransaction> allBankTransactions = bankTransactionService.findAll();
+        List<BankTransaction> firstBankTransactions = allBankTransactions.subList(1, allBankTransactions.size() / 2);
+        List<BankTransaction> lastBankTransactions = allBankTransactions.subList(allBankTransactions.size() / 2, allBankTransactions.size());
+        generateRandomTransactionIncomes(firstBankTransactions);
+        generateRandomTransactionExpenses(lastBankTransactions);
 //
         generateRandomClients(clientsNumber);
         generateRandomManagers(managersNumber);
@@ -55,13 +53,16 @@ public class RandomUsersGenerator {
         List<String> firstnames = Stream.generate(() -> faker.name().firstName()).distinct().limit(clientsNumber).toList();
         List<String> lastnames = Stream.generate(() -> faker.name().lastName()).distinct().limit(clientsNumber).toList();
         List<Saving> savings = savingService.findAll();
-        List<Income> allIncomes = incomeService.findAll();
-        List<Expense> allExpenses = expenseService.findAll();
+        List<Transaction> allIncomes = transactionService.findAllIncomeTransactions();
+        List<Transaction> allExpenses = transactionService.findAllExpenseTransactions();
         int incomesPerClient = allIncomes.size() / clientsNumber;
         int expensesPerClient = allExpenses.size() / clientsNumber;
         IntStream.range(1, clientsNumber).forEach(index -> {
-            List<Income> incomes = allIncomes.subList(index * (incomesPerClient) - incomesPerClient + 1, index * incomesPerClient);
-            List<Expense> expenses = allExpenses.subList(index * (expensesPerClient) - expensesPerClient + 1, index * expensesPerClient);
+            List<Transaction> incomes = allIncomes.subList(index * (incomesPerClient) - incomesPerClient + 1, index * incomesPerClient);
+            List<Transaction> expenses = allExpenses.subList(index * (expensesPerClient) - expensesPerClient + 1, index * expensesPerClient);
+            List<Transaction> allTransactions = new ArrayList<>();
+            allTransactions.addAll(incomes);
+            allTransactions.addAll(expenses);
             String firstname = firstnames.get(index - 1);
             String lastname = lastnames.get(index - 1);
             String fullName = firstname + lastname;
@@ -73,8 +74,7 @@ public class RandomUsersGenerator {
                     .email(faker.internet().emailAddress())
                     .password(faker.lorem().sentence(2))
                     .saving(saving)
-                    .incomes(incomes)
-                    .expenses(expenses)
+                    .transactions(allTransactions)
                     .role(UserRole.Client)
                     .build();
             clientService.saveClient(client);
@@ -137,46 +137,46 @@ public class RandomUsersGenerator {
                 .build()).forEach(bankCardService::save);
     }
 
-    private void generateRandomTransactions(int transactionsNumber) {
+    private void generateRandomBankTransactions(int transactionsNumber) {
         List<BankCard> allBankCards = bankCardService.findAll();
         List<BankCard> bankCardsFrom = allBankCards.subList(0, allBankCards.size() / 2);
         List<BankCard> bankCardsTo = allBankCards.subList(allBankCards.size() / 2, allBankCards.size());
         LocalDateTime now = LocalDateTime.now();
-        List<Transaction> transactions = IntStream.range(1, transactionsNumber)
+        List<BankTransaction> bankTransactions = IntStream.range(1, transactionsNumber)
                 .mapToObj(index ->
-                        Transaction.builder()
+                        BankTransaction.builder()
                                 .sum(new BigDecimal(random.nextDouble() * 1000 + 50))
                                 .from(bankCardsFrom.get(random.nextInt(bankCardsFrom.size())))
                                 .to(bankCardsTo.get(random.nextInt(bankCardsTo.size())))
                                 .name(faker.commerce().productName())
                                 .time(now.minus(random.nextInt(60), ChronoUnit.DAYS))
                                 .build()).toList();
-        transactionService.saveAll(transactions);
+        bankTransactionService.saveAll(bankTransactions);
     }
 
 
-    private void generateRandomIncomes(List<Transaction> transactions) {
-        List<IncomeCategory> incomeCategories = incomeCategoryService.findAll();
-        transactions.stream()
+    private void generateRandomTransactionIncomes(List<BankTransaction> bankTransactions) {
+        List<Category> incomeCategories = categoryService.findAllIncomeCategories();
+        bankTransactions.stream()
                 .skip(1)
-                .map(transaction -> Income.builder()
-                        .incomeCategory(incomeCategories.get(random.nextInt(incomeCategories.size())))
-                        .transaction(transaction)
+                .map(transaction -> Transaction.builder()
+                        .category(incomeCategories.get(random.nextInt(incomeCategories.size())))
+                        .bankTransaction(transaction)
                         .build()
                 )
-                .forEach(incomeService::save);
+                .forEach(transactionService::save);
     }
 
-    private void generateRandomExpenses(List<Transaction> transactions) {
-        List<ExpensesCategory> expenseCategories = expensesCategoryService.findAll();
-        transactions.stream()
+    private void generateRandomTransactionExpenses(List<BankTransaction> bankTransactions) {
+        List<Category> expenseCategories = categoryService.findAllExpensesCategories();
+        bankTransactions.stream()
                 .skip(1)
-                .map(transaction -> Expense.builder()
-                        .expenseCategory(expenseCategories.get(random.nextInt(expenseCategories.size())))
-                        .transaction(transaction)
+                .map(transaction -> Transaction.builder()
+                        .category(expenseCategories.get(random.nextInt(expenseCategories.size())))
+                        .bankTransaction(transaction)
                         .build()
                 )
-                .forEach(expenseService::save);
+                .forEach(transactionService::save);
     }
 
     private LocalDateTime generateRandomLocalDateTime() {

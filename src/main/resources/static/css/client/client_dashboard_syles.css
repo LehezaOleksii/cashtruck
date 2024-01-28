@@ -161,9 +161,14 @@ body {
     width: 75%; 
 }
 
-.info-card-container{ 
-   display: flex;
-   justify-content: center;  
+.justify-content-end{
+  display: flex;
+  justify-content: flex-end;  
+}
+
+.justify-content-center{
+  display: flex;
+  justify-content: center;  
 }
  
 .info-card-font{

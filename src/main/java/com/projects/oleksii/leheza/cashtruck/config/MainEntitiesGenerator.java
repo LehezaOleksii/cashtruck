@@ -1,9 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
-import com.projects.oleksii.leheza.cashtruck.domain.ExpensesCategory;
-import com.projects.oleksii.leheza.cashtruck.domain.IncomeCategory;
-import com.projects.oleksii.leheza.cashtruck.repository.ExpensesCategoryRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.IncomeCategoryRepository;
+import com.projects.oleksii.leheza.cashtruck.domain.Category;
+import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,8 +10,11 @@ import org.springframework.context.annotation.Configuration;
 @RequiredArgsConstructor
 public class MainEntitiesGenerator {
 
-    private final ExpensesCategoryRepository expensesCategoryRepository;
-    private final IncomeCategoryRepository incomeCategoryRepository;
+    private final CategoryRepository categoryRepository;
+
+    private final TransactionType transactionTypeExpense = TransactionType.EXPENSE;
+    private final TransactionType transactionTypeIncome = TransactionType.INCOME;
+
 
     public void generateMainEntities() {
         generateExpensesCategories();
@@ -20,46 +22,46 @@ public class MainEntitiesGenerator {
     }
 
     private void generateExpensesCategories() {
-        ExpensesCategory expensesCategorySport = new ExpensesCategory("Sport & Health");
-        ExpensesCategory expensesCategoryRent = new ExpensesCategory("Rent & Mortgage");
-        ExpensesCategory expensesCategoryUtilities = new ExpensesCategory("Utilities");
-        ExpensesCategory expensesCategoryFood = new ExpensesCategory("Food");
-        ExpensesCategory expensesCategoryDiningOut = new ExpensesCategory("Dining out");
-        ExpensesCategory expensesCategoryEntertainment = new ExpensesCategory("Entertainment");
-        ExpensesCategory expensesCategoryTransportation = new ExpensesCategory("Transportation & Car");
-        ExpensesCategory expensesCategoryPersonalCare = new ExpensesCategory("Personal care");
-        ExpensesCategory expensesCategoryDevices = new ExpensesCategory("Devices");
-        ExpensesCategory expensesCategorySendMoney = new ExpensesCategory("Send money");
-        ExpensesCategory expensesCategorySpendCash = new ExpensesCategory("Spend cash");
-        expensesCategoryRepository.save(expensesCategorySport);
-        expensesCategoryRepository.save(expensesCategoryRent);
-        expensesCategoryRepository.save(expensesCategoryUtilities);
-        expensesCategoryRepository.save(expensesCategoryFood);
-        expensesCategoryRepository.save(expensesCategoryDiningOut);
-        expensesCategoryRepository.save(expensesCategoryEntertainment);
-        expensesCategoryRepository.save(expensesCategoryTransportation);
-        expensesCategoryRepository.save(expensesCategoryPersonalCare);
-        expensesCategoryRepository.save(expensesCategoryDevices);
-        expensesCategoryRepository.save(expensesCategorySendMoney);
-        expensesCategoryRepository.save(expensesCategorySpendCash);
+        Category expensesCategorySport = new Category(transactionTypeExpense, "Sport & Health");
+        Category expensesCategoryRent = new Category(transactionTypeExpense, "Rent & Mortgage");
+        Category expensesCategoryUtilities = new Category(transactionTypeExpense, "Utilities");
+        Category expensesCategoryFood = new Category(transactionTypeExpense, "Food");
+        Category expensesCategoryDiningOut = new Category(transactionTypeExpense, "Dining out");
+        Category expensesCategoryEntertainment = new Category(transactionTypeExpense, "Entertainment");
+        Category expensesCategoryTransportation = new Category(transactionTypeExpense, "Transportation & Car");
+        Category expensesCategoryPersonalCare = new Category(transactionTypeExpense, "Personal care");
+        Category expensesCategoryDevices = new Category(transactionTypeExpense, "Devices");
+        Category expensesCategorySendMoney = new Category(transactionTypeExpense, "Send money");
+        Category expensesCategorySpendCash = new Category(transactionTypeExpense, "Spend cash");
+        categoryRepository.save(expensesCategorySport);
+        categoryRepository.save(expensesCategoryRent);
+        categoryRepository.save(expensesCategoryUtilities);
+        categoryRepository.save(expensesCategoryFood);
+        categoryRepository.save(expensesCategoryDiningOut);
+        categoryRepository.save(expensesCategoryEntertainment);
+        categoryRepository.save(expensesCategoryTransportation);
+        categoryRepository.save(expensesCategoryPersonalCare);
+        categoryRepository.save(expensesCategoryDevices);
+        categoryRepository.save(expensesCategorySendMoney);
+        categoryRepository.save(expensesCategorySpendCash);
     }
 
     private void generateIncomeCategories() {
-        IncomeCategory incomeCategorySalary = new IncomeCategory("Job Salary");
-        IncomeCategory incomeCategoryFreelance = new IncomeCategory("Freelance Income");
-        IncomeCategory incomeCategoryRental = new IncomeCategory("Rental Income");
-        IncomeCategory InvestmentsInvestments = new IncomeCategory("Investments");
-        IncomeCategory incomeCategoryDonations = new IncomeCategory("Gifts & Donations");
-        IncomeCategory incomeCategoryBusiness = new IncomeCategory("Business");
-        IncomeCategory incomeCategoryReceiveMoney  = new IncomeCategory("Recive money");
-        IncomeCategory incomeCategoryGetCash  = new IncomeCategory("Get cash");
-        incomeCategoryRepository.save(incomeCategorySalary);
-        incomeCategoryRepository.save(incomeCategoryFreelance);
-        incomeCategoryRepository.save(incomeCategoryRental);
-        incomeCategoryRepository.save(InvestmentsInvestments);
-        incomeCategoryRepository.save(incomeCategoryDonations);
-        incomeCategoryRepository.save(incomeCategoryBusiness);
-        incomeCategoryRepository.save(incomeCategoryReceiveMoney);
-        incomeCategoryRepository.save(incomeCategoryGetCash);
+        Category incomeCategorySalary = new Category(transactionTypeIncome, "Job Salary");
+        Category incomeCategoryFreelance = new Category(transactionTypeIncome, "Freelance Income");
+        Category incomeCategoryRental = new Category(transactionTypeIncome, "Rental Income");
+        Category InvestmentsInvestments = new Category(transactionTypeIncome, "Investments");
+        Category incomeCategoryDonations = new Category(transactionTypeIncome, "Gifts & Donations");
+        Category incomeCategoryBusiness = new Category(transactionTypeIncome, "Business");
+        Category incomeCategoryReceiveMoney = new Category(transactionTypeIncome, "Recive money");
+        Category incomeCategoryGetCash = new Category(transactionTypeIncome, "Get cash");
+        categoryRepository.save(incomeCategorySalary);
+        categoryRepository.save(incomeCategoryFreelance);
+        categoryRepository.save(incomeCategoryRental);
+        categoryRepository.save(InvestmentsInvestments);
+        categoryRepository.save(incomeCategoryDonations);
+        categoryRepository.save(incomeCategoryBusiness);
+        categoryRepository.save(incomeCategoryReceiveMoney);
+        categoryRepository.save(incomeCategoryGetCash);
     }
 }

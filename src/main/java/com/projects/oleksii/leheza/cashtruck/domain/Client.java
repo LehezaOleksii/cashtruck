@@ -4,12 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.List;
 
@@ -25,7 +20,7 @@ public final class Client {
 
     @Id
     @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence") //strategy Auto
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence") // TODO strategy Auto
     private Long id;
     @Column(name = "first_name", length = 50)
     private String firstname;
@@ -38,14 +33,11 @@ public final class Client {
     @NotBlank
     private String password;
     @OneToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_saving"))
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_client_saving"))
     private Saving saving;
     @OneToMany
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_income"))
-    private List<Income> incomes;
-    @OneToMany
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_expense"))
-    private List<Expense> expenses;
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_client_transaction"))
+    private List<Transaction> transactions;
     @Enumerated(EnumType.STRING)
     private UserRole role;
     //TODO add user image

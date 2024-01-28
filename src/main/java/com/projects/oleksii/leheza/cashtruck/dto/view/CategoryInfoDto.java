@@ -11,11 +11,11 @@ import java.math.BigDecimal;
 @Setter
 @EqualsAndHashCode
 @Builder(toBuilder = true)
-public class IncomeExpenseCategoryDto {
+public class CategoryInfoDto {
 
     @NotNull
     @NotBlank
-    private String categoryName;
+    private String name;
     private BigDecimal fullCategoryTransactionSum;
     private double categoryPercentage;
 }

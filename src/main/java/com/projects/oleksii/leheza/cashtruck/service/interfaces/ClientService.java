@@ -27,13 +27,8 @@ public interface ClientService {
 
     //For UI
     ClientStatisticDto getClientStatisticByClientId(Long clientId);
-
+    void addTransaction(Long clientId, Transaction transaction);
     //TODO use only one method (update) use tranisction
-
-    void addIncome(Long clientId, Income income);
-    //TODO use only one method (update) use tranisction
-
-    void addExpense(Long clientId, Expense expense);
 
     List<BankCard> getBankCardsByClientId(Long clientId);
 }

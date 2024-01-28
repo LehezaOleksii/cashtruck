@@ -8,29 +8,31 @@
     <meta charset="utf-8" />
     <title>Cash truck</title>
   </head>  
-  <body th:object="${client}" layout:fragment="content">
-  
+  <body>
+    <main layout:fragment="content">
 <div class="container mt-4">
     <div class="col-sm-7 mx-auto">
         <div class="my-container">
-            <div class="card-body text-center ">
-                <h4 class="mb-4">Category</h4> 
+            <div class="card-body text-center" >
+                <h4 class="mb-4" th:text="${category.name}"></h4> 
                 <ul class="list-group mb-4">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <div> 
-                            <span> <img src="/static/images/client/wallet-info.png"></span>
-                            <span class="transaction-name">Transaction Name </span>
+                    <li  th:each="transaction : ${transactions}" class="list-group-item d-flex justify-content-between align-items-center ">
+                      <div > 
+                        <span><img th:src="@{/images/client/wallet-info.png}"></span>
+                        <span class="bankTransaction-name" th:text = "${transaction.name}"></span>
                         </div>
                         <div>
-                            <span class="transaction-price m-4">50.00$</span>
-                            <span class="transaction-date">2023-11-16</span>
+                          <span class="m-4">
+                              <span class="bankTransaction-price" th:text= "${#numbers.formatDecimal(transaction.sum, 1, 2, 'POINT')}">0.00</span> $
+                          </span>
+                              <span th:text="${#temporals.format(transaction.time, 'dd.MM.yyyy')}"></span>
+                            </div>
                         </div>
                     </li> 
                 </ul>
              </div>
         </div>
     </div>
-</div> 
 </main>
   </body>
 </html>

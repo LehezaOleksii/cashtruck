@@ -1,11 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.dto.view;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Expense;
-import com.projects.oleksii.leheza.cashtruck.domain.Income;
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
+import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -19,8 +14,8 @@ import java.util.List;
 //For UI
 public class ClientStatisticDto {
 
-    private List<Expense> expenses;
-    private List<Income> incomes;
+    private List<Transaction> expenses;
+    private List<Transaction> incomes;
     private BigDecimal totalIncomeSum;
     private BigDecimal totalExpenseSum;
     private BigDecimal totalBalance;

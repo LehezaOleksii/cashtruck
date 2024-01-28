@@ -1,11 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.Date;
-
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+import java.math.BigDecimal;
+import java.util.Date;
 
 @Data
 @AllArgsConstructor
@@ -24,7 +26,7 @@ public final class BankCard {
     private String cardNumber;
     @Column(length = 50)
     private String nameOnCard;
-    @Column(length = 3 )
+    @Column(length = 3)
     private String cvv;
     private BigDecimal balance = BigDecimal.ZERO;
     private Date expiringDate;

@@ -1,7 +1,5 @@
 package com.projects.oleksii.leheza.cashtruck.dto.view;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Expense;
-import com.projects.oleksii.leheza.cashtruck.domain.Income;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -17,7 +15,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class IncomeExpensesDto {
+public class TransactionDto {
 
     @NotNull
     @NotBlank
