@@ -1,9 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,8 @@ public class ClientController {
     private final ClientService clientService;
     private final BankCardService bankCardService;
     private final SavingService savingService;
-    private final IncomeService incomeService;
-    private final ExpenseService expenseService;
+    private final TransactionService transactionService;
+    private final CategoryService categoryService;
 
 
     @PostMapping(path = "/login")
@@ -97,7 +97,7 @@ public class ClientController {
     public ModelAndView updateBankCardForm(@PathVariable Long clientId) {
         ModelAndView modelAndView = new ModelAndView("client/update_delete_bank_card");
         ClientDto client = clientService.getClient(clientId);
-        modelAndView.addObject("clientId", clientId);
+        modelAndView.addObject("client", client);
         modelAndView.addObject("bank_cards", client.getSaving().getBankCards());
         return modelAndView;
     }
@@ -119,16 +119,17 @@ public class ClientController {
     public ModelAndView viewIncomeAndExpensesDashboard(@PathVariable Long clientId) {
         ModelAndView modelAndView = new ModelAndView("client/categories");
         modelAndView.addObject("client", clientService.getClient(clientId));
-        modelAndView.addObject("incomes_categories", incomeService.findClientIncomesCategories(clientId));
-        modelAndView.addObject("expenses_categories", expenseService.findClientExpensesCategories(clientId) );
+        modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(clientId));
+        modelAndView.addObject("expenses_categories", transactionService.findClientExpenseCategoriesByClientId(clientId));
         return modelAndView;
     }
 
-    @GetMapping("/{clientId}/categories/{category}")
-    public ModelAndView viewIncomeAndExpensesTransactionsByCategoryName(@PathVariable Long clientId,@PathVariable String categoryName) {
+    @GetMapping("/{clientId}/categories/{categoryName}")
+    public ModelAndView viewTransactionsByCategoryName(@PathVariable Long clientId, @PathVariable String categoryName) {
         ModelAndView modelAndView = new ModelAndView("client/transactions_details");
         modelAndView.addObject("client", clientService.getClient(clientId));
-        modelAndView.addObject("incomes_categories", incomeService.findClientIncomesCategories(clientId));
+        modelAndView.addObject("category", categoryService.findByName(categoryName));
+        modelAndView.addObject("transactions", transactionService.findTransactionsByClientIdAndCategoryName(clientId, categoryName));
         return modelAndView;
     }
 }

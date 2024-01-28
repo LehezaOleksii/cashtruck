@@ -20,6 +20,6 @@ public final class Saving {
     private Long id;
     private BigDecimal cash;
     @OneToMany(fetch = FetchType.EAGER)
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_bank_card"))
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_saving_bank_card"))
     private Set<BankCard> bankCards;
 }

@@ -9,7 +9,7 @@
     <title>Cash truck</title>
   </head> 
   <body th:object="${client}">
-    <main class="col-md-10" layout:fragment="content">
+    <main layout:fragment="content">
     <div class="container">
       <div class="row">
 <div class="col-sm-7" th:object="${bank_cards}">
@@ -187,13 +187,10 @@
         <!-- 4 squares -->
         <div class="col-sm-5" th:object = "${client_statistic}">
           <div class="row">
-
-                 <div class="col-md-6 mb-3 info-card-container">
+                 <div class="col-md-6 mb-3 justify-content-end">
           <div class="my-container info-card ">
             <div class="d-flex justify-content-between align-items-center">
               <img th:src="@{/images/client/cc-primary.png}" class="info-card-img" />
-              <div class="d-flex justify-content-end align-items-center"> 
-              </div>
             </div>
             <div>Total balance</div>
             <div class="info-card-font bold" th:text="${client_statistic!=null?client_statistic.totalBalance:'-'}">$</div> 
@@ -282,12 +279,10 @@
 </div>
 </div>
 </div> 
-            <div class="col-md-6 mb-3 info-card-container">
+            <div class="col-md-6 mb-3 justify-content-end">
           <div class="my-container info-card">
             <div class="d-flex justify-content-between align-items-center">
               <img th:src="@{/images/client/green-pie-diagram.png}" class="info-card-img" />
-              <div class="d-flex justify-content-end align-items-center"> 
-              </div>
             </div>
             <div>Income</div>
             <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekIncome}"></div>
@@ -347,12 +342,10 @@
 </div>
 </div>
 
-           <div class="col-md-6 info-card-container">
+           <div class="col-md-6 justify-content-end">
           <div class="my-container info-card">
             <div class="d-flex justify-content-between align-items-center">
               <img th:src="@{/images/client/transfer.png}" class="info-card-img" />
-              <div class="d-flex justify-content-end align-items-center"> 
-              </div>
             </div>
             <div>Profit</div>
             <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekIncome-client_statistic.lastWeekExpense}"></div>
@@ -448,12 +441,10 @@
           </div>
           </div>
 
-           <div class="col-md-6 info-card-container">
+           <div class="col-md-6 justify-content-end">
           <div class="my-container info-card">
             <div class="d-flex justify-content-between align-items-center">
               <img th:src="@{/images/client/paypal.png}" class="info-card-img" />
-              <div class="d-flex justify-content-end align-items-center"> 
-              </div>
             </div>
 
             <div>Expenses</div> 
@@ -521,10 +512,10 @@
  
 <div class="container mt-4">
   <div class="row">
-    <div class="col-sm-12 mb-3 ">
+    <div class= "mb-3">
       <div class="my-container p-2">
                   <div><h5 class="card-title text-center mb-0 mt-3 h4">Statistics</h5></div>
-<div class="card-body info-card-container">
+<div class="card-body justify-content-center">
     <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur1" autocomplete="off" checked>
     <label class="btn h3 mx-3" style="width: 20%;" for="dur1">Last week</label>
 
@@ -587,9 +578,9 @@
                 <div  th:each="income : ${client_statistic.incomes}">
                     <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
                     <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
-                    <span th:text="${income.transaction.name}"></span><br> 
-                    <span th:text="${income.transaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br> 
-                    <span th:text="${#temporals.format(income.transaction.time, 'dd.MM.yy')}"></span>
+                    <span th:text="${income.bankTransaction.name}"></span><br>
+                    <span th:text="${income.bankTransaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br>
+                    <span th:text="${#temporals.format(income.bankTransaction.time, 'dd.MM.yy')}"></span>
                     </div> 
                 </div>
                 </div>
@@ -598,9 +589,9 @@
                 <div th:each="expense : ${client_statistic.expenses}">
                     <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
                     <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
-                    <span th:text="${expense.transaction.name}"></span><br> 
-                    <span th:text="${expense.transaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br> 
-                    <span th:text="${#temporals.format(expense.transaction.time, 'dd.MM.yy')}"></span>
+                    <span th:text="${expense.bankTransaction.name}"></span><br>
+                    <span th:text="${expense.bankTransaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br>
+                    <span th:text="${#temporals.format(expense.bankTransaction.time, 'dd.MM.yy')}"></span>
                     </div> 
                 </div> 
                 </div>
@@ -615,6 +606,8 @@
            </div>
           </div>
           </div>
+      </div>
+      </div>
       </div>
       </div>
       <script> 

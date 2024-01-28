@@ -1,5 +1,23 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
+import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.BankTransaction;
+import com.projects.oleksii.leheza.cashtruck.domain.Client;
+import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
+import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
+import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.repository.BankTransactionRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -7,30 +25,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import com.projects.oleksii.leheza.cashtruck.domain.*;
-import com.projects.oleksii.leheza.cashtruck.dto.DtoConvertor;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
-import com.projects.oleksii.leheza.cashtruck.repository.ExpensesRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.IncomeRepository;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
-
-import jakarta.transaction.Transactional;
-
 @Service
 @RequiredArgsConstructor
 public class ClientServiceImpl implements ClientService {
 
+    private static final TransactionType INCOME_TRANSACTION_TYPE = TransactionType.INCOME;
+    private static final TransactionType EXPENSE_TRANSACTION_TYPE = TransactionType.EXPENSE;
+
     private final ClientRepository clientRepository;
-    private final IncomeRepository incomeRepository;
-    private final ExpensesRepository expensesRepository;
-    private final DtoConvertor dtoConvertor;
+    private final DtoMapper dtoConvertor;
+    private final TransactionRepository transactionRepository;
+    private final BankTransactionRepository bankTransactionRepository;
 //    private final PasswordEncoder passwordEncoder;
 
 
@@ -110,16 +115,16 @@ public class ClientServiceImpl implements ClientService {
     @Override
     @Transactional
     public void updateClient(Long clientId, Client client) throws IllegalStateException {
-        Client currentClient = clientRepository.findById(clientId).get();
-        String updatedEmail = client.getEmail();
-        String currentEmail = currentClient.getEmail();
-        if (isEmailTaken(currentEmail, updatedEmail)) {
-            throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
-        }
-        currentClient.toBuilder().firstname(client.getFirstname())
-                .lastname(client.getLastname()).incomes(client.getIncomes()).expenses(client.getExpenses())
-                .email(updatedEmail).build();
-        clientRepository.save(currentClient);
+//        Client currentClient = clientRepository.findById(clientId).get();
+//        String updatedEmail = client.getEmail();
+//        String currentEmail = currentClient.getEmail();
+//        if (isEmailTaken(currentEmail, updatedEmail)) {
+//            throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
+//        }
+//        currentClient.toBuilder().firstname(client.getFirstname())
+//                .lastname(client.getLastname()).transactions(client.getTransactions()).expenses(client.getExpenses())
+//                .email(updatedEmail).build();
+//        clientRepository.save(currentClient);
     }
 
     //For UI
@@ -132,31 +137,17 @@ public class ClientServiceImpl implements ClientService {
         return createStatisticDto(optionalClient.get());
     }
 
-    @Override//TODO use only one method (update) se tranisction
-    public void addIncome(Long clientId, Income income) {
-        Optional.ofNullable(income)
-                .orElseThrow(() -> new IllegalArgumentException("Income cannot be null"));
-        Optional.ofNullable(income.getTransaction())
-                .orElseThrow(() -> new IllegalArgumentException("Income transaction cannot be null"));
-        incomeRepository.save(income);
+    @Override//TODO use only one method (update) save tranisction
+    public void addTransaction(Long clientId, Transaction transaction) {
+        Optional.ofNullable(transaction)
+                .orElseThrow(() -> new IllegalArgumentException("Transaction cannot be null"));
+        Optional.ofNullable(transaction.getBankTransaction())
+                .orElseThrow(() -> new IllegalArgumentException("Transaction transaction cannot be null"));
+        transactionRepository.save(transaction);
         Client client = clientRepository.findById(clientId).get();
-        List<Income> incomes = client.getIncomes();
-        incomes.add(income);
-        client.setIncomes(incomes);
-        clientRepository.save(client);
-    }
-
-    @Override//TODO use only one method (update) se tranisction
-    public void addExpense(Long clientId, Expense expense) {
-        Optional.ofNullable(expense)
-                .orElseThrow(() -> new IllegalArgumentException("Expense cannot be null"));
-        Optional.ofNullable(expense.getTransaction())
-                .orElseThrow(() -> new IllegalArgumentException("Expense transaction cannot be null"));
-        expensesRepository.save(expense);
-        Client client = clientRepository.findById(clientId).get();
-        List<Expense> expenses = client.getExpenses();
-        expenses.add(expense);
-        client.setExpenses(expenses);
+        List<Transaction> transactions = client.getTransactions();
+        transactions.add(transaction);
+        client.setTransactions(transactions);
         clientRepository.save(client);
     }
 
@@ -175,8 +166,14 @@ public class ClientServiceImpl implements ClientService {
         return ClientDto.builder()
                 .id(clientId)
                 .saving(client.getSaving())
-                .expenses(client.getExpenses().stream().map(dtoConvertor::expenseToDto).toList())
-                .incomes(client.getIncomes().stream().map(dtoConvertor::incomeToDto).toList())
+                .expenses(client.getTransactions().stream()
+                        .filter(transaction -> transaction.getCategory().getTransactionType() == TransactionType.EXPENSE)
+                        .map(dtoConvertor::transactionToDto)
+                        .toList())
+                .incomes(client.getTransactions().stream()
+                        .filter(transaction -> transaction.getCategory().getTransactionType() == TransactionType.INCOME)
+                        .map(dtoConvertor::transactionToDto)
+                        .toList())
                 .email(client.getEmail())
                 .firstname(client.getFirstname())
                 .lastname(client.getLastname())
@@ -198,14 +195,14 @@ public class ClientServiceImpl implements ClientService {
 
     private void setTotalIncomeSum(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
         LocalDateTime tenYearsStartDate = endDate.minusYears(10);
-        List<Income> lastTenYearsIncome = incomeRepository.findIncomesForPeriod(clientId, tenYearsStartDate, endDate);
-        clientStatisticDto.setTotalIncomeSum(getAllIncomeSum(lastTenYearsIncome));
+        List<Transaction> lastTenYearsIncome = bankTransactionRepository.findTransactionForPeriod(clientId, INCOME_TRANSACTION_TYPE, tenYearsStartDate, endDate);
+        clientStatisticDto.setTotalIncomeSum(getAllTransactionSum(lastTenYearsIncome));
     }
 
     private void setTotalExpenseSum(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
         LocalDateTime tenYearsStartDate = endDate.minusYears(10);
-        List<Expense> lastTenYearsExpense = expensesRepository.findExpensesForPeriod(clientId, tenYearsStartDate, endDate);
-        clientStatisticDto.setTotalExpenseSum(getAllExpenseSum(lastTenYearsExpense));
+        List<Transaction> lastTenYearsExpense = bankTransactionRepository.findTransactionForPeriod(clientId, EXPENSE_TRANSACTION_TYPE, tenYearsStartDate, endDate);
+        clientStatisticDto.setTotalExpenseSum(getAllTransactionSum(lastTenYearsExpense));
     }
 
     private BigDecimal getTotalBalance(Client client) {
@@ -220,41 +217,34 @@ public class ClientServiceImpl implements ClientService {
 
     private void setLastYearTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
         LocalDateTime oneYearStartDate = endDate.minusYears(1);
-        List<Expense> lastYearExpenses = expensesRepository.findExpensesForPeriod(clientId, oneYearStartDate, endDate);
+        List<Transaction> lastYearExpenses = bankTransactionRepository.findTransactionForPeriod(clientId, EXPENSE_TRANSACTION_TYPE, oneYearStartDate, endDate);
         clientStatisticDto.setExpenses(lastYearExpenses);
-        clientStatisticDto.setLastYearExpense(getAllExpenseSum(lastYearExpenses));
-        List<Income> lastYearIncomes = incomeRepository.findIncomesForPeriod(clientId, oneYearStartDate, endDate);
+        clientStatisticDto.setLastYearExpense(getAllTransactionSum(lastYearExpenses));
+        List<Transaction> lastYearIncomes = bankTransactionRepository.findTransactionForPeriod(clientId, INCOME_TRANSACTION_TYPE, oneYearStartDate, endDate);
         clientStatisticDto.setIncomes(lastYearIncomes);
-        clientStatisticDto.setLastYearIncome(getAllIncomeSum(lastYearIncomes));
+        clientStatisticDto.setLastYearIncome(getAllTransactionSum(lastYearIncomes));
     }
 
     private void setLastMonthTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
         LocalDateTime oneMonthStartDate = endDate.minusMonths(1);
-        List<Expense> lastMonthExpenses = expensesRepository.findExpensesForPeriod(clientId, oneMonthStartDate, endDate);
-        clientStatisticDto.setLastMonthExpense(getAllExpenseSum(lastMonthExpenses));
-        List<Income> lastMonthIncomes = incomeRepository.findIncomesForPeriod(clientId, oneMonthStartDate, endDate);
-        clientStatisticDto.setLastMonthIncome(getAllIncomeSum(lastMonthIncomes));
+        List<Transaction> lastMonthExpenses = bankTransactionRepository.findTransactionForPeriod(clientId, EXPENSE_TRANSACTION_TYPE, oneMonthStartDate, endDate);
+        clientStatisticDto.setLastMonthExpense(getAllTransactionSum(lastMonthExpenses));
+        List<Transaction> lastMonthIncomes = bankTransactionRepository.findTransactionForPeriod(clientId, INCOME_TRANSACTION_TYPE, oneMonthStartDate, endDate);
+        clientStatisticDto.setLastMonthIncome(getAllTransactionSum(lastMonthIncomes));
     }
 
     private void setLastWeekTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
         LocalDateTime oneWeekStartDate = endDate.minusWeeks(1);
-        List<Expense> lastWeekExpenses = expensesRepository.findExpensesForPeriod(clientId, oneWeekStartDate, endDate);
-        clientStatisticDto.setLastWeekExpense(getAllExpenseSum(lastWeekExpenses));
-        List<Income> lastWeekIncomes = incomeRepository.findIncomesForPeriod(clientId, oneWeekStartDate, endDate);
-        clientStatisticDto.setLastWeekIncome(getAllIncomeSum(lastWeekIncomes));
+        List<Transaction> lastWeekExpenses = bankTransactionRepository.findTransactionForPeriod(clientId, EXPENSE_TRANSACTION_TYPE, oneWeekStartDate, endDate);
+        clientStatisticDto.setLastWeekExpense(getAllTransactionSum(lastWeekExpenses));
+        List<Transaction> lastWeekIncomes = bankTransactionRepository.findTransactionForPeriod(clientId, INCOME_TRANSACTION_TYPE, oneWeekStartDate, endDate);
+        clientStatisticDto.setLastWeekIncome(getAllTransactionSum(lastWeekIncomes));
     }
 
-    private BigDecimal getAllExpenseSum(List<Expense> expenses) {
-        return expenses.stream()
-                .map(Expense::getTransaction)
-                .map(Transaction::getSum)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private BigDecimal getAllIncomeSum(List<Income> incomes) {
-        return incomes.stream()
-                .map(Income::getTransaction)
-                .map(Transaction::getSum)
+    private BigDecimal getAllTransactionSum(List<Transaction> transactions) {
+        return transactions.stream()
+                .map(Transaction::getBankTransaction)
+                .map(BankTransaction::getSum)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
