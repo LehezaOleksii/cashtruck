@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/client/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title> 
+  </head> 
+  <body>
+        <main layout:fragment="content">
+            <div class="overlay"> 
+            <div class="overlay-content">
+                <div class="profile-container">
+                <h5 class="text-center info-card-font bold mb-5">Edit profile information</h5>
+                <hr>
+                <h5 class="text-center info-card-font bold mb-3">Avatar</h5> 
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="image-preview d-flex justify-content-center align-items-center">
+                                <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" height="110" width="110">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="d-flex flex-column row justify-content-center align-items-center">
+                                <label for="fileInput" class="btn custom-back-violet mb-2 small col-6">Choose photo</label>
+                                <input type="file" id="fileInput" name="image" accept="image/*" class="form-control-file" onchange="previewImage(this)" style="display: none;">
+                                <label type="button" class="btn btn-outline-secondary small col-6" onclick="clearImage()">Clear photo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                
+                
+                <script>
+                    function previewImage(input) {
+                        var preview = document.getElementById('preview');
+                        var file = input.files[0];
+                
+                        if (file) {
+                            var reader = new FileReader();
+                
+                            reader.onload = function (e) {
+                                preview.src = e.target.result;
+                            }
+                
+                            reader.readAsDataURL(file);
+                        } 
+                    }
+                    
+                    function clearImage() {
+                        var preview = document.getElementById('preview');
+                        var fileInput = document.querySelector('.form-control-file');
+
+                        preview.src = "";
+                        fileInput.value = ""; 
+    }
+                </script>
+                <hr>
+                <h5 class="text-center info-card-font bold mb-5">Profile information</h5>
+                <div class="row mb-4">
+            <div class="col">
+                <div class="profile-atribute">First name</div> 
+                    <div class="form-outline">
+                        <input id="nameOnCard" type="text" placeholder="First Name" class="form-control"   required/>
+                    </div>
+            </div>
+            <div class="col">
+                <div class="profile-atribute">Last Name</div>
+                <div class="form-outline">
+                    <input id="cardNumber" type="text" class="form-control" placeholder="Last name" pattern="\d{16}"   required>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="profile-atribute">Email</div> 
+                    <div class="form-outline">
+                        <input id="nameOnCard" type="text" placeholder="Email" class="form-control"   required/>
+                    </div>
+            </div>
+            <div class="col">
+                <div class="profile-atribute">Phone Number</div>
+                <div class="form-outline">
+                    <input id="cardNumber" type="text" class="form-control" placeholder="Phone number" pattern="\d{16}"   required>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="profile-atribute">Language</div> 
+                    <div class="form-outline">
+                        <input id="nameOnCard" type="text" placeholder="Language" class="form-control"   required/>
+                    </div>
+            </div>
+            <div class="col">
+                <div class="profile-atribute">Country</div>
+                <div class="form-outline">
+                    <input id="cardNumber" type="text" class="form-control" placeholder="Country" pattern="\d{16}"   required>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col justify-content-end">
+                <button class="btn custom-back-violet col-4 mt-2">Update</button>
+            </div>
+            <div class="col">  
+                <button class="btn col-4 mt-2 custom-back-grey">Cancel</button>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+</main>
+</body>
+</html>
