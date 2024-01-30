@@ -1,9 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,28 +18,31 @@ import java.util.Optional;
 public class ManagerServiceImpl implements ManagerService {
 
     private final ManagerRepository managerRepository;
+    private final CustomUserRepository customUserRepository;
 
     @Override
     public void saveManager(CreateManagerDto createManagerDto) {
         if (existByEmail(createManagerDto.getEmail())) {
             throw new IllegalStateException("Email taken");
         }
-        Manager manager = new Manager();
-        manager.toBuilder()
-                .firstname(createManagerDto.getFirstname())
-                .lastname(createManagerDto.getLastname())
+        CustomUser customUser = CustomUser.builder()
+                .firstName(createManagerDto.getFirstname())
+                .lastName(createManagerDto.getLastname())
                 .email(createManagerDto.getEmail())
                 .password(createManagerDto.getPassword())
-                .role(UserRole.Manager).build();
+                .build();
+        Manager manager = Manager.builder()
+                .customUser(customUser)
+                .build();
         managerRepository.save(manager);
     }
 
     @Override
     public void saveManager(Manager manager) {
-        if(!Optional.ofNullable(manager).isPresent()){
-            throw  new IllegalStateException("Manager is empty");
+        if (!Optional.ofNullable(manager).isPresent()) {
+            throw new IllegalStateException("Manager is empty");
         }
-        if (existByEmail(manager.getEmail())) {
+        if (existByEmail(manager.getCustomUser().getEmail())) {
             throw new IllegalStateException("Email taken");
         }
         managerRepository.save(manager);
@@ -51,8 +55,8 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     public Manager findManagerByEmail(String email) throws IllegalStateException {
-        return managerRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("Manager not found with email: " + email));
+        return managerRepository.findManagerByCustomUser_Email(email);
+//                .orElseThrow(() -> new IllegalStateException("Manager not found with email: " + email)
     }
 
     @Override
@@ -69,13 +73,16 @@ public class ManagerServiceImpl implements ManagerService {
         Manager currentManager = managerRepository.findById(managerId)
                 .orElseThrow(() -> new IllegalStateException("Manager with id " + managerId + " not found"));
         String updatedEmail = createManagerDto.getEmail();
-        String currentEmail = currentManager.getEmail();
+        String currentEmail = currentManager.getCustomUser().getEmail();
+        CustomUser currentCustomUser = customUserRepository.getReferenceById(managerId);
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        currentManager.toBuilder().firstname(createManagerDto.getFirstname())
-                .lastname(createManagerDto.getLastname()).build();
-        managerRepository.save(currentManager);
+        currentCustomUser.toBuilder()
+                .firstName(createManagerDto.getFirstname())
+                .lastName(createManagerDto.getLastname())
+                .build();
+        customUserRepository.save(currentCustomUser);
     }
 
     @Override
@@ -89,7 +96,8 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     private boolean existByEmail(String email) {
-        return managerRepository.findByEmail(email).isPresent();
+        return managerRepository.findManagerByCustomUser_Email(email)!=null&&email.equals(managerRepository.findManagerByCustomUser_Email(email).getCustomUser().getEmail());
+//        managerRepository.findManagerByUser_Email(email).isPresent()
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {

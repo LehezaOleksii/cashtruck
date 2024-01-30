@@ -1,10 +1,11 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
+import org.apache.catalina.User;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
@@ -29,13 +30,16 @@ public class RandomUsersGenerator {
     private final TransactionService transactionService;
     private final BankTransactionService bankTransactionService;
     private final CategoryService categoryService;
+    private final CustomUserRepository customUserRepository;
 
     private final Random random;
     private final Faker faker;
 
-    public void generateRandomUsers(int clientsNumber, int bankCardsNumber, int managersNumber, int adminNumber, int transactionNumber) {
+    public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber) {
 //    prepare for client generation
+        int allUsers = clientsNumber + managersNumber + adminsNumber;
         generateBankCards(bankCardsNumber);
+        generateRandomUsers(allUsers);
         generateRandomSavings(clientsNumber);
         generateRandomBankTransactions(transactionNumber);
         List<BankTransaction> allBankTransactions = bankTransactionService.findAll();
@@ -46,15 +50,28 @@ public class RandomUsersGenerator {
 //
         generateRandomClients(clientsNumber);
         generateRandomManagers(managersNumber);
-        generateRandomAdmins(adminNumber);
+        generateRandomAdmins(adminsNumber);
+    }
+
+    private void generateRandomUsers(int userNumber) {
+        List<String> firstNames = Stream.generate(() -> faker.name().firstName()).distinct().limit(userNumber).toList();
+        List<String> lastNames = Stream.generate(() -> faker.name().lastName()).distinct().limit(userNumber).toList();
+        IntStream.range(1, userNumber).forEach(index -> {
+            CustomUser customUser = CustomUser.builder()
+                    .firstName(firstNames.get(index - 1))
+                    .lastName(lastNames.get(index - 1))
+                    .email(faker.internet().emailAddress())
+                    .password(faker.lorem().sentence(2))
+                    .build();
+            customUserRepository.save(customUser);
+        });
     }
 
     private void generateRandomClients(int clientsNumber) {
-        List<String> firstnames = Stream.generate(() -> faker.name().firstName()).distinct().limit(clientsNumber).toList();
-        List<String> lastnames = Stream.generate(() -> faker.name().lastName()).distinct().limit(clientsNumber).toList();
         List<Saving> savings = savingService.findAll();
         List<Transaction> allIncomes = transactionService.findAllIncomeTransactions();
         List<Transaction> allExpenses = transactionService.findAllExpenseTransactions();
+        List<CustomUser> customUsers = customUserRepository.findAll();
         int incomesPerClient = allIncomes.size() / clientsNumber;
         int expensesPerClient = allExpenses.size() / clientsNumber;
         IntStream.range(1, clientsNumber).forEach(index -> {
@@ -63,19 +80,16 @@ public class RandomUsersGenerator {
             List<Transaction> allTransactions = new ArrayList<>();
             allTransactions.addAll(incomes);
             allTransactions.addAll(expenses);
-            String firstname = firstnames.get(index - 1);
-            String lastname = lastnames.get(index - 1);
-            String fullName = firstname + lastname;
+            CustomUser customUser = customUsers.get(index - 1);
+            String firstName = customUser.getFirstName();
+            String lastName = customUser.getLastName();
+            String fullName = firstName + lastName;
             Saving saving = savings.get(index - 1);
             saveBankCardHolderName(fullName, saving);
             Client client = Client.builder()
-                    .firstname(firstname)
-                    .lastname(lastname)
-                    .email(faker.internet().emailAddress())
-                    .password(faker.lorem().sentence(2))
+                    .customUser(customUser)
                     .saving(saving)
                     .transactions(allTransactions)
-                    .role(UserRole.Client)
                     .build();
             clientService.saveClient(client);
             savingService.assignBankCardsToClient((long) index, saving.getBankCards().stream().toList());
@@ -83,25 +97,26 @@ public class RandomUsersGenerator {
     }
 
     private void generateRandomManagers(int managersNumber) {
-        List<String> firstnames = Stream.generate(() -> faker.name().firstName()).distinct().limit(managersNumber).toList();
-        List<String> lastnames = Stream.generate(() -> faker.name().lastName()).distinct().limit(managersNumber).toList();
-        IntStream.range(1, managersNumber).mapToObj(index -> Manager.builder()
-                .firstname(firstnames.get(index))
-                .lastname(lastnames.get(index))
-                .email(faker.internet().emailAddress())
-                .password(faker.lorem().sentence(2))
-                .role(UserRole.Manager).build()).forEach(managerService::saveManager);
+        int clientsNumber = clientService.findAll().size();
+        List<CustomUser> customUsers = customUserRepository.findAll();
+        IntStream.range(clientsNumber, clientsNumber+managersNumber).forEach(index -> {
+            Manager manager = Manager.builder()
+                    .customUser(customUsers.get(index - 1))
+                    .build();
+            managerService.saveManager(manager);
+        });
     }
 
     private void generateRandomAdmins(int adminNumber) {
-        List<String> firstnames = Stream.generate(() -> faker.name().firstName()).distinct().limit(adminNumber).toList();
-        List<String> lastnames = Stream.generate(() -> faker.name().lastName()).distinct().limit(adminNumber).toList();
-        IntStream.range(1, adminNumber).mapToObj(index -> Admin.builder()
-                .firstname(firstnames.get(index))
-                .lastname(lastnames.get(index))
-                .email(faker.internet().emailAddress())
-                .password(faker.lorem().sentence(2))
-                .role(UserRole.Admin).build()).forEach(adminService::saveAdmin);
+        int clientsNumber = clientService.findAll().size();
+        int managersNumber = managerService.findAllManagers().size();
+        List<CustomUser> customUsers = customUserRepository.findAll();
+        IntStream.range(clientsNumber+managersNumber, clientsNumber+managersNumber+ adminNumber).forEach(index -> {
+            Manager manager = Manager.builder()
+                    .customUser(customUsers.get(index - 1))
+                    .build();
+            managerService.saveManager(manager);
+        });
     }
 
     private void generateRandomSavings(int savingNumber) {

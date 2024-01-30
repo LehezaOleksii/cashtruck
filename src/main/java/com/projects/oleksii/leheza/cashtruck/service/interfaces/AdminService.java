@@ -23,7 +23,7 @@ public interface AdminService {
 
     void updateAdminInfo(Long id, CreateAdminDto createAdminDto);
 
-    Manager findManagerByEmail(String email) throws IllegalStateException;
+//    Manager findManagerByEmail(String email) throws IllegalStateException;
 
     void createManager(CreateManagerDto createManagerDto);
 

@@ -2,12 +2,13 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Admin;
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateAdminDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.AdminRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.AdminService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
@@ -22,6 +23,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AdminServiceImpl implements AdminService {
 
+    private final CustomUserRepository customUserRepository;
     private final AdminRepository adminRepository;
     private final ManagerRepository managerRepository;
     private final ClientService clientService;
@@ -32,22 +34,24 @@ public class AdminServiceImpl implements AdminService {
         if (existByEmail(createAdminDto.getEmail())) {
             throw new IllegalStateException("Email taken");
         }
-        Admin admin = new Admin();
-        admin.toBuilder()
-                .firstname(createAdminDto.getFirstname())
-                .lastname(createAdminDto.getLastname())
-                .email(createAdminDto.getEmail())
+        CustomUser customUser = CustomUser.builder()
+                .firstName(createAdminDto.getFirstname())
+                .lastName(createAdminDto.getLastname())
                 .password(createAdminDto.getPassword())
-                .role(UserRole.Admin).build();
+                .email(createAdminDto.getEmail())
+                .build();
+        Admin admin = Admin.builder()
+                .customUser(customUser)
+                .build();
         adminRepository.save(admin);
     }
 
     @Override
     public void saveAdmin(Admin admin) {
-        if(!Optional.ofNullable(admin).isPresent()){
-            throw  new IllegalStateException("Admin is empty");
+        if (!Optional.ofNullable(admin).isPresent()) {
+            throw new IllegalStateException("Admin is empty");
         }
-        if (existByEmail(admin.getEmail())) {
+        if (existByEmail(admin.getCustomUser().getEmail())) {
             throw new IllegalStateException("Email taken");
         }
         adminRepository.save(admin);
@@ -60,7 +64,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public Admin findAdminByEmail(String email) {
-        return adminRepository.findByEmail(email);
+        return adminRepository.findAdminByCustomUser_Email(email);
     }
 
     @Override
@@ -68,20 +72,15 @@ public class AdminServiceImpl implements AdminService {
         Admin currentAdmin = adminRepository.findById(id)
                 .orElseThrow(() -> new IllegalStateException("Admin with id " + id + " not found"));
         String updatedEmail = createAdminDto.getEmail();
-        String currentEmail = currentAdmin.getEmail();
+        String currentEmail = currentAdmin.getCustomUser().getEmail();
+        CustomUser currentCustomUser = currentAdmin.getCustomUser();
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Admin with " + updatedEmail + " has already exist");
         }
-        currentAdmin.toBuilder().firstname(createAdminDto.getFirstname())
-                .lastname(createAdminDto.getLastname()).build();
-        adminRepository.save(currentAdmin);
-    }
-
-
-    @Override
-    public Manager findManagerByEmail(String email) throws IllegalStateException {
-        return managerRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalStateException("Manager not found with email: " + email));
+        currentCustomUser.toBuilder()
+                .firstName(createAdminDto.getFirstname())
+                .lastName(createAdminDto.getLastname()).build();
+        customUserRepository.save(currentCustomUser);
     }
 
     @Override
@@ -120,7 +119,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     private boolean existByEmail(String email) {
-        return managerRepository.findByEmail(email).isPresent();
+        return email.equals(adminRepository.findAdminByCustomUser_Email(email).getCustomUser().getEmail());
+//        return adminRepository.findAdminByUser_Email(email).isPresent();
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {

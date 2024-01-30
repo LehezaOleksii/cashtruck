@@ -23,7 +23,7 @@ public class CashtruckApplication {
     CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator) {
         return args -> {
             mainEntitiesGenerator.generateMainEntities();
-            randomUsersGenerator.generateRandomUsers(10, 30, 5, 1, 200);
+            randomUsersGenerator.generateRandomClientFields(30, 5, 1, 30, 200);
         };
     }
 

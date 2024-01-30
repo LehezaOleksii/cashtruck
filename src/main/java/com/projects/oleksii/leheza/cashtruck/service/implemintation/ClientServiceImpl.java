@@ -1,18 +1,15 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
-import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.BankTransaction;
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
-import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
+import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.BankTransactionRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +30,7 @@ public class ClientServiceImpl implements ClientService {
     private static final TransactionType EXPENSE_TRANSACTION_TYPE = TransactionType.EXPENSE;
 
     private final ClientRepository clientRepository;
+    private final CustomUserRepository customUserRepository;
     private final DtoMapper dtoConvertor;
     private final TransactionRepository transactionRepository;
     private final BankTransactionRepository bankTransactionRepository;
@@ -59,13 +57,15 @@ public class ClientServiceImpl implements ClientService {
             throw new IllegalStateException("Email taken");
         }
 //        client.setPassword(passwordEncoder.encode(client.getPassword()));
-        Client client = new Client();
-        client.toBuilder()
-                .firstname(createClientDto.getFirstname())
-                .lastname(createClientDto.getLastname())
+        CustomUser customUser = CustomUser.builder()
+                .firstName(createClientDto.getFirstname())
+                .lastName(createClientDto.getLastname())
                 .email(createClientDto.getEmail())
                 .password(createClientDto.getPassword())
-                .role(UserRole.Client).build();
+                .build();
+        Client client = Client.builder()
+                .customUser(customUser)
+                .build();
         clientRepository.save(client);
     }
 
@@ -74,7 +74,7 @@ public class ClientServiceImpl implements ClientService {
         if (!Optional.ofNullable(client).isPresent()) {
             throw new IllegalStateException("Client is empty");
         }
-        if (existByEmail(client.getEmail())) {
+        if (existByEmail(client.getCustomUser().getEmail())) {
             throw new IllegalStateException("Email taken");
         }
         clientRepository.save(client);
@@ -82,7 +82,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public Client findByEmail(String email) {
-        return clientRepository.findByEmail(email);
+        return clientRepository.findClientByCustomUser_Email(email);
     }
 
 
@@ -103,13 +103,16 @@ public class ClientServiceImpl implements ClientService {
     public void updateClientInfo(Long clientId, CreateClientDto createClientDto) throws IllegalStateException {
         Client currentClient = clientRepository.findById(clientId).get();
         String updatedEmail = createClientDto.getEmail();
-        String currentEmail = currentClient.getEmail();
+        String currentEmail = currentClient.getCustomUser().getEmail();
+        CustomUser currentCustomUser = currentClient.getCustomUser();
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        currentClient.toBuilder().firstname(createClientDto.getFirstname())
-                .lastname(createClientDto.getLastname()).build();
-        clientRepository.save(currentClient);
+        currentCustomUser.toBuilder()
+                .firstName(createClientDto.getFirstname())
+                .lastName(createClientDto.getLastname())
+                .build();
+        customUserRepository.save(currentCustomUser);
     }
 
     @Override
@@ -163,6 +166,7 @@ public class ClientServiceImpl implements ClientService {
     @Override
     public ClientDto getClient(Long clientId) {
         Client client = clientRepository.getReferenceById(clientId);
+        CustomUser customUser = customUserRepository.getReferenceById(clientId);
         return ClientDto.builder()
                 .id(clientId)
                 .saving(client.getSaving())
@@ -174,9 +178,9 @@ public class ClientServiceImpl implements ClientService {
                         .filter(transaction -> transaction.getCategory().getTransactionType() == TransactionType.INCOME)
                         .map(dtoConvertor::transactionToDto)
                         .toList())
-                .email(client.getEmail())
-                .firstname(client.getFirstname())
-                .lastname(client.getLastname())
+                .email(customUser.getEmail())
+                .firstname(customUser.getFirstName())
+                .lastname(customUser.getLastName())
                 .build();
     }
 
@@ -249,7 +253,7 @@ public class ClientServiceImpl implements ClientService {
     }
 
     private boolean existByEmail(String email) {
-        return clientRepository.findByEmail(email) != null;
+        return clientRepository.findClientByCustomUser_Email(email) != null;
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {

@@ -1,9 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
 
@@ -18,20 +15,10 @@ import lombok.*;
 public class Manager {
 
     @Id
-    @SequenceGenerator(name = "client_sequence", sequenceName = "client_sequence", allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "client_sequence")
+    @SequenceGenerator(name = "manager_sequence", sequenceName = "manager_sequence", allocationSize = 1)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "manager_sequence")
     private Long id;
-    @Column(name = "first_name", length = 50)
-    private String firstname;
-    @Column(name = "last_name", length = 50)
-    private String lastname;
-    @NotEmpty
-    @NotBlank
-    private String email;
-    @NotEmpty
-    @NotBlank
-    private String password;
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
-    //TODO add user image
+    @OneToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_manager_user"))
+    private CustomUser customUser;
 }
