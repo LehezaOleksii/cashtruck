@@ -110,7 +110,7 @@ public class AdminServiceImpl implements AdminService {
 
     @Override
     public void changeClientInfoById(Long clientId, CreateClientDto createClientDto) {
-        clientService.updateClientInfo(clientId, createClientDto);
+//        clientService.updateClientInfo(clientId, createClientDto);
     }
 
     @Override

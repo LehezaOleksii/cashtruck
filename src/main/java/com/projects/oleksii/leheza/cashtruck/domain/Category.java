@@ -27,7 +27,6 @@ public final class Category {
     @NotBlank
     @Column(name = "name", length = 50)
     private String name;
-    private String categoryImage;
 
     public Category(TransactionType transactionType, String name) {
         this.transactionType = transactionType;

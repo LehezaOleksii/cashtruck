@@ -1,9 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.dto.create;
 
 import jakarta.persistence.Column;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.validator.constraints.CreditCardNumber;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.util.Date;
@@ -17,16 +17,19 @@ public class CreateBankCardDto {
 
     @Min(0)
     Long id;
-    @Column(length = 100)
+    @NotNull
+    @NotBlank
+    @Size(max = 100, message = "Must be exactly 16 characters")
     private String bankName;
-    @Column(length = 16)
-    @Pattern(regexp = "^[0-9]+$", message = "Only numbers are allowed")
+    @CreditCardNumber(message = "Invalid credit card number")
     private String cardNumber;
-    @Column(length = 50)
+    @NotNull
+    @NotBlank
+    @Size(max = 50, message = "Must be at most 50 characters")
     @Pattern(regexp = "^[A-Za-z]+$", message = "Only letters are allowed")
     private String nameOnCard;
-    @Column(length = 3)
-    @Pattern(regexp = "^[0-9]+$", message = "Only numbers are allowed")
+    @Size(min = 3, max = 3, message = "Must be exactly 3 digits")
+    @Pattern(regexp = "\\d{3}", message = "Must contain only digits")
     private String cvv;
     private double balance;
     @DateTimeFormat(pattern = "yyyy-MM-dd")

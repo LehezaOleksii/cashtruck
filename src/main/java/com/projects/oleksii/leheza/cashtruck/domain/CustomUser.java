@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 @Getter
@@ -24,6 +25,10 @@ public class CustomUser {
     private String firstName;
     @Column(name = "last_name", length = 50)
     private String lastName;
+    @Pattern(regexp = "\\d{10}", message = "Phone number must be 10 digits")
+    private String phoneNumber;
+    private String language; //TODO
+    private String country; //TODO
     @NotEmpty
     @NotBlank
     private String email;
@@ -32,6 +37,7 @@ public class CustomUser {
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    //TODO add user image
+    @OneToOne
+    private Image avatar;
     //TODO add phone number
 }

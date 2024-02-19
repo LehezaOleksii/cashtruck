@@ -22,7 +22,7 @@
 </script>
  
      <!-- Credit card form -->
-          <div class=" mt-4 justify-content-center align-items-center" style="margin-left: 60px;">
+          <div class="mt-4" style="margin-left: 60px;">
             <div class="card mb-4">
               <div class="card-header py-3">
                 <h5 class="mb-0">Card details</h5>
@@ -59,12 +59,26 @@
             <div class="form-outline">
                 <input id="nameOnCard" type="text" placeholder="Name on card" class="form-control" th:field="*{nameOnCard}" required/>
                 <label class="form-label" for="nameOnCard">Name on card</label>
+                <div>
+                <small th:if="${#fields.hasErrors('nameOnCard')}"
+                th:errors="*{nameOnCard}"
+                th:text="${#strings.listJoin(#fields.errors('nameOnCard'), ', ')}" class="text-danger">
+                    Please provide a valid name.
+                </small>
+                </div>
             </div>
         </div>
         <div class="col">
             <div class="form-outline">
-                <input id="cardNumber" type="text" class="form-control" placeholder="Credit card number" pattern="\d{16}" th:field="*{cardNumber}" required>
+                <input id="cardNumber" type="text" class="form-control" placeholder="Credit card number"  th:field="*{cardNumber}" required>
                 <label class="form-label" for="formCardNumber">Credit card number</label>
+                <div>
+                <small th:if="${#fields.hasErrors('cardNumber')}"
+                th:errors="*{cardNumber}"
+                th:text="${#strings.listJoin(#fields.errors('cardNumber'), ', ')}" class="text-danger">
+                    Please provide a valid card number.
+                </small>
+                </div>
             </div>
         </div>
     </div>
@@ -73,8 +87,15 @@
         <div class="col-6">
             <div class="form-outline">
                 <input type="hidden" th:field="*{expiringDate}" id="hiddenExpiringDate"/>
-                <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY" pattern="(0[1-9]|1[0-2])\/\d{4}" required th:value="${#dates.format(bank_card.expiringDate, 'MM/yyyy')}">
+                <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY" th:field="${bank_card.expiringDate}" pattern="^(0[1-9]|1[0-2])\/[0-9]{4}|[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$" required>
                 <label class="form-label" for="formExpiringDate">Expiration date</label>
+                <div>
+                    <small th:if="${#fields.hasErrors('expiringDate')}"
+                    th:errors="*{expiringDate}"
+                    th:text="${#strings.listJoin(#fields.errors('expiringDate'), ', ')}" class="text-danger">
+                        Please provide a expiring date.
+                    </small>
+                </div>
             </div>
         </div>
 
@@ -82,13 +103,20 @@
 
         <div class="col-6">
             <div class="form-outline">
-                <input id="cvv" type="text" class="form-control" placeholder="cvv" pattern="\d{3}" th:field="*{cvv}" required>
+                <input id="cvv" type="text" class="form-control" placeholder="cvv"   th:field="*{cvv}" required>
                 <label class="form-label" for="formCVV">CVV</label>
+                <div>
+                    <small th:if="${#fields.hasErrors('cvv')}"
+                    th:errors="*{cvv}"
+                    th:text="${#strings.listJoin(#fields.errors('cvv'), ', ')}" class="text-danger">
+                        Please provide a cvv.
+                    </small>
+                </div>
             </div>
         </div>
     </div>
 
-    <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit">Save bank card</button>
+    <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit" style="width: 30%;">Save bank card</button>
 </form>
 
               </div>

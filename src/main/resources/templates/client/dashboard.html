@@ -23,19 +23,20 @@
                                 type="button"
                                 data-bs-toggle="dropdown" aria-expanded="false"
                                 id="selectedBankButton"
-                                th:text="${'Bank card'}">
+                                th:text="${card.bankName}">
                         </button>
-                       <ul class="dropdown-menu">
-    <li th:each="card : ${bank_cards}">
-        <button class="dropdown-item"
-                type="button"
-                onclick="selectBank(this)"
-                th:text="${card.bankName}"
-                th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
-                th:attr="card-number=${card.cardNumber}">
-        </button>
-    </li>
-</ul>
+                        <ul class="dropdown-menu">
+                            <li th:each="card : ${bank_cards}">
+                                <button id="bank-card-swithcer"
+                                        class="dropdown-item"
+                                        type="button"
+                                        onclick="selectBank(this)"
+                                        th:text="${card.bankName}"
+                                        th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
+                                        th:attr="card-number=${card.cardNumber}">
+                                </button>
+                            </li>
+                        </ul>
                     </div>   
                   <div class="col-4">
                     <a style="width:100%;" th:href="@{'/clients/' + ${client.id} + '/bank_cards/save'}">
@@ -134,14 +135,18 @@
         // Call the updateCardNumber function when the page is loaded
         updateCardNumber();
     };
- function selectBank(button) {
-    var selectedBankName = button.innerText;
-    var cards = /*[[${bank_cards}]]*/ [];
+    function selectBank(button) {
+        var selectedBankName = button.innerText;
+        var cards = /*[[${bank_cards}]]*/ [];
 
-    // Find the selected bank card from the list using a unique identifier (card ID)
-    var selectedCard = cards.find(function (card) {
-        return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
-    });
+        // Find the selected bank card from the list using a unique identifier (card ID)
+        var selectedCard = cards.find(function (card) {
+            return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
+        });
+
+        // Update the text on the top button to the selected bank name
+        document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
+
 
         // Update card details
         var elementsWithBalanceClass = document.getElementsByClassName('balance');
@@ -560,7 +565,7 @@
                     });
                 }
             </script>
- 
+            
 
       <div class="col-sm-12 mb-5">
       <div class="my-container">
@@ -597,12 +602,16 @@
                 </div>
             <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions" >
            <div class="d-flex justify-content-center align-items-center ">
-            <button class="btn btn-primary custom-back-violet" style="width: 30%;">Details</button>
+            <a th:href="@{'/clients/' + ${client.id} + '/categories'}"  >
+                <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
+            </a> 
            </div>
            </div>
            <div th:if="${client_statistic.expenses.size() > 0} "  class = "expense_transactions" style="display: none;">
            <div class="d-flex justify-content-center align-items-center ">
-            <button class="btn btn-primary custom-back-violet" style="width: 30%;">Details</button>
+            <a th:href="@{'/clients/' + ${client.id} + '/categories'}"  >
+                <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
+            </a>
            </div>
           </div>
           </div>

@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.dto.view;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
+import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,11 +15,16 @@ import java.util.List;
 @Builder(toBuilder = true)
 public class ClientDto {
 
-    private final Long id;
-    private final String firstname;
-    private final String lastname;
-    private final String email;
-    private final Saving saving;
-    private final List<TransactionDto> incomes;
-    private final List<TransactionDto> expenses;
+    private Long id;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private String password;
+    private String phoneNumber;
+    private String country;
+    private String language;
+    private Saving saving;
+    private byte[] avatar;
+    private List<Transaction> incomes;
+    private List<Transaction> expenses;
 }

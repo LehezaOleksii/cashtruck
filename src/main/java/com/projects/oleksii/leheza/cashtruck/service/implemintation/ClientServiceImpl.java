@@ -3,14 +3,16 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.update.ClientUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
-import com.projects.oleksii.leheza.cashtruck.repository.BankTransactionRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
+import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.repository.*;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
+import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -31,9 +33,13 @@ public class ClientServiceImpl implements ClientService {
 
     private final ClientRepository clientRepository;
     private final CustomUserRepository customUserRepository;
-    private final DtoMapper dtoConvertor;
+    private final DtoMapper dtoMapper;
     private final TransactionRepository transactionRepository;
     private final BankTransactionRepository bankTransactionRepository;
+    private final ImageConvertor imageConvertor;
+    private final ImageRepository imageRepository;
+    private final ImageService imageService;
+
 //    private final PasswordEncoder passwordEncoder;
 
 
@@ -49,7 +55,7 @@ public class ClientServiceImpl implements ClientService {
 //    }
 
     @Override
-    public void saveClient(CreateClientDto createClientDto) throws IllegalArgumentException {
+    public Client saveClient(CreateClientDto createClientDto) throws IllegalArgumentException {
         if (!Optional.ofNullable(createClientDto).isPresent()) {
             throw new IllegalStateException("Client is empty");
         }
@@ -58,26 +64,26 @@ public class ClientServiceImpl implements ClientService {
         }
 //        client.setPassword(passwordEncoder.encode(client.getPassword()));
         CustomUser customUser = CustomUser.builder()
-                .firstName(createClientDto.getFirstname())
-                .lastName(createClientDto.getLastname())
+                .firstName(createClientDto.getFirstName())
+                .lastName(createClientDto.getLastName())
                 .email(createClientDto.getEmail())
                 .password(createClientDto.getPassword())
                 .build();
         Client client = Client.builder()
                 .customUser(customUser)
                 .build();
-        clientRepository.save(client);
+        return clientRepository.save(client);
     }
 
     @Override
-    public void saveClient(Client client) throws IllegalArgumentException {
+    public Client saveClient(Client client) throws IllegalArgumentException {
         if (!Optional.ofNullable(client).isPresent()) {
             throw new IllegalStateException("Client is empty");
         }
-        if (existByEmail(client.getCustomUser().getEmail())) {
-            throw new IllegalStateException("Email taken");
-        }
-        clientRepository.save(client);
+//        if (existByEmail(client.getCustomUser().getEmail())) {
+//            throw new IllegalStateException("Email taken");
+//        }
+        return clientRepository.save(client);
     }
 
     @Override
@@ -100,19 +106,25 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public void updateClientInfo(Long clientId, CreateClientDto createClientDto) throws IllegalStateException {
+    public void updateClientInfo(Long clientId, ClientUpdateDto clientUpdateDto) throws IllegalStateException {
         Client currentClient = clientRepository.findById(clientId).get();
-        String updatedEmail = createClientDto.getEmail();
+        String updatedEmail = clientUpdateDto.getEmail();
         String currentEmail = currentClient.getCustomUser().getEmail();
-        CustomUser currentCustomUser = currentClient.getCustomUser();
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        currentCustomUser.toBuilder()
-                .firstName(createClientDto.getFirstname())
-                .lastName(createClientDto.getLastname())
+        CustomUser user = currentClient.getCustomUser().toBuilder()
+                .phoneNumber(clientUpdateDto.getPhoneNumber())
+                .country(clientUpdateDto.getCountry())
+                .language(clientUpdateDto.getLanguage())
+                .firstName(clientUpdateDto.getFirstName())
+                .lastName(clientUpdateDto.getLastName())
+                .email(clientUpdateDto.getEmail())
+                .password(clientUpdateDto.getPassword())
+                .avatar(imageRepository.save(new Image(imageConvertor.convertStringToByteImage(clientUpdateDto.getAvatar()))))
+                .role(UserRole.Client)
                 .build();
-        customUserRepository.save(currentCustomUser);
+        customUserRepository.save(user);
     }
 
     @Override
@@ -164,7 +176,38 @@ public class ClientServiceImpl implements ClientService {
     }
 
     @Override
-    public ClientDto getClient(Long clientId) {
+    public ClientDto getClientDto(Long clientId) {
+        return dtoMapper.clientToDto(clientRepository.findById(clientId).get());
+    }
+
+    @Override
+    public ClientUpdateDto getClientUpdateDto(Long clientId) {
+        return dtoMapper.clientToClientUpdateDto(clientRepository.findById(clientId).get());
+    }
+
+    @Override
+    public Client getClient(Long clientId) {
+        return clientRepository.findById(clientId).get();
+    }
+
+    @Override
+    @Transactional
+    public ClientHeaderDto getHeaderClientData(Long clientId) {
+        if (clientRepository.findAvatarByClientId(clientId)!= null && clientRepository.findAvatarByClientId(clientId).length > 0) {
+            return ClientHeaderDto.builder()
+                    .id(clientId)
+                    .avatar(imageConvertor.convertByteImageToString(clientRepository.findAvatarByClientId(clientId)))
+                    .build();
+        } else {
+            return ClientHeaderDto.builder()
+                    .id(clientId)
+                    .avatar(imageService.getDefaultAvatarImage())
+                    .build();
+        }
+    }
+
+    @Override
+    public ClientDto getDtoClient(Long clientId) {
         Client client = clientRepository.getReferenceById(clientId);
         CustomUser customUser = customUserRepository.getReferenceById(clientId);
         return ClientDto.builder()
@@ -172,16 +215,21 @@ public class ClientServiceImpl implements ClientService {
                 .saving(client.getSaving())
                 .expenses(client.getTransactions().stream()
                         .filter(transaction -> transaction.getCategory().getTransactionType() == TransactionType.EXPENSE)
-                        .map(dtoConvertor::transactionToDto)
                         .toList())
                 .incomes(client.getTransactions().stream()
                         .filter(transaction -> transaction.getCategory().getTransactionType() == TransactionType.INCOME)
-                        .map(dtoConvertor::transactionToDto)
                         .toList())
                 .email(customUser.getEmail())
-                .firstname(customUser.getFirstName())
-                .lastname(customUser.getLastName())
+                .password(customUser.getPassword())
+                .firstName(customUser.getFirstName())
+                .lastName(customUser.getLastName())
+                .avatar(customUser.getAvatar().getImageBytes())
                 .build();
+    }
+
+    @Override
+    public CreateClientDto getCreateClientDto(Long clientId) {
+        return dtoMapper.clientToCreateDto(clientRepository.findById(clientId).get());
     }
 
     private ClientStatisticDto createStatisticDto(Client client) {

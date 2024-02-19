@@ -16,14 +16,9 @@ import java.time.LocalDateTime;
 @Setter
 @Builder(toBuilder = true)
 public class TransactionDto {
-
-    @NotNull
-    @NotBlank
     private String name;
-    @NotNull
-    @NotBlank
     private String category;
-    @NotNull
+    private String transactionType;
     private LocalDateTime time;
     @DecimalMin(value = "0", inclusive = true)
     private BigDecimal sum;

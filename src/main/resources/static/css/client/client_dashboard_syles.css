@@ -258,3 +258,14 @@ height: 50px;
   width: 80%;
   padding: 20px;
 }
+
+
+/* Table without last border line */
+
+.my-table tr:last-child td {
+  border-bottom: none;
+}
+
+.my-table td:last-child {
+  border-right: none;
+}

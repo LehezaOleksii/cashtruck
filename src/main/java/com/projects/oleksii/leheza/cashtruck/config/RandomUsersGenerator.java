@@ -5,7 +5,6 @@ import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
-import org.apache.catalina.User;
 import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
@@ -24,7 +23,6 @@ public class RandomUsersGenerator {
 
     private final ClientService clientService;
     private final ManagerService managerService;
-    private final AdminService adminService;
     private final SavingService savingService;
     private final BankCardService bankCardService;
     private final TransactionService transactionService;
@@ -99,7 +97,7 @@ public class RandomUsersGenerator {
     private void generateRandomManagers(int managersNumber) {
         int clientsNumber = clientService.findAll().size();
         List<CustomUser> customUsers = customUserRepository.findAll();
-        IntStream.range(clientsNumber, clientsNumber+managersNumber).forEach(index -> {
+        IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
             Manager manager = Manager.builder()
                     .customUser(customUsers.get(index - 1))
                     .build();
@@ -111,7 +109,7 @@ public class RandomUsersGenerator {
         int clientsNumber = clientService.findAll().size();
         int managersNumber = managerService.findAllManagers().size();
         List<CustomUser> customUsers = customUserRepository.findAll();
-        IntStream.range(clientsNumber+managersNumber, clientsNumber+managersNumber+ adminNumber).forEach(index -> {
+        IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
             Manager manager = Manager.builder()
                     .customUser(customUsers.get(index - 1))
                     .build();

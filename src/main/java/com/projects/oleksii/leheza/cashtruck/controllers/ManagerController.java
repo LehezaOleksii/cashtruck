@@ -63,7 +63,7 @@ public class ManagerController {
     @GetMapping(path = "/show/client/{clientId}")
     public ModelAndView showClinetInfo(@PathVariable("clientId") Long clientId) {
         ModelAndView modelAndView = new ModelAndView("manager/show/client");
-        modelAndView.addObject("client", clientService.getClient(clientId));
+        modelAndView.addObject("client", clientService.getDtoClient(clientId));
         return modelAndView;
     }
 }

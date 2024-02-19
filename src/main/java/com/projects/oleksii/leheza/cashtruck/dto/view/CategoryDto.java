@@ -21,5 +21,4 @@ public class CategoryDto {
     @NotBlank
     @Column(name = "name", length = 50)
     private String name;
-    private String categoryImage;
 }

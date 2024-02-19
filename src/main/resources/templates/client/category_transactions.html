@@ -9,7 +9,6 @@
     <title>Cash truck</title>
   </head>  
   <body th:object="${client}" layout:fragment="content">
-
       <div class="income_transactions">
                 <div class="mb-2 "  style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
                 <div  th:each="income : ${client_statistic.incomes}">
