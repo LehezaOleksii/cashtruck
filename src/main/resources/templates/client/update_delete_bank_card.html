@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/client/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+  </head> 
+  <body>
+    <main layout:fragment="content">
+     <!-- Credit card form -->
+      <section class="info-card-container d-flex justify-content-center align-items-center"> 
+          <div class="col-md-10 mb-4">
+            <div class="card mb-4  my-container">
+              <div class="card-header py-3">
+                <h5 class="mb-0">Card details</h5>
+              </div>
+              <div class="card-body">
+<div th:object="${bank_cards}">   
+ <!-- choose bank -->
+              <div class="card-body" th:if="${not #lists.isEmpty(bank_cards)}" th:with="card=${bank_cards[0]}">
+           <div class="row">
+    <!-- Bank cards dropdown --> 
+    <div class="col-6">
+        <h5>Bank cards</h5> 
+        <div class="dropdown">
+          <button class="btn btn-secondary dropdown-toggle custom-back-violet bold col-12"
+                  type="button"
+                  data-bs-toggle="dropdown" aria-expanded="false"
+                  id="selectedBankButton"
+                  th:text="${card.bankName}">
+          </button>
+          <ul class="dropdown-menu">
+              <li th:each="card : ${bank_cards}">
+                  <button id="bank-card-swithcer"
+                          class="dropdown-item"
+                          type="button"
+                          onclick="selectBank(this)"
+                          th:text="${card.bankName}"
+                          th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
+                          th:attr="card-number=${card.cardNumber}">
+                  </button>
+              </li>
+          </ul>
+      </div> 
+        
+       <div class="additional-info mt-4">       
+        <div type="hidden" class="cardId" id="cardId" th:text="${card != null ? card.id : '-'}" style="display: none;"></div>
+        <div type="hidden" class="clientId" id="clientId" th:text="${clientId}" style="display: none;"></div>  
+              <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div> 
+              <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
+              <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
+              <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
+                         
+                <button type="button" class="btn btn-primary custom-back-violet col-12 mt-2" id="changeBankCard">                  
+                  Change bank card information
+                </button> 
+
+              <script>
+                document.getElementById('changeBankCard').addEventListener('click', function() {
+                var cardId = document.getElementById('cardId').innerText;
+                var clientId = document.getElementById('clientId').innerText;  
+                var updateUrl = '/clients/' + clientId + '/bank_cards/' + cardId + '/save'; 
+                window.location.href = updateUrl;});
+              </script>
+
+              <button id="deleteCardBtn" class="btn custom-back-red col-12 mt-2">
+                 Delete current bank card
+               </button> 
+
+              
+<script>
+  // Show the modal when the button is clicked
+  document.getElementById('deleteCardBtn').addEventListener('click', function() {
+    $('#confirmationModal').modal('show');
+  }); 
+</script> 
+
+              <!-- Modal -->
+<div class="modal" tabindex="-1" role="dialog" id="confirmationModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Delete Confirmation</h5>   
+      </div>
+      <div class="modal-body">
+        <p><i class="fas fa-exclamation-triangle text-warning"></i> Are you sure you want to delete the current bank card?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn custom-back-red" id="confirmDelete">Delete</button>
+        <script>
+          document.getElementById('confirmDelete').addEventListener('click', function() {
+          var cardId = document.getElementById('cardId').innerText;
+          var clientId = document.getElementById('clientId').innerText;  
+          var deleteUrl = '/clients/' + clientId + '/bank_cards/' + cardId + '/remove'; 
+          window.location.href = deleteUrl;});
+            // Handle cancel button to close the modal
+document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
+$('#confirmationModal').modal('hide');
+});
+        </script>
+      </div>
+    </div>
+  </div>
+</div> 
+
+            </div>
+    </div>
+
+    <!-- Bank card details on the right -->
+    <div class="col-md-6">
+         <div class="bank-card card-container mt-4">
+                        <div class="bank-name-and-currency-name">
+                        <div class="bank-name bankName" th:text="${card != null ? #strings.length(card.bankName) > 22 ? #strings.substring(card.bankName, 0, 22) : card.bankName : '-'}"></div>
+                            <div class="currency-name">USD</div>
+                        </div>
+                        <div class="card-number cardNumber"></div>
+                        <div class="card-holder-and-expiry">
+                        <div class="card-holder nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></div>
+                        <div class="expiry expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></div>
+                        </div>
+                    </div> 
+                </div>
+            </div>  
+        <div class="card-body" th:if="${#lists.isEmpty(bank_cards)}"> 
+        </div>
+    </div>  
+  </div>
+              </div>
+            </div>
+          </div> 
+        </div>
+      </section> 
+      <script th:inline="javascript"> 
+       function formatCardNumber(cardNumber) {
+        // Add a space after every 4 digits
+        return cardNumber.replace(/(\d{4})/g, '$1 ').trim();
+    }
+
+    function updateCardNumber() {
+        var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
+        var cards = /*[[${bank_cards}]]*/ [];
+
+        // Assuming you want to format the first card in the list
+        if (cards.length > 0) {
+            var formattedCardNumber = formatCardNumber(cards[0].cardNumber);
+
+            for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
+                elementsWithCardNumberClass[i].innerText = formattedCardNumber;
+            }
+        }
+    }
+
+    window.onload = function () { 
+        updateCardNumber();
+    };
+ function selectBank(button) {
+        var selectedBankName = button.innerText;
+        var cards = /*[[${bank_cards}]]*/ [];
+
+        // Find the selected bank card from the list using a unique identifier (card ID)
+        var selectedCard = cards.find(function (card) {
+            return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
+        });
+
+        // Update the text on the top button to the selected bank name
+        document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
+
+
+        // Update card details
+        var elementsWithBalanceClass = document.getElementsByClassName('balance');
+        for (var i = 0; i < elementsWithBalanceClass.length; i++) {
+            elementsWithBalanceClass[i].innerText = selectedCard.balance;
+        }
+
+        var elementsWithCvvClass = document.getElementsByClassName('cvv');
+        for (var i = 0; i < elementsWithCvvClass.length; i++) {
+            elementsWithCvvClass[i].innerText = selectedCard.cvv;
+        }
+
+         var elementsWithIdClass = document.getElementsByClassName('card-id');
+        for (var i = 0; i < elementsWithIdClass.length; i++) {
+            elementsWithIdClass[i].innerText = selectedCard.id;
+        }
+
+        var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
+        for (var i = 0; i < elementsWithExpiringDateClass.length; i++) {
+            // Format the date as "year month day"
+            var formattedDate = new Date(selectedCard.expiringDate).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit'
+            });
+            elementsWithExpiringDateClass[i].innerText = formattedDate;
+        }
+
+          var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
+        for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
+            var formattedCardNumber = formatCardNumber(selectedCard.cardNumber);
+            elementsWithCardNumberClass[i].innerText = formattedCardNumber;
+        }
+        var elementsWithBankNameClass = document.getElementsByClassName('bankName');
+        for (var i = 0; i < elementsWithBankNameClass.length; i++) {
+            // Display only the first 22 characters of the bank name
+            elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
+        }
+
+        var elementsWithNameOnCardClass = document.getElementsByClassName('nameOnCard');
+        for (var i = 0; i < elementsWithNameOnCardClass.length; i++) {
+            elementsWithNameOnCardClass[i].innerText = selectedCard.nameOnCard;
+        }
+
+         var elementsWithCardIdClass = document.getElementsByClassName('cardId');
+        for (var i = 0; i < elementsWithCardIdClass.length; i++) {
+            elementsWithCardIdClass[i].innerText = selectedCard.id;
+        } 
+        
+
+        $('cardId').text(button.getAttribute('card-id')); 
+        $('cardId').val(button.getAttribute('card-id'));
+        $('cardId').val(button.getAttribute('card-id')); 
+    }
+</script> 
+    </div>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/client/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+  </head> 
+  <body >
+  <content layout:fragment="content">
+<script th:inline="javascript">
+    function validateForm() {
+        var selectedBankName = document.getElementById('hiddenBankName').value;
+        if (!selectedBankName || selectedBankName.trim() === '') {
+            alert('Please select a bank name');
+            return false;
+        }
+        return true;
+    }
+</script>
+ 
+     <!-- Credit card form -->
+          <div class="mt-4" style="margin-left: 60px;">
+            <div class="card mb-4">
+              <div class="card-header py-3">
+                <h5 class="mb-0">Card details</h5>
+              </div>
+              <div class="card-body">
+<form method="post" th:object="${bank_card}" th:action="@{'/clients/' + ${client.id} + '/bank_cards'}" onsubmit="return validateForm();">
+ <!-- choose bank --> 
+<div class="dropdown mb-3">  
+    <select id="bankNameButton" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:field="*{bankName}" text="Select a bank">
+    <option class="dropdown-item custom-back-white" style="color:black" value="Monobank">Monobank</option>
+    <option class="dropdown-item custom-back-white" style="color:black" value="Privat bank">Privat bank</option>
+    <option class="dropdown-item custom-back-white" style="color:black" value="Alfa bank">Alfa bank</option>
+</select> 
+</div> 
+<input type="hidden" th:field="*{id}" style="display: none;"/>
+<input type="hidden" th:field="*{balance}" style="display: none;"/>  
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var expiringDateInput = document.getElementById('expiringDate');
+        var hiddenExpiringDateInput = document.getElementById('hiddenExpiringDate');
+
+        expiringDateInput.addEventListener('input', function () {
+            // Parse the input value and set it in ISO format in the hidden input field
+            var parts = expiringDateInput.value.split('/');
+            var isoDate = parts[1] + '-' + parts[0] + '-01'; // Assuming day is always 01
+            hiddenExpiringDateInput.value = isoDate;
+        });
+    });
+</script>
+
+    <!-- Input for bankName --> 
+    <div class="row mb-4">
+        <div class="col">
+            <div class="form-outline">
+                <input id="nameOnCard" type="text" placeholder="Name on card" class="form-control" th:field="*{nameOnCard}" required/>
+                <label class="form-label" for="nameOnCard">Name on card</label>
+                <div>
+                <small th:if="${#fields.hasErrors('nameOnCard')}"
+                th:errors="*{nameOnCard}"
+                th:text="${#strings.listJoin(#fields.errors('nameOnCard'), ', ')}" class="text-danger">
+                    Please provide a valid name.
+                </small>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="form-outline">
+                <input id="cardNumber" type="text" class="form-control" placeholder="Credit card number"  th:field="*{cardNumber}" required>
+                <label class="form-label" for="formCardNumber">Credit card number</label>
+                <div>
+                <small th:if="${#fields.hasErrors('cardNumber')}"
+                th:errors="*{cardNumber}"
+                th:text="${#strings.listJoin(#fields.errors('cardNumber'), ', ')}" class="text-danger">
+                    Please provide a valid card number.
+                </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-6">
+            <div class="form-outline">
+                <input type="hidden" th:field="*{expiringDate}" id="hiddenExpiringDate"/>
+                <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY" th:field="${bank_card.expiringDate}" pattern="^(0[1-9]|1[0-2])\/[0-9]{4}|[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$" required>
+                <label class="form-label" for="formExpiringDate">Expiration date</label>
+                <div>
+                    <small th:if="${#fields.hasErrors('expiringDate')}"
+                    th:errors="*{expiringDate}"
+                    th:text="${#strings.listJoin(#fields.errors('expiringDate'), ', ')}" class="text-danger">
+                        Please provide a expiring date.
+                    </small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your existing script for handling expiringDate -->
+
+        <div class="col-6">
+            <div class="form-outline">
+                <input id="cvv" type="text" class="form-control" placeholder="cvv"   th:field="*{cvv}" required>
+                <label class="form-label" for="formCVV">CVV</label>
+                <div>
+                    <small th:if="${#fields.hasErrors('cvv')}"
+                    th:errors="*{cvv}"
+                    th:text="${#strings.listJoin(#fields.errors('cvv'), ', ')}" class="text-danger">
+                        Please provide a cvv.
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit" style="width: 30%;">Save bank card</button>
+</form>
+
+              </div>
+            </div>
+          </div> 
+        </content>
+  </body>
+</html>
