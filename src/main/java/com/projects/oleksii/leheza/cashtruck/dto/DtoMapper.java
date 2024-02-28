@@ -3,10 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.dto;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.ClientUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.*;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
@@ -120,11 +117,7 @@ public class DtoMapper {
     public ClientUpdateDto clientToClientUpdateDto(Client client) {
         CustomUser user = client.getCustomUser();
         ClientUpdateDto clientUpdateDto = new ClientUpdateDto();
-//        if (user.getAvatar() != null) {
-//            clientUpdateDto.setAvatar(imageConvertor.convertByteImageToString(user.getAvatar().getImageBytes()));
-//        }
         Image image = client.getCustomUser().getAvatar();
-        Long clientId = client.getId();
         if (image != null && image.getImageBytes().length > 0) {
             clientUpdateDto.setAvatar((imageConvertor.convertByteImageToString(image.getImageBytes())));
         } else {
@@ -157,6 +150,40 @@ public class DtoMapper {
                 .build();
         return Client.builder()
                 .customUser(user)
+                .build();
+    }
+
+    public CustomUserDto customUserToCustomUserDto(CustomUser customUser){
+        CustomUserDto customUserDto = new CustomUserDto();
+        Image image = customUser.getAvatar();
+        if (image != null && image.getImageBytes().length > 0) {
+            customUserDto.setAvatar((imageConvertor.convertByteImageToString(image.getImageBytes())));
+        } else {
+            customUserDto.setAvatar(imageService.getDefaultAvatarImage());
+        }
+        return customUserDto.toBuilder()
+                .id(customUser.getId())
+                .firstName(customUser.getFirstName())
+                .lastName(customUser.getLastName())
+                .email(customUser.getEmail())
+                .password(customUser.getPassword())
+                .language(customUser.getLanguage())
+                .country(customUser.getCountry())
+                .phoneNumber(customUser.getPhoneNumber())
+                .build();
+    }
+    public CustomUser customUserDtoToCustomUser(CustomUserDto customUserDto){
+       return CustomUser.builder()
+                .id(customUserDto.getId())
+                .firstName(customUserDto.getFirstName())
+                .lastName(customUserDto.getLastName())
+                .avatar(new Image(imageConvertor.convertStringToByteImage(customUserDto.getAvatar())))
+                .language(customUserDto.getLanguage())
+                .email(customUserDto.getEmail())
+                .password(customUserDto.getPassword())
+                .phoneNumber(customUserDto.getPhoneNumber())
+                .country(customUserDto.getCountry())
+                .role(UserRole.Client)
                 .build();
     }
 }

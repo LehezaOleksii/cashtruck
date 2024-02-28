@@ -6,6 +6,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateAdminDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
+import com.projects.oleksii.leheza.cashtruck.dto.update.ManagerUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.repository.AdminRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
@@ -93,10 +94,10 @@ public class AdminServiceImpl implements AdminService {
         return managerService.findAllManagers();
     }
 
-    @Override
-    public void updateManagerInfo(Long managerId, CreateManagerDto createManagerDto) throws IllegalStateException {
-        managerService.updateManagerInfo(managerId, createManagerDto);
-    }
+//    @Override
+//    public void updateManagerInfo(Long managerId, CreateManagerDto createManagerDto) throws IllegalStateException {
+//        managerService.updateManagerInfo(managerId, createManagerDto);
+//    }
 
     @Override
     public void deleteManagerById(Long managerId) throws IllegalStateException {
@@ -114,8 +115,8 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public void changeManagerInfoById(Long managerId, CreateManagerDto createManagerDto) {
-        managerService.updateManagerInfo(managerId, createManagerDto);
+    public void changeManagerInfoById(Long managerId, ManagerUpdateDto managerUpdateDto) {
+        managerService.updateManagerInfo(managerId, managerUpdateDto);
     }
 
     private boolean existByEmail(String email) {

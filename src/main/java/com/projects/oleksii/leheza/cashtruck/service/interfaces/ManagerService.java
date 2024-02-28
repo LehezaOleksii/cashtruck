@@ -2,6 +2,7 @@ package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
+import com.projects.oleksii.leheza.cashtruck.dto.update.ManagerUpdateDto;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface ManagerService {
 
     Manager findManagerById(Long managerId);
 
-    void updateManagerInfo(Long managerId, CreateManagerDto createManagerDto);
+    void updateManagerInfo(Long managerId, ManagerUpdateDto managerUpdateDto);
 
     void deleteManagerById(Long id);
 }

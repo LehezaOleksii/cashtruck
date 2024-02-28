@@ -5,6 +5,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.Manager;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateAdminDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateClientDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
+import com.projects.oleksii.leheza.cashtruck.dto.update.ManagerUpdateDto;
 
 import java.util.List;
 
@@ -27,7 +28,7 @@ public interface AdminService {
 
     void createManager(CreateManagerDto createManagerDto);
 
-    void updateManagerInfo(Long id, CreateManagerDto createManagerDto);
+//    void updateManagerInfo(Long id, CreateManagerDto createManagerDto);
 
     void deleteManagerById(Long id);
 
@@ -35,5 +36,5 @@ public interface AdminService {
 
     void changeClientInfoById(Long clientId, CreateClientDto createClientDto);
 
-    void changeManagerInfoById(Long managerId, CreateManagerDto createManagerDto);
+    void changeManagerInfoById(Long managerId, ManagerUpdateDto managerUpdateDto);
 }

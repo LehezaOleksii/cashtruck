@@ -1,11 +1,17 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
+import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
+import com.projects.oleksii.leheza.cashtruck.domain.Image;
 import com.projects.oleksii.leheza.cashtruck.domain.Manager;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateManagerDto;
-import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
+import com.projects.oleksii.leheza.cashtruck.dto.update.ManagerUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.repository.CustomUserRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.ImageRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.ManagerRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
+import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +25,8 @@ public class ManagerServiceImpl implements ManagerService {
 
     private final ManagerRepository managerRepository;
     private final CustomUserRepository customUserRepository;
+    private final ImageRepository imageRepository;
+    private final ImageConvertor imageConvertor;
 
     @Override
     public void saveManager(CreateManagerDto createManagerDto) {
@@ -69,20 +77,25 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     @Override
-    public void updateManagerInfo(Long managerId, CreateManagerDto createManagerDto) throws IllegalStateException {
-        Manager currentManager = managerRepository.findById(managerId)
-                .orElseThrow(() -> new IllegalStateException("Manager with id " + managerId + " not found"));
-        String updatedEmail = createManagerDto.getEmail();
+    public void updateManagerInfo(Long managerId, ManagerUpdateDto managerUpdateDto) throws IllegalStateException {
+        Manager currentManager = managerRepository.findById(managerId).get();
+        String updatedEmail = managerUpdateDto.getEmail();
         String currentEmail = currentManager.getCustomUser().getEmail();
-        CustomUser currentCustomUser = customUserRepository.getReferenceById(managerId);
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        currentCustomUser.toBuilder()
-                .firstName(createManagerDto.getFirstname())
-                .lastName(createManagerDto.getLastname())
+        CustomUser user = currentManager.getCustomUser().toBuilder()
+                .phoneNumber(managerUpdateDto.getPhoneNumber())
+                .country(managerUpdateDto.getCountry())
+                .language(managerUpdateDto.getLanguage())
+                .firstName(managerUpdateDto.getFirstName())
+                .lastName(managerUpdateDto.getLastName())
+                .email(managerUpdateDto.getEmail())
+                .password(managerUpdateDto.getPassword())
+                .avatar(imageRepository.save(new Image(imageConvertor.convertStringToByteImage(managerUpdateDto.getAvatar()))))
+                .role(UserRole.Client)
                 .build();
-        customUserRepository.save(currentCustomUser);
+        customUserRepository.save(user);
     }
 
     @Override
@@ -96,7 +109,7 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     private boolean existByEmail(String email) {
-        return managerRepository.findManagerByCustomUser_Email(email)!=null&&email.equals(managerRepository.findManagerByCustomUser_Email(email).getCustomUser().getEmail());
+        return managerRepository.findManagerByCustomUser_Email(email) != null && email.equals(managerRepository.findManagerByCustomUser_Email(email).getCustomUser().getEmail());
 //        managerRepository.findManagerByUser_Email(email).isPresent()
     }
 

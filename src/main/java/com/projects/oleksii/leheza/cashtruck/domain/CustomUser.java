@@ -39,5 +39,4 @@ public class CustomUser {
     private UserRole role;
     @OneToOne
     private Image avatar;
-    //TODO add phone number
 }

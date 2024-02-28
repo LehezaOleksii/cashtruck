@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/manager/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+  </head>
+  <body th:object="${manager}">
+    <main layout:fragment="content">
+      <div class="row">
+        <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+          <div class="my-container mb-4" style="height: auto">
+            <div class="card-body">
+              <div class="d-flex align-items-center flex-column pt-4">
+                <!-- <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${clientDto.avatar != null}" th:src="'data:image/jpeg;base64,' + ${clientDto.avatar}" height="110" width="110">                                -->
+
+                <!-- <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${clientDto.avatar == null}" height="110" width="110" > -->
+
+
+                <div class="user-info text-center">
+                  <h4>name</h4>
+                  <span>role</span>
+                </div>
+              </div>
+              <h5 class="pb-2 custom-dark-grey border-bottom mb-4">Details</h5>
+              <div>
+                <div>
+                  <span class="custom-dark-grey">First name:</span>
+                  <span class="custom-fear-grey">First name</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Last name:</span>
+                  <span class="custom-fear-grey">Last name</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Email:</span>
+                  <span class="custom-fear-grey">Email</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Status:</span>
+                  <span class="custom-fear-grey">Status</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Role:</span>
+                  <span class="custom-fear-grey">Role</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Contact: </span>
+                  <span class="custom-fear-grey">Contact</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Languages: </span>
+                  <span class="custom-fear-grey">Languages</span>
+                </div>
+                <div>
+                  <span class="custom-dark-grey">Country:</span>
+                  <span class="custom-fear-grey">Country</span>
+                </div>
+                <div class="d-flex justify-content-center mt-3">
+                  <button class="btn btn-primary custom-back-violet me-3 col-3">
+                      Edit
+                  </button>
+                  <button class="btn custom-back-red col-3">
+                      Block
+                  </button>
+              </div>
+              
+              </div>
+            </div>
+          </div>
+          <div class="my-container card-body mt-4" style="height: auto">
+            <div class="d-flex justify-content-between align-items-center">
+              <h5 class="pt-2 pb-2">Payment Methods</h5>
+              <div class="card-action-element">
+                <button
+                  class="btn btn-primary btn-sm custom-back-violet"
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#addNewCCModal"
+                >
+                  <i class="bx bx-plus bx-xs me-1"></i>Change Card
+                </button>
+              </div>
+            </div>
+
+            <div class="cardMaster border p-3 rounded mb-3">
+              <div
+                class="d-flex justify-content-between flex-sm-row flex-column"
+              >
+                <div class="card-information">
+                  <h6 class="mb-1">Kaith Morrison</h6>
+                  <span class="card-number">∗∗∗∗ ∗∗∗∗ ∗∗∗∗ 9856</span>
+                </div>
+                <div class="d-flex flex-column text-start text-lg-end">
+                  <small class="mt-sm-auto mt-2 order-sm-1 order-0"
+                    >Card expires at 12/26</small
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="d-flex order-sm-0 order-1">
+              <button class="btn btn-primary custom-back-violet me-3">
+                Edit
+              </button>
+              <button class="btn btn-label-secondary custom-back-grey">
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
+          <div class="card-body my-container" style="height: auto">
+            <h4 class="pt-4 mb-4 custom-dark-grey">Current Plan</h4>
+            <div class="row">
+              <div class="col-xl-6">
+                <div class="mb-3">
+                  <div class="custom-fair-grey">
+                    <h5>User Current Plan is Basic</h5>
+                  </div>
+                  <div>A simple start for everyone</div>
+                  <small>$199 Per Month</small>
+                </div>
+                <div>
+                  <div class="custom-fair-grey">
+                    <h5>Active until Dec 09, 2021</h5>
+                  </div>
+                  <p>
+                    We will send you a notification upon Subscription expiration
+                  </p>
+                </div>
+                <div class="mt-2 row">
+                  <div class="col-6">
+                    <button class="btn btn-primary custom-back-violet w-100">
+                      Upgrade Plan
+                    </button>
+                  </div>
+                  <div class="col-6">
+                    <button class="btn custom-back-red w-100">
+                      Cancel Subscription
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body col-xl-6">
+                <div class="alert alert-warning mb-4" role="alert">
+                  <h6 class="alert-heading mb-1">We need your attention!</h6>
+                  <span>Your plan requires update</span>
+                </div>
+                <div class="d-flex justify-content-between mb-2">
+                  <h6>Days</h6>
+                  <h6>24 of 30 Days</h6>
+                </div>
+                <div class="progress">
+                  <div
+                    class="progress-bar w-75 custom-back-violet"
+                    role="progressbar"
+                    aria-valuenow="75"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  ></div>
+                </div>
+                <small>6 days remaining until your plan requires update</small>
+              </div>
+            </div>
+          </div>
+          <div class="my-container card-body mt-4" style="height: auto">
+            <div class="d-flex justify-content-between align-items-center mt-2">
+              <h5>Client Cards</h5>
+              <div class="d-flex justify-content-center">
+                <div class="card-action-element mb-3">
+                  <button
+                    class="btn btn-primary btn-sm custom-back-violet"
+                    type="button"
+                    data-bs-toggle="modal"
+                    data-bs-target="#addNewCCModal"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24"
+                      height="24"
+                      fill="currentColor"
+                      class="bi bi-plus"
+                      viewBox="0 0 16 16"
+                    >
+                      <path
+                        d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
+                      />
+                    </svg>
+                    Add Card
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="cardMaster border p-3 rounded mb-3">
+              <div
+                class="d-flex justify-content-between flex-sm-row flex-column"
+              >
+                <div class="card-information">
+                  <h6 class="mb-1">Kaith Morrison</h6>
+                  <span class="card-number">∗∗∗∗ ∗∗∗∗ ∗∗∗∗ 9856</span>
+                </div>
+                <div class="d-flex flex-column text-start text-lg-end">
+                  <div class="d-flex order-sm-0 order-1">
+                    <button class="btn btn-primary custom-back-violet me-3">
+                      Edit
+                    </button>
+                    <button class="btn custom-back-grey">Delete</button>
+                  </div>
+                  <small class="mt-sm-auto mt-2 order-sm-1 order-0"
+                    >Card expires at 12/26</small
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
