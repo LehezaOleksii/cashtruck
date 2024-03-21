@@ -1,14 +1,14 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
+import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
-    private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
     private final DtoMapper dtoMapper;
 
     @Override
@@ -40,8 +40,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId) {
-        Client client = clientRepository.findById(clientId).get();
-        List<TransactionDto> transactionDtos = client.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
+        User user = userRepository.findById(clientId).get();
+        List<TransactionDto> transactionDtos = user.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
         return categoryRepository.findCategoriesByClientId(INCOME_TRANSACTION_TYPE, clientId).stream()
                 .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
                 .toList();
@@ -49,8 +49,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<CategoryInfoDto> findClientExpenseCategoriesByClientId(Long clientId) {
-        Client client = clientRepository.findById(clientId).get();
-        List<TransactionDto> transactionDtos = client.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
+        User user = userRepository.findById(clientId).get();
+        List<TransactionDto> transactionDtos = user.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
         return categoryRepository.findCategoriesByClientId(EXPENSE_TRANSACTION_TYPE, clientId).stream()
                 .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
                 .toList();

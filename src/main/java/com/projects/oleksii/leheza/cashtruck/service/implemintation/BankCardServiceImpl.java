@@ -4,23 +4,22 @@ import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BankCardServiceImpl implements BankCardService {
 
     private final BankCardRepository bankCardRepository;
-    private final ClientRepository clientRepository;
-    private final ClientService clientService;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -62,20 +61,22 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public boolean isClientHasCard(Long clientId, CreateBankCardDto bankCardDto) {
-        return clientService.getBankCardsByClientId(clientId)
+    public boolean isClientHasCard(Long userId, CreateBankCardDto bankCardDto) {
+        return bankCardRepository.getBankCardsByUserId(userId)
                 .stream()
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .anyMatch(card -> card.getCardNumber().equals(bankCardDto.getCardNumber()));
     }
 
     @Override
-    public void removeBankCardForClient(Long bankCardId, Long clientId) {
-        clientRepository.findById(clientId)
+    public void removeBankCardForClient(Long bankCardId, Long userId) {
+        userRepository.findById(userId)
                 .ifPresent(client -> {
                     Saving saving = client.getSaving();
                     saving.getBankCards()
                             .removeIf(bc -> Objects.equals(bc.getId(), bankCardId));
-                    clientRepository.save(client);
+                    userRepository.save(client);
                 });
     }
 }

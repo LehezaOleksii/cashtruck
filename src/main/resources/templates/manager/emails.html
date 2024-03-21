@@ -9,13 +9,15 @@
     <title>Cash truck</title>
   </head>
   <body th:object="${manager}">
-    <main layout:fragment="content">
+    <main layout:fragment="content" >
+      <form method="post" th:object="${email}" th:action="@{'/managers/' + ${manager.id} + '/emails/send'}">
+      <div id="userId" style="display: none;" data-th-text="${manager.id}"></div>
       <div class="my-container ml-4 mr-4 row">
         <div class="col-3 card-body border-right">
           <div class="text-center">
-            <button id="composeBtn" class="btn btn-primary custom-back-violet mt-1 mx-auto d-block" style="width: 85%">
+            <a id="composeBtn" class="btn btn-primary custom-back-violet mt-1 mx-auto d-block" style="width: 85%">
               Compose
-            </button>
+            </a>
  
           </div>
           <ul class="custom-dark-grey email-filter-folders list-unstyled pb-1 mt-5">
@@ -100,15 +102,15 @@
               </div>
         <div class="d-flex justify-content-center border-bottom">
           <label for="formGroupExampleInput" class="pl-3 mb-2 mt-2">To:</label>
-          <input type="text" class="form-control border-0 mt-1" placeholder="Mail"> 
+          <input type="text"  th:field="*{to}" class="form-control border-0 mt-1" placeholder="Mail"> 
         </div>
         
         <div class="d-flex justify-content-center border-bottom">
           <label for="formGroupExampleInput" class="pl-3 mb-2 mt-2">Subject:</label>
-          <input type="text" class="form-control border-0 mb-2 mt-1" placeholder="Subject"> 
+          <input type="text" th:field="*{subject}"  class="form-control border-0 mb-2 mt-1" placeholder="Subject"> 
         </div>
       <div class="d-flex border-bottom" style="height: 200px;">
-        <textarea class="form-control" id="exampleFormControlTextarea1" rows="3" placeholder="Enter your message here..."></textarea>
+        <textarea class="form-control" th:field="*{email}"  id="exampleFormControlTextarea1" rows="3" placeholder="Enter your message here..."></textarea>
       </div>
     
     <div class="email-compose-actions d-flex justify-content-between align-items-center my-2 py-1 mt-2">
@@ -129,13 +131,13 @@
   </div>
   </div> 
               <script>
-                document.getElementById('sendBtn').addEventListener('click', function() {
-                // var cardId = document.getElementById('cardId').innerText;
-                // var clientId = document.getElementById('clientId').innerText;  
-                // var deleteUrl = '/clients/' + clientId + '/bank_cards/' + cardId + '/remove'; 
-                // window.location.href = deleteUrl;
+                document.getElementById('sendBtn').addEventListener('click', function() { 
+                var userId = document.getElementById('userId').innerText;  
+                var sendUrl = '/managers/' + userId + '/emails/send'; 
+                window.location.href = sendUrl;
               }); 
               </script>
+      </form>
     </main>
   </body>
 </html>

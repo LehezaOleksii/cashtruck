@@ -7,6 +7,8 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,8 +16,8 @@ import lombok.*;
 @ToString
 @Builder(toBuilder = true)
 @Entity
-@Table
-public class CustomUser {
+@Table(name = "users")
+public class User {
 
     @Id
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
@@ -39,4 +41,11 @@ public class CustomUser {
     private UserRole role;
     @OneToOne
     private Image avatar;
+    @OneToOne
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_client_saving"))
+    private Saving saving;
+    @OneToMany
+    @JoinColumn(foreignKey = @ForeignKey(name = "fk_client_transaction"))
+    private List<Transaction> transactions;
+    private boolean isEnable; //TODO status
 }

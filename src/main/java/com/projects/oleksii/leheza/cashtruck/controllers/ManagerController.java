@@ -1,10 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
-import com.projects.oleksii.leheza.cashtruck.dto.update.ClientUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.update.ManagerUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.CustomUserService;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.ManagerService;
+import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,32 +21,31 @@ import java.io.IOException;
 public class ManagerController {
 
     // TODO     @Resource
-    private final ManagerService managerService;
-    private final CustomUserService customUserService;
-    private final ClientService clientService;
+    private final UserService userService;
     private final ImageConvertor imageConvertor;
+    private final EmailServiceImpl emailService;
 
-    @PutMapping(path = "/update/{managerId}")
-    ModelAndView updateManagerInfo(@PathVariable("managerId") Long managerId, @ModelAttribute("manager") ManagerUpdateDto managerUpdateDto) {
+    @PutMapping(path = "/update/{userId}")
+    ModelAndView updateManagerInfo(@PathVariable("userId") Long managerId, @ModelAttribute("manager") UserUpdateDto userUpdateDto) {
         ModelAndView modelAndView = new ModelAndView();
-        managerService.updateManagerInfo(managerId, managerUpdateDto);
+//        userService.updateUserInfo(managerId, userUpdateDto);
         return modelAndView;
     }
 
-    @GetMapping(path = "/{managerId}")
-    ModelAndView showManagerDashboard(@PathVariable("managerId") Long managerId) {
-        ModelAndView modelAndView = new ModelAndView("manager/dashboard");
-        modelAndView.addObject("managerId", managerId);
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
-        return modelAndView;
-    }
+//    @GetMapping(path = "/{managerId}")
+//    ModelAndView showManagerDashboard(@PathVariable("managerId") Long managerId) {
+//        ModelAndView modelAndView = new ModelAndView("manager/dashboard");
+//        modelAndView.addObject("managerId", managerId);
+////        modelAndView.addObject("manager", userService.(managerId));
+//        return modelAndView;
+//    }
 
     @GetMapping(path = "/{managerId}/users")
     ModelAndView getClientsList(@PathVariable("managerId") Long managerId) {
         ModelAndView modelAndView = new ModelAndView("manager/users");
         modelAndView.addObject("managerId", managerId);
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
-        modelAndView.addObject("users", customUserService.findAll());
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("users", userService.findAll());
         return modelAndView;
     }
 
@@ -56,7 +54,7 @@ public class ManagerController {
         //if user == client modelAndView
         //else another modelAndView
         ModelAndView modelAndView = new ModelAndView("manager/client_info");
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
 
 
 //        ModelAndView modelAndView = new ModelAndView("manager/manager_info");
@@ -70,8 +68,8 @@ public class ManagerController {
         //if user == client modelAndView
         //else another modelAndView
         ModelAndView modelAndView = new ModelAndView("manager/client_profile");
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
-        modelAndView.addObject("clientDto", clientService.getClientUpdateDto(clientId));
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("clientDto", userService.getClientUpdateDto(clientId));
 
 
 //        ModelAndView modelAndView = new ModelAndView("manager/manager_info");
@@ -81,27 +79,27 @@ public class ManagerController {
     }
 
     @PostMapping(path = "/{managerId}/users/{clientId}/profile")
-    ModelAndView changeClientProfile(@PathVariable Long managerId, @PathVariable Long clientId, @Valid @ModelAttribute("clientDto") ClientUpdateDto clientUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
+    ModelAndView changeClientProfile(@PathVariable Long managerId, @PathVariable Long clientId, @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
         if (bindingResult.hasFieldErrors()) {
             return new ModelAndView("manager/client_profile")
-                    .addObject("manager", clientService.getHeaderClientData(clientId))
+                    .addObject("manager", userService.getHeaderClientData(clientId))
                     .addObject("clientId", clientId)
                     .addObject("managerId", managerId);
 
         } else {
             if (!avatar.isEmpty()) {
                 try {
-                    clientUpdateDto.setAvatar(imageConvertor.convertByteImageToString(avatar.getBytes()));
+                    userUpdateDto.setAvatar(imageConvertor.convertByteImageToString(avatar.getBytes()));
                 } catch (IOException e) {
                     return new ModelAndView("redirect:/managers/" + managerId + "/users/" + clientId)
                             .addObject("errorMessage", e.getMessage());
                 }
             }
             try {
-                clientService.updateClientInfo(clientId, clientUpdateDto);
+                userService.updateUserInfo(clientId, userUpdateDto);
             } catch (Exception e) {
                 ModelAndView modelAndView = new ModelAndView("redirect:/managers/" + managerId + "/users/" + clientId + "/profile");
-                modelAndView.addObject("client", clientService.getHeaderClientData(clientId));
+                modelAndView.addObject("client", userService.getHeaderClientData(clientId));
                 return modelAndView.addObject("errorMessage", e.getMessage());
             }
             return new ModelAndView("redirect:/managers/" + managerId + "/users/" + clientId);
@@ -111,14 +109,14 @@ public class ManagerController {
     @GetMapping(path = "/{managerId}/plans")
     ModelAndView getPlansModerationMenu(@PathVariable("managerId") Long managerId) {
         ModelAndView modelAndView = new ModelAndView("manager/plans");
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
         return modelAndView;
     }
 
     @GetMapping(path = "/{managerId}/plans/{planId}")
     ModelAndView getPlanModerationMenu(@PathVariable("managerId") Long managerId,@PathVariable("planId") Long planId) {
         ModelAndView modelAndView = new ModelAndView("manager/plan");
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
         return modelAndView;
     }
 
@@ -126,14 +124,23 @@ public class ManagerController {
     @GetMapping(path = "/{managerId}/plans/create")
     ModelAndView createPlanModerationMenu(@PathVariable("managerId") Long managerId) {
         ModelAndView modelAndView = new ModelAndView("manager/create_plan");
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
         return modelAndView;
     }
     @GetMapping(path = "/{managerId}/emails")
     ModelAndView getEmailsMenu(@PathVariable("managerId") Long managerId) {
         ModelAndView modelAndView = new ModelAndView("manager/emails");
-        modelAndView.addObject("manager", managerService.findManagerById(managerId));
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("email", new EmailContext());
         return modelAndView;
     }
 
+    @PostMapping(path = "/{managerId}/emails/send")
+    ModelAndView sendEmail(@PathVariable("managerId") Long managerId, @Valid @ModelAttribute("email") EmailContext email) {
+//        emailService.sendEmail(manager.getCustomUser().getEmail(), email.getTo(), email.getSubject(),email.getEmail());
+        ModelAndView modelAndView = new ModelAndView("manager/emails");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("email", new EmailContext());
+        return new ModelAndView("redirect:/managers/" + managerId+"/emails");
+    }
 }

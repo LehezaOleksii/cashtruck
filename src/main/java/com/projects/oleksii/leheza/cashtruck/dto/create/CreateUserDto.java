@@ -1,20 +1,21 @@
 package com.projects.oleksii.leheza.cashtruck.dto.create;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 @Getter
-@Setter
 @AllArgsConstructor
 @Builder(toBuilder = true)
-public class CreateClientDto {
+public class CreateUserDto {
 
-    @Size(max=50)
+    @Size(max = 50)
     private String firstName;
-    @Size(max=50)
+    @Size(max = 50)
     private String lastName;
     @Email
     @NotEmpty
@@ -22,7 +23,6 @@ public class CreateClientDto {
     private String email;
     @NotEmpty
     @NotBlank
-    @Size(min=7,max=50)
+    @Size(min = 7, max = 50)
     private String password;
-
 }

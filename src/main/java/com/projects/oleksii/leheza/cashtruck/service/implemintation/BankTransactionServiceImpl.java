@@ -1,7 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankTransaction;
-import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.repository.BankTransactionRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankTransactionService;
 import lombok.RequiredArgsConstructor;

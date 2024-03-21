@@ -2,18 +2,16 @@ package com.projects.oleksii.leheza.cashtruck.dto.view;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
+@NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class ClientDto {
+public class UserDto {
 
     private Long id;
     private String firstName;
@@ -24,7 +22,7 @@ public class ClientDto {
     private String country;
     private String language;
     private Saving saving;
-    private byte[] avatar;
+    private String avatar;
     private List<Transaction> incomes;
     private List<Transaction> expenses;
 }

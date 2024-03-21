@@ -6,14 +6,12 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-import java.util.Base64;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class ClientUpdateDto {
+public class UserUpdateDto {
 
     private Long id;
     @Size(max = 50, message = "First name must be at most 50 characters")

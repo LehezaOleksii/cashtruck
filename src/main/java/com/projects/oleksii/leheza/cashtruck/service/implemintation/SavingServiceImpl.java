@@ -1,12 +1,12 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
+import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.SavingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ import java.util.List;
 public class SavingServiceImpl implements SavingService {
 
     private final SavingRepository savingRepository;
-    private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
     private final BankCardRepository bankCardRepository;
 
 
@@ -34,12 +34,12 @@ public class SavingServiceImpl implements SavingService {
     }
 
     @Override
-    public void assignBankCardToClient(Long clientId, BankCard bankCard) throws IllegalStateException {
-        if (!clientRepository.findById(clientId).isPresent()) {
+    public void assignBankCardToClient(Long userId, BankCard bankCard) throws IllegalStateException {
+        if (!userRepository.findById(userId).isPresent()) {
             throw new IllegalStateException("Client dose not exist");
         }
-        Client client = clientRepository.findById(clientId).get();
-        Saving saving = client.getSaving();
+        User user = userRepository.findById(userId).get();
+        Saving saving = user.getSaving();
         if (saving == null) {
             throw new IllegalStateException("Client does not have saving");
         }
@@ -52,14 +52,14 @@ public class SavingServiceImpl implements SavingService {
     }
 
     @Override
-    public void assignBankCardsToClient(Long clientId, List<BankCard> bankCards) throws IllegalStateException {
+    public void assignBankCardsToClient(Long userId, List<BankCard> bankCards) throws IllegalStateException {
         for (BankCard bankCard : bankCards) {
-            assignBankCardToClient(clientId, bankCard);
+            assignBankCardToClient(userId, bankCard);
         }
     }
 
     @Override
-    public void assignBankCardDtoToClient(Long clientId, CreateBankCardDto bankCardDto) {
+    public void assignBankCardDtoToClient(Long userId, CreateBankCardDto bankCardDto) {
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())
@@ -68,6 +68,6 @@ public class SavingServiceImpl implements SavingService {
                 .expiringDate(bankCardDto.getExpiringDate())
                 .build();
         bankCardRepository.save(bankCard);
-        assignBankCardToClient(clientId, bankCard);
+        assignBankCardToClient(userId, bankCard);
     }
 }

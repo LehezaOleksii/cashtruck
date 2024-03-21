@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder(toBuilder = true)
-public class ClientHeaderDto {
+public class UserHeaderDto {
 
     private Long id;
     private String avatar;
