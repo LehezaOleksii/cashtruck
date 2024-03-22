@@ -114,7 +114,7 @@ public class ManagerController {
     }
 
     @GetMapping(path = "/{managerId}/plans/{planId}")
-    ModelAndView getPlanModerationMenu(@PathVariable("managerId") Long managerId,@PathVariable("planId") Long planId) {
+    ModelAndView getPlanModerationMenu(@PathVariable("managerId") Long managerId, @PathVariable("planId") Long planId) {
         ModelAndView modelAndView = new ModelAndView("manager/plan");
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         return modelAndView;
@@ -127,6 +127,7 @@ public class ManagerController {
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         return modelAndView;
     }
+
     @GetMapping(path = "/{managerId}/emails")
     ModelAndView getEmailsMenu(@PathVariable("managerId") Long managerId) {
         ModelAndView modelAndView = new ModelAndView("manager/emails");
@@ -136,11 +137,12 @@ public class ManagerController {
     }
 
     @PostMapping(path = "/{managerId}/emails/send")
-    ModelAndView sendEmail(@PathVariable("managerId") Long managerId, @Valid @ModelAttribute("email") EmailContext email) {
-//        emailService.sendEmail(manager.getCustomUser().getEmail(), email.getTo(), email.getSubject(),email.getEmail());
+    ModelAndView sendEmail(@PathVariable("managerId") Long managerId,
+                           @Valid @ModelAttribute("email") EmailContext email) {
+        emailService.sendEmailWithAttachment(userService.getUserById(managerId).getEmail(), email);
         ModelAndView modelAndView = new ModelAndView("manager/emails");
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         modelAndView.addObject("email", new EmailContext());
-        return new ModelAndView("redirect:/managers/" + managerId+"/emails");
+        return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
 }

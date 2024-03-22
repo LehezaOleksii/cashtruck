@@ -10,8 +10,8 @@
   </head>
   <body th:object="${manager}">
     <main layout:fragment="content" >
-      <form method="post" th:object="${email}" th:action="@{'/managers/' + ${manager.id} + '/emails/send'}">
-      <div id="userId" style="display: none;" data-th-text="${manager.id}"></div>
+      <form method="post" th:object="${email}" th:action="@{'/managers/' + ${manager.id} + '/emails/send'}" enctype="multipart/form-data">
+        <div id="userId" style="display: none;" data-th-text="${manager.id}"></div>
       <div class="my-container ml-4 mr-4 row">
         <div class="col-3 card-body border-right">
           <div class="text-center">
@@ -116,27 +116,32 @@
     <div class="email-compose-actions d-flex justify-content-between align-items-center my-2 py-1 mt-2">
       <div class="d-flex align-items-center"> 
         <div class=" ml-4 mb-2">
-          <button  class="btn btn-primary custom-back-violet" style="width: 100px;" id="sendBtn">Send</button> 
-         <label for="attach-file">         
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="bi bi-paperclip ml-2"   style="cursor: pointer;"viewBox="0 0 16 16">
-          <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
-        </svg>
-      </label>
-        <input type="file" name="file-input" class="d-none" id="attach-file">
-        </div> 
+          <button  type="submit" class="btn btn-primary custom-back-violet" style="width: 100px;" id="sendBtn">Send</button> 
+         <label for="attach-file">       
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="bi bi-paperclip ml-2"   style="cursor: pointer;"viewBox="0 0 16 16">
+              <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+            </svg>
+      </label> 
+      <input type="file" name="attachment"> 
+
+    </div> 
       </div>
     </div> 
       </div>
     </div>      
-  </div>
   </div> 
-              <script>
-                document.getElementById('sendBtn').addEventListener('click', function() { 
-                var userId = document.getElementById('userId').innerText;  
-                var sendUrl = '/managers/' + userId + '/emails/send'; 
-                window.location.href = sendUrl;
-              }); 
-              </script>
+  </div> 
+
+  <script>
+    $(document).ready(function() { 
+      $("#composeBtn").click(function() { 
+        $("#composeForm").modal("show");
+      }); 
+      $(".btn-close").click(function() { 
+        $("#composeForm").modal("hide");
+      });
+    });
+  </script>        
       </form>
     </main>
   </body>

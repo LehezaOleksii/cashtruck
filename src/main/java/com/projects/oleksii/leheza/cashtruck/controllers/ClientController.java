@@ -7,7 +7,6 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
-import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
@@ -28,7 +27,6 @@ public class ClientController {
     private final SavingService savingService;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
-    private final ImageConvertor imageConvertor;
 
 
     @PostMapping(path = "/login")

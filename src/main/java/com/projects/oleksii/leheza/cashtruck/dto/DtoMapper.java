@@ -6,7 +6,10 @@ import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.*;
+import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
@@ -15,7 +18,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -71,8 +73,8 @@ public class DtoMapper {
                 .build();
     }
 
-    public UserDto clientToDto(User user) {
-        return UserDto.builder()
+    public UserDto userToDto(User user) {
+        UserDto dto = UserDto.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
@@ -90,8 +92,11 @@ public class DtoMapper {
                         .filter(transaction -> transaction.getCategory().getTransactionType()
                                 .equals(TransactionType.EXPENSE))
                         .collect(Collectors.toList()))
-                .avatar(Arrays.toString(user.getAvatar().getImageBytes()))
                 .build();
+        if (user.getAvatar() != null) {
+            dto.setAvatar(imageConvertor.convertByteImageToString(user.getAvatar().getImageBytes()));
+        }
+        return dto;
     }
 
     public User dtoToClient(UserDto clientdto) {
