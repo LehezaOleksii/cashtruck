@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <title>Cash truck</title>
   </head>
-  <body th:object="${user}">
+  <body th:object="${customUser}">
     <main layout:fragment="content">
       <div
         class="alert alert-danger alert-dismissible fade show"
@@ -43,15 +43,15 @@
                     <img
                       id="preview"
                       class="rounded-3 custom-back-grey mb-3"
-                      th:if="${user.avatar != null}"
-                      th:src="'data:image/jpeg;base64,' + ${user.avatar}"
+                      th:if="${customUser.avatar != null}"
+                      th:src="'data:image/jpeg;base64,' + ${customUser.avatar}"
                       height="110"
                       width="110"
                       alt="Avatar"
                     />
                     <!-- Placeholder if there is no avatar -->
                     <div
-                      th:unless="${user.avatar != null}"
+                      th:unless="${customUser.avatar != null}"
                       class="rounded-3 custom-back-grey mb-3"
                       style="height: 110px; width: 110px"
                     ></div>
@@ -146,7 +146,7 @@
             <div class="d-flex justify-content-center">
               <div class="mb-4">
                 <a
-                  th:href="@{'/managers/' + ${manager.id} + '/users'}"
+                  th:href="@{'/managers/' + ${manager.id} + '/customUsers'}"
                   class="btn mt-2 custom-back-grey"
                   style="width: 240px"
                   >Back</a

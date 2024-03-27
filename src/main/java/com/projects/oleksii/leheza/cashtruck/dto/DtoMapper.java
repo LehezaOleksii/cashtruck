@@ -1,9 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.dto;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Category;
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.domain.Image;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
@@ -11,13 +11,14 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,46 +64,46 @@ public class DtoMapper {
                 .build();
     }
 
-    public CreateUserDto clientToCreateDto(User user) {
+    public CreateUserDto clientToCreateDto(CustomUser customUser) {
         return CreateUserDto.builder()
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
+                .email(customUser.getEmail())
+                .password(customUser.getPassword())
+                .firstName(customUser.getFirstName())
+                .lastName(customUser.getLastName())
 //                .avatar(user.getAvatar().getBytes())
                 .build();
     }
 
-    public UserDto userToDto(User user) {
+    public UserDto userToDto(CustomUser customUser) {
         UserDto dto = UserDto.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .language(user.getLanguage())
-                .country(user.getCountry())
-                .phoneNumber(user.getPhoneNumber())
-                .saving(user.getSaving())
-                .expenses(user.getTransactions().stream()
+                .id(customUser.getId())
+                .email(customUser.getEmail())
+                .password(customUser.getPassword())
+                .firstName(customUser.getFirstName())
+                .lastName(customUser.getLastName())
+                .language(customUser.getLanguage())
+                .country(customUser.getCountry())
+                .phoneNumber(customUser.getPhoneNumber())
+                .saving(customUser.getSaving())
+                .expenses(customUser.getTransactions().stream()
                         .filter(transaction -> transaction.getCategory().getTransactionType()
                                 .equals(TransactionType.EXPENSE))
                         .collect(Collectors.toList()))
-                .incomes(user.getTransactions().stream()
+                .incomes(customUser.getTransactions().stream()
                         .filter(transaction -> transaction.getCategory().getTransactionType()
                                 .equals(TransactionType.EXPENSE))
                         .collect(Collectors.toList()))
                 .build();
-        if (user.getAvatar() != null) {
-            dto.setAvatar(imageConvertor.convertByteImageToString(user.getAvatar().getImageBytes()));
+        if (customUser.getAvatar() != null) {
+            dto.setAvatar(imageConvertor.convertByteImageToString(customUser.getAvatar().getImageBytes()));
         }
         return dto;
     }
 
-    public User dtoToClient(UserDto clientdto) {
+    public CustomUser dtoToClient(UserDto clientdto) {
         List<Transaction> transactions = clientdto.getIncomes();
         transactions.addAll(clientdto.getExpenses());
-        return User.builder()
+        return CustomUser.builder()
                 .id(clientdto.getId())
                 .firstName(clientdto.getFirstName())
                 .lastName(clientdto.getLastName())
@@ -114,32 +115,32 @@ public class DtoMapper {
                 .country(clientdto.getCountry())
                 .saving(clientdto.getSaving())
                 .transactions(transactions)
-                .role(UserRole.Client)
+                .roles(Collections.singletonList(Role.CLIENT))
                 .build();
     }
 
-    public UserUpdateDto clientToClientUpdateDto(User user) {
+    public UserUpdateDto clientToClientUpdateDto(CustomUser customUser) {
         UserUpdateDto userUpdateDto = new UserUpdateDto();
-        Image image = user.getAvatar();
+        Image image = customUser.getAvatar();
         if (image != null && image.getImageBytes().length > 0) {
             userUpdateDto.setAvatar((imageConvertor.convertByteImageToString(image.getImageBytes())));
         } else {
             userUpdateDto.setAvatar(imageService.getDefaultAvatarImage());
         }
         return userUpdateDto.toBuilder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .language(user.getLanguage())
-                .country(user.getCountry())
-                .phoneNumber(user.getPhoneNumber())
+                .id(customUser.getId())
+                .firstName(customUser.getFirstName())
+                .lastName(customUser.getLastName())
+                .email(customUser.getEmail())
+                .password(customUser.getPassword())
+                .language(customUser.getLanguage())
+                .country(customUser.getCountry())
+                .phoneNumber(customUser.getPhoneNumber())
                 .build();
     }
 
-    public User updateClientDtoToClient(UserUpdateDto userUpdateDto) {
-        return User.builder()
+    public CustomUser updateClientDtoToClient(UserUpdateDto userUpdateDto) {
+        return CustomUser.builder()
                 .id(userUpdateDto.getId())
                 .firstName(userUpdateDto.getFirstName())
                 .lastName(userUpdateDto.getLastName())
@@ -149,32 +150,32 @@ public class DtoMapper {
                 .password(userUpdateDto.getPassword())
                 .phoneNumber(userUpdateDto.getPhoneNumber())
                 .country(userUpdateDto.getCountry())
-                .role(UserRole.Client)
+                .roles(Collections.singletonList(Role.CLIENT))
                 .build();
     }
 
-    public UserDto userToUserDto(User user) {
+    public UserDto userToUserDto(CustomUser customUser) {
         UserDto userDto = new UserDto();
-        Image image = user.getAvatar();
+        Image image = customUser.getAvatar();
         if (image != null && image.getImageBytes().length > 0) {
             userDto.setAvatar((imageConvertor.convertByteImageToString(image.getImageBytes())));
         } else {
             userDto.setAvatar(imageService.getDefaultAvatarImage());
         }
         return userDto.toBuilder()
-                .id(user.getId())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .language(user.getLanguage())
-                .country(user.getCountry())
-                .phoneNumber(user.getPhoneNumber())
+                .id(customUser.getId())
+                .firstName(customUser.getFirstName())
+                .lastName(customUser.getLastName())
+                .email(customUser.getEmail())
+                .password(customUser.getPassword())
+                .language(customUser.getLanguage())
+                .country(customUser.getCountry())
+                .phoneNumber(customUser.getPhoneNumber())
                 .build();
     }
 
-    public User userDtoToUser(UserDto userDto) {
-        return User.builder()
+    public CustomUser userDtoToUser(UserDto userDto) {
+        return CustomUser.builder()
                 .id(userDto.getId())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
@@ -184,7 +185,7 @@ public class DtoMapper {
                 .password(userDto.getPassword())
                 .phoneNumber(userDto.getPhoneNumber())
                 .country(userDto.getCountry())
-                .role(UserRole.Client)
+                .roles(Collections.singletonList(Role.CLIENT))
                 .build();
     }
 }

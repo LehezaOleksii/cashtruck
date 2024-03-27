@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.service.email;
 
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import com.projects.oleksii.leheza.cashtruck.util.EmailUtils;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -16,7 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class EmailServiceImpl {
+public class EmailServiceImpl implements EmailService {
 
     private static final String UTF_8 = "UTF-8";
     private static final String NEW_USER_ACCOUNT_VERIFICATION = "New User Account Verification";

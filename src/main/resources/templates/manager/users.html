@@ -48,23 +48,23 @@
                         </tr>
                     </thead>
                     <tbody >
-                        <tr th:each="user, rowStat : ${users}">
+                        <tr th:each="customUser, rowStat : ${customUsers}">
                             <td>
-                                <div class="d-flex justify-content-start align-items-center user-name">
+                                <div class="d-flex justify-content-start align-items-center customUser-name">
                                     <div>
-                                        <img class="rounded-circle text-decoration-none me-2" th:if="${user.avatar != null}" th:src="'data:image/jpeg;base64,' + ${user.avatar}" width="34" height="34">
+                                        <img class="rounded-circle text-decoration-none me-2" th:if="${customUser.avatar != null}" th:src="'data:image/jpeg;base64,' + ${customUser.avatar}" width="34" height="34">
                                     </div>
                                     <div class="d-flex flex-column">
                                         <div>
-                                            <span th:text="${user.firstName}"></span>
-                                            <span th:text="${user.lastName}"></span>
+                                            <span th:text="${customUser.firstName}"></span>
+                                            <span th:text="${customUser.lastName}"></span>
                                         </div>
-                                        <small class="custom-grey" th:text="${user.email}"></small>
+                                        <small class="custom-grey" th:text="${customUser.email}"></small>
                                     </div>
                                 </div>
                             </td>
-                            <td class="text-center">user role</td>
-                            <td class="text-center">user plan</td>
+                            <td class="text-center">customUser role</td>
+                            <td class="text-center">customUser plan</td>
                             <td class="text-center">status</td>
                             <td class="text-center">
                                 <a href="">

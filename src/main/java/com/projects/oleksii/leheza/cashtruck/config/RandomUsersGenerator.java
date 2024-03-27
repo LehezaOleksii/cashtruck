@@ -1,7 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
@@ -69,7 +69,7 @@ public class RandomUsersGenerator {
             String fullName = firstName + lastName;
             Saving saving = savings.get(index - 1);
             saveBankCardHolderName(fullName, saving);
-            User user = User.builder()
+            CustomUser customUser = CustomUser.builder()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(faker.internet().emailAddress())
@@ -77,35 +77,35 @@ public class RandomUsersGenerator {
                     .saving(saving)
                     .transactions(allTransactions)
                     .build();
-            userService.saveUser(user);
+            userService.saveUser(customUser);
             savingService.assignBankCardsToClient((long) index, saving.getBankCards().stream().toList());
         });
     }
 
     private void generateRandomClients(int clientsNumber) {
-        List<User> users = userRepository.findAll();
+        List<CustomUser> customUsers = userRepository.findAll();
         IntStream.range(1, clientsNumber).forEach(index -> {
-            User user = users.get(clientsNumber);
-            user.setRole(UserRole.Client);
-            userService.saveUser(user);
+            CustomUser customUser = customUsers.get(clientsNumber);
+            customUser.setRoles(Collections.singletonList(Role.CLIENT));
+            userService.saveUser(customUser);
         });
     }
 
     private void generateRandomManagers(int managersNumber, int clientsNumber) {
-        List<User> users = userRepository.findAll();
+        List<CustomUser> customUsers = userRepository.findAll();
         IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
-                User user = users.get(clientsNumber);
-                user.setRole(UserRole.Manager);
-                userService.saveUser(user);
+                CustomUser customUser = customUsers.get(clientsNumber);
+                customUser.setRoles(Arrays.asList(Role.CLIENT, Role.MANAGER));
+                userService.saveUser(customUser);
             });
     }
 
     private void generateRandomAdmins(int adminNumber, int managersNumber, int clientsNumber) {
-        List<User> users = userRepository.findAll();
+        List<CustomUser> customUsers = userRepository.findAll();
         IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
-                User user = users.get(clientsNumber);
-                user.setRole(UserRole.Admin);
-                userService.saveUser(user);
+                CustomUser customUser = customUsers.get(clientsNumber);
+            customUser.setRoles(Arrays.asList(Role.CLIENT, Role.MANAGER, Role.ADMIN));
+                userService.saveUser(customUser);
             });
     }
 

@@ -2,18 +2,27 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
+import com.projects.oleksii.leheza.cashtruck.dto.auth.SignUpRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,20 +30,22 @@ import java.beans.Transient;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements UserDetailsService, UserService {
 
     private static final TransactionType INCOME_TRANSACTION_TYPE = TransactionType.INCOME;
     private static final TransactionType EXPENSE_TRANSACTION_TYPE = TransactionType.EXPENSE;
 
+    @PersistenceContext
+    private EntityManager em;
+    @Autowired
+    BCryptPasswordEncoder bCryptPasswordEncoder;
+
     private final UserRepository userRepository;
-    private final ConfirmationRepository confirmationRepository;
+//    private final ConfirmationRepository confirmationRepository;
     private final TransactionRepository transactionRepository;
     private final BankTransactionRepository bankTransactionRepository;
     private final ImageConvertor imageConvertor;
@@ -43,7 +54,7 @@ public class UserServiceImpl implements UserService {
     private final DtoMapper dtoMapper;
 
     @Override
-    public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
+    public CustomUser saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
         if (!Optional.ofNullable(createUserDto).isPresent()) {
             throw new IllegalStateException("Client is empty");
         }
@@ -51,62 +62,69 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Email taken");
         }
 //        client.setPassword(passwordEncoder.encode(client.getPassword()));
-        User user = User.builder()
+        CustomUser customUser = CustomUser.builder()
                 .firstName(createUserDto.getFirstName())
                 .lastName(createUserDto.getLastName())
                 .email(createUserDto.getEmail())
                 .password(createUserDto.getPassword())
                 .isEnable(false)
                 .build();
-        return userRepository.save(user);
+        return userRepository.save(customUser);
     }
 
     @Override
-    public User saveUser(User user) {
-        if (!Optional.ofNullable(user).isPresent()) {
-            throw new IllegalStateException("Client is empty");
+    public boolean registerUser(SignUpRequest signUpRequest) {
+        CustomUser user = userRepository.findByEmailIgnoreCase(signUpRequest.getEmail());
+        if (user != null) {
+            return false;
+        }
+        user.setFirstName(signUpRequest.getFirstName());
+        user.setLastName(signUpRequest.getLastName());
+        user.setEmail(signUpRequest.getEmail());
+        user.setRoles(Collections.singleton(new Role(1L, "ROLE_CLIENT")));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return true;
+    }
+
+    @Override
+    public CustomUser saveUser(CustomUser customUser) {
+        if (!Optional.ofNullable(customUser).isPresent()) {
+            throw new IllegalStateException("User is empty");
         }
 //        if (existByEmail(client.getCustomUser().getEmail())) {
 //            throw new IllegalStateException("Email taken");
 //        }
-        return userRepository.save(user);
+        customUser.setRoles(Collections.singleton(new Role(1L, "ROLE_CLIENT")));
+        customUser.setPassword(bCryptPasswordEncoder.encode(customUser.getPassword()));
+        userRepository.save(customUser);
+        return userRepository.save(customUser);
     }
 
-    @Override
-    public Boolean verifyEmailToken(String token) {
-        Confirmation confirmation = confirmationRepository.findByToken(token);
-        User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail());
-        if (user == null) {
-            throw new RuntimeException();
-        }
-        user.setEnable(true);
-        userRepository.save(user);
-        confirmationRepository.delete(confirmation);
-        return Boolean.TRUE;
-    }
+
 
     @Override
-    public List<User> findAll() {
+    public List<CustomUser> findAll() {
         return userRepository.findAll();
     }
 
     @Override
-    public List<User> findAllManagers() {
+    public List<CustomUser> findAllManagers() {
         return null;
     }
 
     @Override
-    public List<User> findAllAdmins() {
+    public List<CustomUser> findAllAdmins() {
         return null;
     }
 
     @Override
-    public User findByEmail(String email) {
+    public CustomUser findByEmail(String email) {
         return userRepository.findByEmailIgnoreCase(email);
     }
 
     @Override
-    public User getUserById(Long userId) {
+    public CustomUser getUserById(Long userId) {
         return userRepository.findById(userId).get();
     }
 
@@ -117,13 +135,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserInfo(Long userId, UserUpdateDto userUpdateDto) {
-        User currentUser = userRepository.findById(userId).get();
+        CustomUser currentCustomUser = userRepository.findById(userId).get();
         String updatedEmail = userUpdateDto.getEmail();
-        String currentEmail = currentUser.getEmail();
+        String currentEmail = currentCustomUser.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        currentUser = currentUser.toBuilder()
+        currentCustomUser = currentCustomUser.toBuilder()
                 .firstName(userUpdateDto.getFirstName())
                 .lastName(userUpdateDto.getLastName())
                 .password(userUpdateDto.getPassword())
@@ -131,18 +149,18 @@ public class UserServiceImpl implements UserService {
                 .phoneNumber(userUpdateDto.getPhoneNumber())
                 .language(userUpdateDto.getLanguage())
                 .email(updatedEmail).build();
-        userRepository.save(currentUser);
+        userRepository.save(currentCustomUser);
     }
 
     @Override
     public void updateClient(Long clientId, UserUpdateDto userDto) {
-        User currentClient = userRepository.findById(clientId).get();
+        CustomUser currentClient = userRepository.findById(clientId).get();
         String updatedEmail = userDto.getEmail();
         String currentEmail = currentClient.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
-        User user = currentClient.toBuilder()
+        CustomUser customUser = currentClient.toBuilder()
                 .phoneNumber(userDto.getPhoneNumber())
                 .country(userDto.getCountry())
                 .language(userDto.getLanguage())
@@ -153,7 +171,7 @@ public class UserServiceImpl implements UserService {
                 .avatar(imageRepository.save(new Image(imageConvertor.convertStringToByteImage(userDto.getAvatar()))))
 //                .role(UserRole.Client)
                 .build();
-        userRepository.save(user);
+        userRepository.save(customUser);
     }
 
     @Override
@@ -177,7 +195,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ClientStatisticDto getClientStatisticByUserId(Long userId) {
-        Optional<User> optionalClient = userRepository.findById(userId);
+        Optional<CustomUser> optionalClient = userRepository.findById(userId);
         return optionalClient.map(this::createStatisticDto).orElseGet(ClientStatisticDto::new);
     }
 
@@ -188,7 +206,7 @@ public class UserServiceImpl implements UserService {
         Optional.ofNullable(transaction.getBankTransaction())
                 .orElseThrow(() -> new IllegalArgumentException("Transaction transaction cannot be null"));
         transactionRepository.save(transaction);
-        User client = userRepository.findById(clientId).get();
+        CustomUser client = userRepository.findById(clientId).get();
         List<Transaction> transactions = client.getTransactions();
         transactions.add(transaction);
         client.setTransactions(transactions);
@@ -225,18 +243,18 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transient
     public void updateAvatar(Long userId, MultipartFile avatar) {
-        User user = userRepository.findById(userId).get();
+        CustomUser customUser = userRepository.findById(userId).get();
         try {
             Image image = new Image(avatar.getBytes());
             imageRepository.save(image);
-            user.setAvatar(image);
+            customUser.setAvatar(image);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        userRepository.save(user);
+        userRepository.save(customUser);
     }
 
-    private ClientStatisticDto createStatisticDto(User client) {
+    private ClientStatisticDto createStatisticDto(CustomUser client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
         Long clientId = client.getId();
         LocalDateTime endDate = LocalDateTime.now();
@@ -261,7 +279,7 @@ public class UserServiceImpl implements UserService {
         clientStatisticDto.setTotalExpenseSum(getAllTransactionSum(lastTenYearsExpense));
     }
 
-    private BigDecimal getTotalBalance(User client) {
+    private BigDecimal getTotalBalance(CustomUser client) {
         if (client == null || client.getSaving() == null || client.getSaving().getBankCards() == null) {
             return BigDecimal.ZERO;
         }
@@ -311,6 +329,17 @@ public class UserServiceImpl implements UserService {
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {
         return !Objects.equals(currentEmail, updatedEmail) && existByEmail(updatedEmail);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        CustomUser user = userRepository.findByEmailIgnoreCase(username);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        return user;
     }
 }
 

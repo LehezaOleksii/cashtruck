@@ -15,7 +15,7 @@ public interface BankCardRepository extends JpaRepository<BankCard,Long> {
     @Query("SELECT bc FROM BankCard bc WHERE bc.cardNumber=?1")
     Optional<BankCard> findCardByNumber(String bankCard);
 
-    @Query("SELECT u.saving.bankCards FROM User u WHERE u.id = :userId")
+    @Query("SELECT u.saving.bankCards FROM CustomUser u WHERE u.id = :userId")
     List<Optional<BankCard>> getBankCardsByUserId(@Param("userId") Long userId);
 
 

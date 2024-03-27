@@ -1,8 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
@@ -38,8 +38,8 @@ public class SavingServiceImpl implements SavingService {
         if (!userRepository.findById(userId).isPresent()) {
             throw new IllegalStateException("Client dose not exist");
         }
-        User user = userRepository.findById(userId).get();
-        Saving saving = user.getSaving();
+        CustomUser customUser = userRepository.findById(userId).get();
+        Saving saving = customUser.getSaving();
         if (saving == null) {
             throw new IllegalStateException("Client does not have saving");
         }

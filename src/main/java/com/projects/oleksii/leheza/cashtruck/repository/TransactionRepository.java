@@ -13,10 +13,10 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long> 
 
     List<Transaction> findTransactionsByCategoryTransactionType(TransactionType transactionType);
 
-    @Query("SELECT t FROM User u JOIN u.transactions t JOIN t.category cat WHERE u.id = ?1 AND cat.transactionType = ?2")
+    @Query("SELECT t FROM CustomUser u JOIN u.transactions t JOIN t.category cat WHERE u.id = ?1 AND cat.transactionType = ?2")
     List<Transaction> findTransactionsByClientIdAndTransactionType(Long userId, TransactionType transactionType);
 
 
-    @Query("SELECT t FROM User u JOIN u.transactions t JOIN t.category cat WHERE u.id = ?1 AND cat.name = ?2")
+    @Query("SELECT t FROM CustomUser u JOIN u.transactions t JOIN t.category cat WHERE u.id = ?1 AND cat.name = ?2")
     List<Transaction> findTransactionsByClientIdAndCategoryName(Long userId, String categoryName);
 }

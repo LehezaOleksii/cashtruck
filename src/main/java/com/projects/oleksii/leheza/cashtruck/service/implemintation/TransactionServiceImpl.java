@@ -1,7 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
@@ -40,8 +40,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId) {
-        User user = userRepository.findById(clientId).get();
-        List<TransactionDto> transactionDtos = user.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
+        CustomUser customUser = userRepository.findById(clientId).get();
+        List<TransactionDto> transactionDtos = customUser.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
         return categoryRepository.findCategoriesByClientId(INCOME_TRANSACTION_TYPE, clientId).stream()
                 .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
                 .toList();
@@ -49,8 +49,8 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<CategoryInfoDto> findClientExpenseCategoriesByClientId(Long clientId) {
-        User user = userRepository.findById(clientId).get();
-        List<TransactionDto> transactionDtos = user.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
+        CustomUser customUser = userRepository.findById(clientId).get();
+        List<TransactionDto> transactionDtos = customUser.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
         return categoryRepository.findCategoriesByClientId(EXPENSE_TRANSACTION_TYPE, clientId).stream()
                 .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
                 .toList();

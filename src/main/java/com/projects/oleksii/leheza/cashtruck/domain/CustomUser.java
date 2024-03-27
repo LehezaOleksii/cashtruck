@@ -1,13 +1,15 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,7 +19,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "users")
-public class User {
+public class CustomUser implements UserDetails {
 
     @Id
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
@@ -31,14 +33,17 @@ public class User {
     private String phoneNumber;
     private String language; //TODO
     private String country; //TODO
-    @NotEmpty
-    @NotBlank
+    @Email
+    @Column(name = "email", unique = true, nullable = false)
+    @Size(min = 5, max = 255, message = "Length of email must be between 5 and 255")
     private String email;
     @NotEmpty
     @NotBlank
+    @Column(nullable = false)
+    @Size(min = 3, max = 50)
     private String password;
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @ManyToMany(fetch = FetchType.EAGER)
+    private Set<Role> roles;
     @OneToOne
     private Image avatar;
     @OneToOne
@@ -48,4 +53,34 @@ public class User {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_client_transaction"))
     private List<Transaction> transactions;
     private boolean isEnable; //TODO status
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return null;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
 }

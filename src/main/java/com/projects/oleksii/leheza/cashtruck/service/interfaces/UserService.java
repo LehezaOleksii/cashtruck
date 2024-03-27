@@ -1,8 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.dto.auth.SignUpRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
@@ -14,21 +15,22 @@ import java.util.List;
 
 public interface UserService {
 
-    User saveClient(CreateUserDto createUserDto);
+    CustomUser saveClient(CreateUserDto createUserDto);
 
-    User saveUser(User user); //TODO paramiters(DTO,id)
+    boolean registerUser(SignUpRequest signUpRequest);
 
-    Boolean verifyEmailToken(String token);
+    CustomUser saveUser(CustomUser customUser); //TODO paramiters(DTO,id)
 
-    List<User> findAll();
 
-    List<User> findAllManagers();// TODO filter?
+    List<CustomUser> findAll();
 
-    List<User> findAllAdmins();
+    List<CustomUser> findAllManagers();// TODO filter?
 
-    User findByEmail(String email);
+    List<CustomUser> findAllAdmins();
 
-    User getUserById(Long userId);
+    CustomUser findByEmail(String email);
+
+    CustomUser getUserById(Long userId);
 
     void deleteUserById(Long id);
 

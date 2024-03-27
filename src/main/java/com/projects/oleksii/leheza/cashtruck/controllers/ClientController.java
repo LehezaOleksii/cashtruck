@@ -1,11 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.domain.CustomUser;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -27,15 +29,16 @@ public class ClientController {
     private final SavingService savingService;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
+    private final EmailServiceImpl emailService;
 
 
     @PostMapping(path = "/login")
     public ModelAndView registerNewClient(@RequestBody CreateUserDto createUserDto) {
         ModelAndView modelAndView;
         if (userService.findByEmail(createUserDto.getEmail()) != null) {
-            User user = userService.saveClient(createUserDto);
+            CustomUser customUser = userService.saveClient(createUserDto);
             modelAndView = new ModelAndView("redirect:/client/login");
-            modelAndView.addObject("client", userService.getHeaderClientData(user.getId()));
+            modelAndView.addObject("client", userService.getHeaderClientData(customUser.getId()));
             //TODO error email is already taken
             return modelAndView;
         } else {
@@ -154,5 +157,15 @@ public class ClientController {
             modelAndView.addObject("client", userService.getHeaderClientData(userId));
             return new ModelAndView("redirect:/clients/" + userId);
         }
+    }
+
+    @PostMapping(path = "/{managerId}/emails/send")
+    ModelAndView sendEmail(@PathVariable("managerId") Long managerId,
+                           @Valid @ModelAttribute("email") EmailContext email) {
+        emailService.sendEmailWithAttachment(userService.getUserById(managerId).getEmail(), email);
+        ModelAndView modelAndView = new ModelAndView("manager/emails");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("email", new EmailContext());
+        return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
 }
