@@ -7,16 +7,17 @@ import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import jakarta.transaction.Transactional;
 import java.beans.Transient;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -56,7 +57,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(createUserDto.getLastName())
                 .email(createUserDto.getEmail())
                 .password(createUserDto.getPassword())
-                .isEnable(false)
+                .status(ActiveStatus.INACTIVE)
                 .build();
         return userRepository.save(user);
     }
@@ -79,7 +80,7 @@ public class UserServiceImpl implements UserService {
         if (user == null) {
             throw new RuntimeException();
         }
-        user.setEnable(true);
+        user.setStatus(ActiveStatus.ACTIVE);
         userRepository.save(user);
         confirmationRepository.delete(confirmation);
         return Boolean.TRUE;

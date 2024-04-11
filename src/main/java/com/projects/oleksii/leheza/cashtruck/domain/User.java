@@ -1,13 +1,18 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
-
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -17,7 +22,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @SequenceGenerator(name = "user_sequence", sequenceName = "user_sequence", allocationSize = 1)
@@ -37,8 +42,8 @@ public class User {
     @NotEmpty
     @NotBlank
     private String password;
-    @Enumerated(EnumType.STRING)
-    private UserRole role;
+    @Enumerated(EnumType.STRING)//???????
+    private Set<Role> roles;
     @OneToOne
     private Image avatar;
     @OneToOne
@@ -47,5 +52,35 @@ public class User {
     @OneToMany
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_client_transaction"))
     private List<Transaction> transactions;
-    private boolean isEnable; //TODO status
+    private ActiveStatus status;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return ActiveStatus.isEnabled(status);
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return ActiveStatus.isEnabled(status);
+    }
 }

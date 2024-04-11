@@ -1,7 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
@@ -86,7 +86,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(1, clientsNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRole(UserRole.Client);
+            user.setRoles(Collections.singleton(Role.CLIENT));
             userService.saveUser(user);
         });
     }
@@ -95,7 +95,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
                 User user = users.get(clientsNumber);
-                user.setRole(UserRole.Manager);
+                user.setRoles(Collections.singleton(Role.MANAGER));
                 userService.saveUser(user);
             });
     }
@@ -104,7 +104,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
                 User user = users.get(clientsNumber);
-                user.setRole(UserRole.Admin);
+                user.setRoles(Collections.singleton(Role.ADMIN));
                 userService.saveUser(user);
             });
     }

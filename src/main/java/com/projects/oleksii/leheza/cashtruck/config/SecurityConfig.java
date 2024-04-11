@@ -1,8 +1,9 @@
-//package com.projects.oleksii.leheza.cashtruck.config;
+package com.projects.oleksii.leheza.cashtruck.config;
 //
 //import com.projects.oleksii.leheza.cashtruck.dao.UserDao;
+//import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
+//import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 //import lombok.RequiredArgsConstructor;
-//import org.springframework.cglib.proxy.NoOp;
 //import org.springframework.context.annotation.Bean;
 //import org.springframework.security.authentication.AuthenticationManager;
 //import org.springframework.security.authentication.AuthenticationProvider;
@@ -11,28 +12,20 @@
 //import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 //import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 //import org.springframework.security.config.http.SessionCreationPolicy;
-//import org.springframework.security.core.Authentication;
-//import org.springframework.security.core.authority.SimpleGrantedAuthority;
-//import org.springframework.security.core.userdetails.User;
 //import org.springframework.security.core.userdetails.UserDetails;
 //import org.springframework.security.core.userdetails.UserDetailsService;
 //import org.springframework.security.core.userdetails.UsernameNotFoundException;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 //import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 //import org.springframework.security.crypto.password.PasswordEncoder;
 //import org.springframework.security.web.SecurityFilterChain;
 //import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-//
-//import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.List;
 //
 //@EnableWebSecurity
 //@RequiredArgsConstructor
 //public class SecurityConfig {
 //
 //    private final JwtAuthFilter jwtAuthFilter;
-//    private final UserDao userDao;
+//    private final UserService userDao;
 //
 //    @Bean
 //    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -77,8 +70,46 @@
 //        return new UserDetailsService() {
 //            @Override
 //            public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-//                return userDao.findByUserEmail(email);
+//                return userDao.findByEmail(email);
 //            }
 //        };
 //    }
 //}
+
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@EnableWebSecurity
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(authorizeRequests ->
+                        authorizeRequests
+                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/clients/**").hasRole(Role.CLIENT.toString())
+                                .requestMatchers("/managers/**").hasAnyRole(Role.MANAGER.toString(), Role.ADMIN.toString())
+                                .requestMatchers("/admins/**").hasAnyRole(Role.ADMIN.toString(), Role.CLIENT.toString(), Role.MANAGER.toString())
+                                .anyRequest().authenticated()
+                )
+                .formLogin(Customizer.withDefaults());
+
+        return http.build();
+    }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        return encoder;
+    }
+}

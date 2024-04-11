@@ -4,14 +4,11 @@ package com.projects.oleksii.leheza.cashtruck.service.email;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.util.EmailUtils;
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 
 @Service
@@ -38,27 +35,27 @@ public class EmailServiceImpl {
 //        mailSender.send(simpleMailMessage);
 //    }
     @Async
-    public void sendEmailWithAttachment(String from,EmailContext emailContext) {
-        try {
-            MimeMessage mimeMessage = getMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, UTF_8);
-            helper.setFrom("leheza.oleksii@gmail.com");
-//            User user = userRepository.findByEmailIgnoreCase(to);
-//            if (user != null) {
-            helper.setTo("leheza.oleksii@gmail.com");
+    public void sendEmailWithAttachment(String from, EmailContext emailContext) {
+//        try {
+//            MimeMessage mimeMessage = getMimeMessage();
+//            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, UTF_8);
+//            helper.setFrom("leheza.oleksii@gmail.com");
+////            User user = userRepository.findByEmailIgnoreCase(to);
+////            if (user != null) {
+//            helper.setTo("leheza.oleksii@gmail.com");
+////            }
+//            helper.setFrom("leheza.oleksii@gmail.com");
+//            helper.setSubject(emailContext.getSubject());
+//            helper.setText(emailContext.getEmail());
+//            MultipartFile attachment = emailContext.getAttachment();
+//            if (attachment != null && !attachment.isEmpty()) {
+//                helper.addAttachment(attachment.getName(), attachment);
 //            }
-            helper.setFrom("leheza.oleksii@gmail.com");
-            helper.setSubject(emailContext.getSubject());
-            helper.setText(emailContext.getEmail());
-            MultipartFile attachment = emailContext.getAttachment();
-            if (attachment != null && !attachment.isEmpty()) {
-                helper.addAttachment(attachment.getName(), attachment);
-            }
-            mailSender.send(mimeMessage);
-        } catch (MessagingException exception) {
-            System.out.println(exception.getMessage());
-            throw new RuntimeException(exception.getMessage());
-        }
+//            mailSender.send(mimeMessage);
+//        } catch (MessagingException exception) {
+//            System.out.println(exception.getMessage());
+//            throw new RuntimeException(exception.getMessage());
+//        }
     }
 
 //    @Async
@@ -72,6 +69,7 @@ public class EmailServiceImpl {
 //    }
 
     private MimeMessage getMimeMessage() {
-        return mailSender.createMimeMessage();
+//        return mailSender.createMimeMessage();
+        return null;
     }
 }

@@ -11,7 +11,6 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
-import com.projects.oleksii.leheza.cashtruck.enums.UserRole;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import lombok.RequiredArgsConstructor;
@@ -114,7 +113,6 @@ public class DtoMapper {
                 .country(clientdto.getCountry())
                 .saving(clientdto.getSaving())
                 .transactions(transactions)
-                .role(UserRole.Client)
                 .build();
     }
 
@@ -149,7 +147,6 @@ public class DtoMapper {
                 .password(userUpdateDto.getPassword())
                 .phoneNumber(userUpdateDto.getPhoneNumber())
                 .country(userUpdateDto.getCountry())
-                .role(UserRole.Client)
                 .build();
     }
 
@@ -184,7 +181,6 @@ public class DtoMapper {
                 .password(userDto.getPassword())
                 .phoneNumber(userDto.getPhoneNumber())
                 .country(userDto.getCountry())
-                .role(UserRole.Client)
                 .build();
     }
 }

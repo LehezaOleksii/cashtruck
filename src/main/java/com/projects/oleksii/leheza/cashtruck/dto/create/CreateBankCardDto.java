@@ -1,11 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.dto.create;
 
-import jakarta.persistence.Column;
-import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.CreditCardNumber;
 import org.springframework.format.annotation.DateTimeFormat;
 
+import jakarta.validation.constraints.*;
 import java.util.Date;
 
 @Getter

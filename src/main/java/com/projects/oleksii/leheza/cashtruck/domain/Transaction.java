@@ -1,10 +1,11 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+
+import jakarta.persistence.*;
 
 @Data
 @AllArgsConstructor
