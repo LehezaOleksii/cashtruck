@@ -1,14 +1,17 @@
 package com.projects.oleksii.leheza.cashtruck.enums;
 
-public enum ActiveStatus  {
+public enum ActiveStatus {
     ACTIVE,
     INACTIVE,
     BANNED;
 
     public static boolean isEnabled(ActiveStatus status) {
-        if (status == ACTIVE) {
-            return true;
-        }
-        return false;
+        return status == ACTIVE;
+    }
+
+    @Override
+    public String toString() {
+        String roleName = name().toLowerCase();
+        return Character.toUpperCase(roleName.charAt(0)) + roleName.substring(1);
     }
 }

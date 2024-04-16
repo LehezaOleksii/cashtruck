@@ -3,21 +3,24 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
+import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.filter.UserSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import jakarta.transaction.Transactional;
 import java.beans.Transient;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -26,6 +29,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,13 +55,12 @@ public class UserServiceImpl implements UserService {
         if (existByEmail(createUserDto.getEmail())) {
             throw new IllegalStateException("Email taken");
         }
-//        client.setPassword(passwordEncoder.encode(client.getPassword()));
         User user = User.builder()
                 .firstName(createUserDto.getFirstName())
                 .lastName(createUserDto.getLastName())
                 .email(createUserDto.getEmail())
-                .password(createUserDto.getPassword())
-                .status(ActiveStatus.INACTIVE)
+                .password((createUserDto.getPassword()))
+                .status(ActiveStatus.ACTIVE)
                 .build();
         return userRepository.save(user);
     }
@@ -87,8 +90,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<UserDto> findAll() {
+        return userRepository.findAll().stream()
+                .map(dtoMapper::userToUserDto)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -107,8 +112,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long userId) {
-        return userRepository.findById(userId).get();
+    public UserDto getUserById(Long userId) {
+        return dtoMapper.userToDto(userRepository.findById(userId).get());
     }
 
     @Override
@@ -236,6 +241,13 @@ public class UserServiceImpl implements UserService {
         }
         userRepository.save(user);
     }
+
+    @Override
+    public List<User> findUsersWithFilters(UserSearchCriteria criteria) {
+        Specification<User> spec = UserSpecification.withFilters(criteria);
+        return userRepository.findAll(spec);
+    }
+
 
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();

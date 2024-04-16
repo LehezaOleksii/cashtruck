@@ -23,6 +23,8 @@ public class UserDto {
     private String language;
     private Saving saving;
     private String avatar;
+    private String role;
+    private String status;
     private List<Transaction> incomes;
     private List<Transaction> expenses;
 }

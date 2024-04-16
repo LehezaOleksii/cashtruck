@@ -91,6 +91,8 @@ public class DtoMapper {
                         .filter(transaction -> transaction.getCategory().getTransactionType()
                                 .equals(TransactionType.EXPENSE))
                         .collect(Collectors.toList()))
+                .role(String.valueOf(user.getLeadRole()))
+                .status(String.valueOf(user.getStatus()))
                 .build();
         if (user.getAvatar() != null) {
             dto.setAvatar(imageConvertor.convertByteImageToString(user.getAvatar().getImageBytes()));
@@ -167,6 +169,8 @@ public class DtoMapper {
                 .language(user.getLanguage())
                 .country(user.getCountry())
                 .phoneNumber(user.getPhoneNumber())
+                .role(user.getLeadRole().toString())
+                .status(String.valueOf(user.getStatus()))
                 .build();
     }
 

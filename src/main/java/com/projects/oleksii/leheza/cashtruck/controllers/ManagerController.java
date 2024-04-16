@@ -2,6 +2,7 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
@@ -51,30 +52,29 @@ public class ManagerController {
 
     @GetMapping(path = "/{managerId}/users/{userId}")
     ModelAndView getClientsList(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
-        //if user == client modelAndView
-        //else another modelAndView
-        ModelAndView modelAndView = new ModelAndView("manager/client_info");
-        modelAndView.addObject("manager", userService.getUserDto(managerId));
-
-
-//        ModelAndView modelAndView = new ModelAndView("manager/manager_info");
-//        modelAndView.addObject("user", managerService.findManagerById(managerId).getCustomUser());
-//        modelAndView.addObject("manager", managerService.findManagerById(managerId));
+        ModelAndView modelAndView;
+        if (userService.getUserById(userId).getRole().equals((Role.CLIENT.toString()))) {
+            modelAndView = new ModelAndView("manager/client_info");
+        } else {
+            modelAndView = new ModelAndView("manager/manager_info");
+        }
+        modelAndView.addObject("user", userService.getUserById(userId));
+        modelAndView.addObject("manager", userService.getUserById(managerId));
         return modelAndView;
     }
 
-    @GetMapping(path = "/{managerId}/users/{clientId}/profile")
-    ModelAndView getClientProfileForm(@PathVariable("managerId") Long managerId, @PathVariable("clientId") Long clientId) {
-        //if user == client modelAndView
-        //else another modelAndView
-        ModelAndView modelAndView = new ModelAndView("manager/client_profile");
+    @GetMapping(path = "/{managerId}/users/{userId}/profile")
+    ModelAndView getClientProfileForm(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
+        ModelAndView modelAndView;
+        if (userService.getUserById(userId).getRole().equals((Role.CLIENT.toString()))) {
+            modelAndView = new ModelAndView("manager/client_profile");
+            modelAndView.addObject("client", userService.getClientUpdateDto(userId));
+        } else {
+            modelAndView = new ModelAndView("manager/manager_info");
+            modelAndView.addObject("user", userService.getUserById(userId));
+        }
+        modelAndView.addObject("user", userService.getUserById(userId));
         modelAndView.addObject("manager", userService.getUserDto(managerId));
-        modelAndView.addObject("clientDto", userService.getClientUpdateDto(clientId));
-
-
-//        ModelAndView modelAndView = new ModelAndView("manager/manager_info");
-//        modelAndView.addObject("user", managerService.findManagerById(managerId).getCustomUser());
-//        modelAndView.addObject("manager", managerService.findManagerById(managerId));
         return modelAndView;
     }
 
@@ -105,6 +105,12 @@ public class ManagerController {
             return new ModelAndView("redirect:/managers/" + managerId + "/users/" + clientId);
         }
     }
+
+    @GetMapping(path = "/{managerId}/users/filter")
+    ModelAndView getUsersByFilter() {
+        return null;
+    }
+
 
     @GetMapping(path = "/{managerId}/plans")
     ModelAndView getPlansModerationMenu(@PathVariable("managerId") Long managerId) {

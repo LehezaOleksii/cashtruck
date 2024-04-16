@@ -27,11 +27,6 @@ public class CashtruckApplication {
         };
     }
 
-//    @Bean
-//    BCryptPasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-
     @Bean
     @Scope("prototype")
     Random getRandom() {
@@ -47,5 +42,4 @@ public class CashtruckApplication {
     public LayoutDialect layoutDialect() {
         return new LayoutDialect();
     }
-
 }

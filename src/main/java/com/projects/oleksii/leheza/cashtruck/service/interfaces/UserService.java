@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
+import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
@@ -20,7 +21,7 @@ public interface UserService {
 
     Boolean verifyEmailToken(String token);
 
-    List<User> findAll();
+    List<UserDto> findAll();
 
     List<User> findAllManagers();// TODO filter?
 
@@ -28,7 +29,7 @@ public interface UserService {
 
     User findByEmail(String email);
 
-    User getUserById(Long userId);
+    UserDto getUserById(Long userId);
 
     void deleteUserById(Long id);
 
@@ -55,4 +56,6 @@ public interface UserService {
     UserHeaderDto getHeaderClientData(Long userId);
 
     void updateAvatar(Long userId, MultipartFile avatar);
+
+    List<User> findUsersWithFilters(UserSearchCriteria criteria);
 }

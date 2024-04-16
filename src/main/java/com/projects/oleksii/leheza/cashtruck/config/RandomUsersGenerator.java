@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
@@ -46,8 +47,18 @@ public class RandomUsersGenerator {
         generateRandomTransactionExpenses(lastBankTransactions);
         generateRandomUsers(allUsers);
         generateRandomClients(clientsNumber);
-        generateRandomManagers(managersNumber,clientsNumber);
-        generateRandomAdmins(adminsNumber,managersNumber,clientsNumber);
+        generateRandomManagers(managersNumber, clientsNumber);
+        generateRandomAdmins(adminsNumber, managersNumber, clientsNumber);
+        generateTestAccount();
+    }
+
+    private void generateTestAccount() {
+        User user = new User();
+        user.setPassword("password");
+        user.setEmail("oleksii.leheza@gmail.com");
+        user.setRoles(Collections.singleton(Role.CLIENT));
+        user.setStatus(ActiveStatus.ACTIVE);
+        userService.saveUser(user);
     }
 
     private void generateRandomUsers(int allUsers) {
@@ -76,6 +87,8 @@ public class RandomUsersGenerator {
                     .password(faker.lorem().sentence(2))
                     .saving(saving)
                     .transactions(allTransactions)
+                    .roles(Collections.singleton(Role.CLIENT))
+                    .status(ActiveStatus.INACTIVE)
                     .build();
             userService.saveUser(user);
             savingService.assignBankCardsToClient((long) index, saving.getBankCards().stream().toList());
@@ -94,19 +107,19 @@ public class RandomUsersGenerator {
     private void generateRandomManagers(int managersNumber, int clientsNumber) {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
-                User user = users.get(clientsNumber);
-                user.setRoles(Collections.singleton(Role.MANAGER));
-                userService.saveUser(user);
-            });
+            User user = users.get(clientsNumber);
+            user.setRoles(Collections.singleton(Role.MANAGER));
+            userService.saveUser(user);
+        });
     }
 
     private void generateRandomAdmins(int adminNumber, int managersNumber, int clientsNumber) {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
-                User user = users.get(clientsNumber);
-                user.setRoles(Collections.singleton(Role.ADMIN));
-                userService.saveUser(user);
-            });
+            User user = users.get(clientsNumber);
+            user.setRoles(Collections.singleton(Role.ADMIN));
+            userService.saveUser(user);
+        });
     }
 
     private void generateRandomSavings(int savingNumber) {

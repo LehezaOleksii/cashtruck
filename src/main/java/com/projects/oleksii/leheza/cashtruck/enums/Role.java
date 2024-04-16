@@ -1,13 +1,22 @@
 package com.projects.oleksii.leheza.cashtruck.enums;
 
-import org.springframework.security.core.GrantedAuthority;
+import lombok.Getter;
 
-public enum Role implements GrantedAuthority {
-    ADMIN,
-    MANAGER,
-    CLIENT;
+@Getter
+public enum Role {
+    ADMIN(1),
+    MANAGER(2),
+    CLIENT(3);
 
-    public String getAuthority() {
-        return name();
+    private final int order;
+
+    Role(int order) {
+        this.order = order;
+    }
+
+    @Override
+    public String toString() {
+        String roleName = name().toLowerCase();
+        return Character.toUpperCase(roleName.charAt(0)) + roleName.substring(1);
     }
 }
