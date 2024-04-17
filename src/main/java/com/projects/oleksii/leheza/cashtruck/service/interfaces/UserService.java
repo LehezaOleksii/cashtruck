@@ -58,4 +58,8 @@ public interface UserService {
     void updateAvatar(Long userId, MultipartFile avatar);
 
     List<User> findUsersWithFilters(UserSearchCriteria criteria);
+
+    void blockUser(Long userId);
+
+    void unblockUser(Long userId);
 }

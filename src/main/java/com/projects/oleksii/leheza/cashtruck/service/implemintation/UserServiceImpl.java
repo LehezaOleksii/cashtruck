@@ -9,6 +9,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.filter.UserSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
@@ -248,6 +249,29 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll(spec);
     }
 
+    @Override
+    public void blockUser(Long userId) {
+        User user = userRepository.findById(userId).get();
+        if (user.getLeadRole() == Role.CLIENT){
+            user.setStatus(ActiveStatus.BANNED);
+            userRepository.save(user);
+        }
+        else {
+            System.out.println("User does not have enough permissions");
+        }
+    }
+
+    @Override
+    public void unblockUser(Long userId) {
+        User user = userRepository.findById(userId).get();
+        if (user.getLeadRole() == Role.CLIENT){
+            user.setStatus(ActiveStatus.ACTIVE);
+            userRepository.save(user);
+        }
+        else {
+            System.out.println("User does not have enough permissions");
+        }
+    }
 
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();

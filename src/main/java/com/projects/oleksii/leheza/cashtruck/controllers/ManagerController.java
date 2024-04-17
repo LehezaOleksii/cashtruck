@@ -13,6 +13,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 
@@ -63,6 +64,18 @@ public class ManagerController {
         return modelAndView;
     }
 
+    @GetMapping(path = "/{managerId}/users/{userId}/block")
+    RedirectView blockUser(@PathVariable("managerId") Long managerId,@PathVariable("userId") Long userId) {
+        userService.blockUser(userId);
+        return new RedirectView("/managers/" + managerId + "/users");
+    }
+
+    @GetMapping(path = "/{managerId}/users/{userId}/unblock")
+    RedirectView unblockUser(@PathVariable("managerId") Long managerId,@PathVariable("userId") Long userId) {
+        userService.unblockUser(userId);
+        return new RedirectView("/managers/" + managerId + "/users");
+    }
+
     @GetMapping(path = "/{managerId}/users/{userId}/profile")
     ModelAndView getClientProfileForm(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         ModelAndView modelAndView;
@@ -79,7 +92,7 @@ public class ManagerController {
     }
 
     @PostMapping(path = "/{managerId}/users/{clientId}/profile")
-    ModelAndView changeClientProfile(@PathVariable Long managerId, @PathVariable Long clientId, @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
+    ModelAndView changeClientProfile(@PathVariable("managerId") Long managerId, @PathVariable("clientId") Long clientId, @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
         if (bindingResult.hasFieldErrors()) {
             return new ModelAndView("manager/client_profile")
                     .addObject("manager", userService.getHeaderClientData(clientId))
