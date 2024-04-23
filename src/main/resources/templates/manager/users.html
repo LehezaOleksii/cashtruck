@@ -10,6 +10,9 @@
   </head>
   <body th:object="${manager}">
     <main layout:fragment="content">
+        <div id = "managerId" th:text="${manager.id}" style="display: none"></div>
+        <form th:action="@{/managers/{managerId}/users/filter(managerId=${managerId})}" method="get">
+
         <div class="my-container mt-4">
             <div class="pt-4 pl-4">
                 <h5 class="custom-dark-grey">Search filter</h5>
@@ -18,9 +21,16 @@
 
             </div>
             <div class="mx-auto">
+                <div class="pl-4 p-0">
+                    <div class="row">
+                        <div class="input-group col-md-4">
+                            <input type="text" class="form-control" name = "email" placeholder="Search..." aria-label="Username" aria-describedby="addon-wrapping">
+                        </div>
+                    </div>
+                </div>
                 <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 px-4">
                     <div class="col-md-4">
-                        <select id="roleFilter" class="form-select px-2" aria-label="Default select example">
+                        <select id="roleFilter"  name="role" class="form-select px-2" aria-label="Default select example">
                             <option value="" selected>Select role</option>
                             <option value="ADMIN">Admin</option>
                             <option value="MANAGER">Manager</option>
@@ -28,13 +38,13 @@
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <select class="form-select px-2" aria-label="Default select example">
-                            <option selected>Select plan</option>
-                            <option value="select plan">select plan</option>
+                        <select  name="plan" class="form-select px-2" aria-label="Default select example">
+                            <option value="" selected>Select plan</option>
+                            <option value="select plan"> plan</option>
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <select id="statusFilter" class="form-select px-2" aria-label="Default select example">
+                        <select  name="status" id="statusFilter" class="form-select px-2" aria-label="Default select example">
                             <option value="" selected>Select status</option>
                             <option value="ACTIVE">Active</option>
                             <option value="INACTIVE">Inactive</option>
@@ -42,11 +52,26 @@
                         </select>
                     </div>
                 </div>
-                <div style="display: none;" id = "managerId" th:text="${manager.id}"></div>
-                <table class="table my-table mt-3">
+                <div class="row pl-4">
+                    <div class="col-2 pl-4">
+                        <button class="col-12 btn btn-outline-secondary custom-back-violet" type="submit">Filter</button>
+                    </div>
+                    <div class="col-2 pl-4">
+                        <button id="cancelButton" class="col-8 btn btn-outline-secondary custom-back-grey" type="button">Cancel</button>
+                    </div>
+                    <script>
+                        document.getElementById("cancelButton").addEventListener("click", function() {
+                            var managerId = document.getElementById("managerId").innerText;
+                            window.location.href = 'http://localhost:8080/managers/' + managerId + '/users';
+                        });
+                    </script>
+                </div>
+        </form>
+
+                <table class="table mt-3">
                     <thead>
                         <tr>
-                            <th scope="col" class="text-center" style="width: 28%;">User</th>
+                            <th scope="col" class="text-center">User</th>
                             <th scope="col" class="text-center">Role</th>
                             <th scope="col" class="text-center">Plan</th>
                             <th scope="col" class="text-center">Status</th>
@@ -83,8 +108,8 @@
                                 </span>
                                 <a id="blockUser"  th:data-user-id="${user.id}">
                                 <span class="me-1">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3 dropdown-toggle" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <path d="M6.5 1h3a.5.5 0 0 1 .5.5v1H6v-1a.5.5 0 0 1 .5-.5M11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3A1.5 1.5 0 0 0 5 1.5v1H1.5a.5.5 0 0 0 0 1h.538l.853 10.66A2 2 0 0 0 4.885 16h6.23a2 2 0 0 0 1.994-1.84l.853-10.66h.538a.5.5 0 0 0 0-1zm1.958 1-.846 10.58a1 1 0 0 1-.997.92h-6.23a1 1 0 0 1-.997-.92L3.042 3.5zm-7.487 1a.5.5 0 0 1 .528.47l.5 8.5a.5.5 0 0 1-.998.06L5 5.03a.5.5 0 0 1 .47-.53Zm5.058 0a.5.5 0 0 1 .47.53l-.5 8.5a.5.5 0 1 1-.998-.06l.5-8.5a.5.5 0 0 1 .528-.47M8 4.5a.5.5 0 0 1 .5.5v8.5a.5.5 0 0 1-1 0V5a.5.5 0 0 1 .5-.5"/>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-lock dropdown-toggle" role="button"  data-bs-toggle="dropdown" aria-expanded="false"viewBox="0 0 18 18">
+                                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2m3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2M5 8h6a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1"/>
                                     </svg>
                                 </span>
                                 </a>

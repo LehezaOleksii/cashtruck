@@ -91,7 +91,7 @@ public class DtoMapper {
                         .filter(transaction -> transaction.getCategory().getTransactionType()
                                 .equals(TransactionType.EXPENSE))
                         .collect(Collectors.toList()))
-                .role(String.valueOf(user.getLeadRole()))
+                .role(String.valueOf(user.getRole()))
                 .status(String.valueOf(user.getStatus()))
                 .build();
         if (user.getAvatar() != null) {
@@ -169,7 +169,7 @@ public class DtoMapper {
                 .language(user.getLanguage())
                 .country(user.getCountry())
                 .phoneNumber(user.getPhoneNumber())
-                .role(user.getLeadRole().toString())
+                .role(user.getRole().toString())
                 .status(String.valueOf(user.getStatus()))
                 .build();
     }

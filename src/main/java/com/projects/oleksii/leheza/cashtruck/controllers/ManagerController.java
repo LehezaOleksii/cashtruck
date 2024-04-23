@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
@@ -48,6 +49,7 @@ public class ManagerController {
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         modelAndView.addObject("users", userService.findAll());
+        modelAndView.addObject("filterCriteria", new UserSearchCriteria());
         return modelAndView;
     }
 
@@ -65,13 +67,13 @@ public class ManagerController {
     }
 
     @GetMapping(path = "/{managerId}/users/{userId}/block")
-    RedirectView blockUser(@PathVariable("managerId") Long managerId,@PathVariable("userId") Long userId) {
+    RedirectView blockUser(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         userService.blockUser(userId);
         return new RedirectView("/managers/" + managerId + "/users");
     }
 
     @GetMapping(path = "/{managerId}/users/{userId}/unblock")
-    RedirectView unblockUser(@PathVariable("managerId") Long managerId,@PathVariable("userId") Long userId) {
+    RedirectView unblockUser(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         userService.unblockUser(userId);
         return new RedirectView("/managers/" + managerId + "/users");
     }
@@ -120,8 +122,13 @@ public class ManagerController {
     }
 
     @GetMapping(path = "/{managerId}/users/filter")
-    ModelAndView getUsersByFilter() {
-        return null;
+    ModelAndView getUsersByFilter(@PathVariable("managerId") Long managerId, @ModelAttribute("filterCriteria") UserSearchCriteria userFilterCriteria) {
+        ModelAndView modelAndView = new ModelAndView("manager/users");
+        modelAndView.addObject("managerId", managerId);
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("users", userService.findUsersWithFilters(userFilterCriteria));
+        modelAndView.addObject("filterCriteria", new UserSearchCriteria());
+        return modelAndView;
     }
 
 

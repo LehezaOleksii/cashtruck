@@ -10,9 +10,6 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.util.List;
-import java.util.Set;
-
-import static java.util.Comparator.comparingInt;
 
 @Getter
 @Setter
@@ -44,7 +41,7 @@ public class User {
     private String password;
     @NotNull
     @Enumerated(EnumType.STRING)//???????
-    private Set<Role> roles;
+    private Role role;
     @OneToOne
     private Image avatar;
     @OneToOne
@@ -57,11 +54,11 @@ public class User {
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
 
-    public Role getLeadRole() {
-        return roles.stream()
-                .min(comparingInt(Role::getOrder))
-                .orElse(null);
-    }
+//    public Role getLeadRole() {
+//        return roles.stream()
+//                .min(comparingInt(Role::getOrder))
+//                .orElse(null);
+//    }
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
 //        return roles;

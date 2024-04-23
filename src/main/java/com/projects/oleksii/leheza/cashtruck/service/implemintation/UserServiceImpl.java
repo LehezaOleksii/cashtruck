@@ -18,7 +18,6 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -47,6 +46,7 @@ public class UserServiceImpl implements UserService {
     private final ImageRepository imageRepository;
     private final ImageService imageService;
     private final DtoMapper dtoMapper;
+    private final UserSpecification userSpecification;
 
     @Override
     public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
@@ -245,18 +245,16 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> findUsersWithFilters(UserSearchCriteria criteria) {
-        Specification<User> spec = UserSpecification.withFilters(criteria);
-        return userRepository.findAll(spec);
+        return userSpecification.getUsersWithCriterias(criteria);
     }
 
     @Override
     public void blockUser(Long userId) {
         User user = userRepository.findById(userId).get();
-        if (user.getLeadRole() == Role.CLIENT){
+        if (user.getRole() == Role.CLIENT) {
             user.setStatus(ActiveStatus.BANNED);
             userRepository.save(user);
-        }
-        else {
+        } else {
             System.out.println("User does not have enough permissions");
         }
     }
@@ -264,11 +262,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void unblockUser(Long userId) {
         User user = userRepository.findById(userId).get();
-        if (user.getLeadRole() == Role.CLIENT){
+        if (user.getRole() == Role.CLIENT) {
             user.setStatus(ActiveStatus.ACTIVE);
             userRepository.save(user);
-        }
-        else {
+        } else {
             System.out.println("User does not have enough permissions");
         }
     }

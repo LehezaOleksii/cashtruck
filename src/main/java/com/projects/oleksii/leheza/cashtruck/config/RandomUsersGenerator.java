@@ -56,7 +56,7 @@ public class RandomUsersGenerator {
         User user = new User();
         user.setPassword("password");
         user.setEmail("oleksii.leheza@gmail.com");
-        user.setRoles(Collections.singleton(Role.CLIENT));
+        user.setRole(Role.CLIENT);
         user.setStatus(ActiveStatus.ACTIVE);
         userService.saveUser(user);
     }
@@ -87,7 +87,7 @@ public class RandomUsersGenerator {
                     .password(faker.lorem().sentence(2))
                     .saving(saving)
                     .transactions(allTransactions)
-                    .roles(Collections.singleton(Role.CLIENT))
+                    .role(Role.CLIENT)
                     .status(ActiveStatus.INACTIVE)
                     .build();
             userService.saveUser(user);
@@ -99,7 +99,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(1, clientsNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRoles(Collections.singleton(Role.CLIENT));
+            user.setRole(Role.CLIENT);
             userService.saveUser(user);
         });
     }
@@ -108,7 +108,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRoles(Collections.singleton(Role.MANAGER));
+            user.setRole(Role.MANAGER);
             userService.saveUser(user);
         });
     }
@@ -117,7 +117,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRoles(Collections.singleton(Role.ADMIN));
+            user.setRole(Role.ADMIN);
             userService.saveUser(user);
         });
     }

@@ -23,5 +23,7 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     @Query("SELECT u.avatar.imageBytes FROM User u WHERE u.id = :userId")
     byte[] findAvatarByUserId(@Param("userId") Long userId);
 
+    List<User> findAll();
+
     List<User> findAll(Specification<User> specification);
 }
