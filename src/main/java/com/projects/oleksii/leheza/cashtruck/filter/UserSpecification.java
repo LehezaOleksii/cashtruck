@@ -33,12 +33,7 @@ public class UserSpecification {
         if (criterias.getRole() != null && !criterias.getRole().isEmpty()) {
             specifications.add(roleLike(criterias));
         }
-
-        Specification<User> combinedSpec = Specification.where(null);
-        for (Specification<User> spec : specifications) {
-            combinedSpec = combinedSpec.and(spec);
-        }
-        return userRepository.findAll(combinedSpec);
+        return userRepository.findAll(Specification.allOf(specifications));
     }
 
     private Specification<User> roleLike(UserSearchCriteria criteria) {
