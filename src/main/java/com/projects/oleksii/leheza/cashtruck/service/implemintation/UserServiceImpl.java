@@ -250,8 +250,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDto> findUsersWithFilters(int page, int size, UserSearchCriteria criteria) {
         Sort sort = Sort.by("firstName");
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<User> userPage = userRepository.findAll(pageable);
+        Page<User> userPage = userSpecification.getUsersWithCriterias(criteria,page,size,sort);
         return userPage.map(dtoMapper::userToDto);
     }
 

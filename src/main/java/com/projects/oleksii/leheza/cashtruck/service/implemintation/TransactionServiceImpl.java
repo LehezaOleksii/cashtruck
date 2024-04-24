@@ -84,6 +84,7 @@ public class TransactionServiceImpl implements TransactionService {
         Pageable pageRequest = createPageRequestUsing(page, size);
 
         List<TransactionDto> transactions = user.getTransactions().stream()
+                .filter(transaction -> transaction.getCategory().getName().equals(categoryName))
                 .map(dtoMapper::transactionToDto)
                 .collect(Collectors.toList());
         int start = (int) pageRequest.getOffset();

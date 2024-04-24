@@ -141,6 +141,7 @@ public class ManagerController {
         modelAndView.addObject("currentPage", usersPage.getNumber());
         modelAndView.addObject("totalPages", usersPage.getTotalPages());
         modelAndView.addObject("filterCriteria", new UserSearchCriteria());
+        //TODO exceptions with page number
         return modelAndView;
     }
 

@@ -134,6 +134,7 @@ public class ClientController {
         modelAndView.addObject("currentPage", transactionPage.getNumber());
         modelAndView.addObject("totalPages", transactionPage.getTotalPages());
         modelAndView.addObject("transactions",transactionPage);
+        //TODO exceptions with page number
         return modelAndView;
     }
 
