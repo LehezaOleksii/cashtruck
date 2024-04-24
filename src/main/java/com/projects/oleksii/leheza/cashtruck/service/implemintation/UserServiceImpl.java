@@ -18,6 +18,10 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -91,10 +94,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(dtoMapper::userToUserDto)
-                .collect(Collectors.toList());
+    public Page<UserDto> findAll(int page, int size) {
+        Sort sort = Sort.by("firstName");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(dtoMapper::userToDto);
     }
 
     @Override
@@ -244,8 +248,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> findUsersWithFilters(UserSearchCriteria criteria) {
-        return userSpecification.getUsersWithCriterias(criteria);
+    public Page<UserDto> findUsersWithFilters(int page, int size, UserSearchCriteria criteria) {
+        Sort sort = Sort.by("firstName");
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<User> userPage = userRepository.findAll(pageable);
+        return userPage.map(dtoMapper::userToDto);
     }
 
     @Override

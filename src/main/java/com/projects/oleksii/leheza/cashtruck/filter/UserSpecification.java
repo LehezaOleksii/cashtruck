@@ -7,6 +7,10 @@ import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +23,7 @@ public class UserSpecification {
 
     private final UserRepository userRepository;
 
-    public List<User> getUsersWithCriterias(UserSearchCriteria criterias) {
+    public Page<User> getUsersWithCriterias(UserSearchCriteria criterias, int page, int size, Sort sort) {
         List<Specification<User>> specifications = new ArrayList<>();
         if (criterias.getStatus() != null && !criterias.getStatus().isEmpty()) {
             specifications.add(statusLike(criterias));
@@ -33,25 +37,27 @@ public class UserSpecification {
         if (criterias.getRole() != null && !criterias.getRole().isEmpty()) {
             specifications.add(roleLike(criterias));
         }
-        return userRepository.findAll(Specification.allOf(specifications));
+        Specification<User> specification = Specification.where(Specification.allOf(specifications));
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return userRepository.findAll(specification, pageable);
     }
 
-    private Specification<User> roleLike(UserSearchCriteria criteria) {
+    public Specification<User> roleLike(UserSearchCriteria criteria) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("role"), Role.valueOf(criteria.getRole()));
     }
 
-    private Specification<User> planLike(UserSearchCriteria criteria) {
+    public Specification<User> planLike(UserSearchCriteria criteria) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("plan"), "%" + criteria.getPlan() + "%");
     }
 
-    private Specification<User> emailLike(UserSearchCriteria criteria) {
+    public Specification<User> emailLike(UserSearchCriteria criteria) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.like(root.get("email"), "%" + criteria.getEmail() + "%");
     }
 
-    private Specification<User> statusLike(UserSearchCriteria criteria) {
+    public Specification<User> statusLike(UserSearchCriteria criteria) {
         return (root, query, criteriaBuilder) ->
                 criteriaBuilder.equal(root.get("status"), ActiveStatus.valueOf(criteria.getStatus()));
     }

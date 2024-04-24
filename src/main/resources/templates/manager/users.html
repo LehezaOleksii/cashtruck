@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 <div class="row pl-4">
-                    <div class="col-2 pl-4">
+                    <div class="col-2">
                         <button class="col-12 btn btn-outline-secondary custom-back-violet" type="submit">Filter</button>
                     </div>
                     <div class="col-2 pl-4">
@@ -136,7 +136,24 @@
                         </tr>
                     </tbody>
                 </table>
-                <script>
+        <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
+                    <a class="page-link" th:if="${currentPage > 0}" th:href="@{'/managers/' + ${managerId} + '/users?page=' + ${currentPage - 1} + '&size=' + ${10}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a class="page-link" th:href="@{'/managers/' + ${managerId} + '/users?page=' + ${pageNumber} + '&size=' + ${10}}" th:text="${pageNumber + 1}"></a>
+                </li>
+                <li class="page-item" th:class="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                    <a class="page-link" th:if="${currentPage < totalPages - 1}" th:href="@{'/managers/' + ${managerId} + '/users?page=' + ${currentPage + 1} + '&size=' + ${10}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+        <script>
                     document.querySelectorAll('#blockUser').forEach(function(blockUserLink) {
                         blockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');

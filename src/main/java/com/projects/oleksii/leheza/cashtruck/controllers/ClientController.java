@@ -5,10 +5,12 @@ import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -121,11 +123,17 @@ public class ClientController {
     }
 
     @GetMapping("/{userId}/categories/{categoryName}")
-    public ModelAndView viewTransactionsByCategoryName(@PathVariable Long userId, @PathVariable String categoryName) {
+    public ModelAndView viewTransactionsByCategoryName(@PathVariable Long userId,
+                                                       @PathVariable String categoryName,
+                                                       @RequestParam(value = "page", defaultValue = "0") int page,
+                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
         ModelAndView modelAndView = new ModelAndView("client/transactions_details");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("category", categoryService.findByName(categoryName));
-        modelAndView.addObject("transactions", transactionService.findTransactionsByClientIdAndCategoryName(userId, categoryName));
+        Page<TransactionDto> transactionPage = transactionService.findTransactionsByClientIdAndCategoryName(userId, categoryName, page, size);
+        modelAndView.addObject("currentPage", transactionPage.getNumber());
+        modelAndView.addObject("totalPages", transactionPage.getTotalPages());
+        modelAndView.addObject("transactions",transactionPage);
         return modelAndView;
     }
 

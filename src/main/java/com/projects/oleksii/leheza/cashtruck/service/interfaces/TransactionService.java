@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -30,7 +31,7 @@ public interface TransactionService {
 
     List<TransactionDto> findExpenseTransactionsByClientId(Long clientId);
 
-    List<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName);
+    Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int page,int size);
 
     List<Transaction> findAllIncomeTransactions();
 

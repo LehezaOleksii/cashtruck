@@ -9,6 +9,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface UserService {
 
     Boolean verifyEmailToken(String token);
 
-    List<UserDto> findAll();
+    Page<UserDto> findAll(int page, int size);
 
     List<User> findAllManagers();// TODO filter?
 
@@ -57,7 +58,7 @@ public interface UserService {
 
     void updateAvatar(Long userId, MultipartFile avatar);
 
-    List<User> findUsersWithFilters(UserSearchCriteria criteria);
+    Page<UserDto> findUsersWithFilters(int page, int size, UserSearchCriteria criteria);
 
     void blockUser(Long userId);
 

@@ -6,14 +6,20 @@ import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.filter.TransactionSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final CategoryRepository categoryRepository;
     private final UserRepository userRepository;
     private final DtoMapper dtoMapper;
+    private final TransactionSpecification transactionSpecification;
 
     @Override
     public List<Transaction> findAll() {
@@ -71,11 +78,28 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName) {
-        return transactionRepository.findTransactionsByClientIdAndCategoryName(clientId, categoryName).stream()
+    public Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int page, int size) {
+        User user = userRepository.findById(clientId).get();
+
+        Pageable pageRequest = createPageRequestUsing(page, size);
+
+        List<TransactionDto> transactions = user.getTransactions().stream()
                 .map(dtoMapper::transactionToDto)
-                .toList();
+                .collect(Collectors.toList());
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), transactions.size());
+
+        List<TransactionDto> pageContent = transactions.subList(start, end);
+        return new PageImpl<>(pageContent, pageRequest, transactions.size());
+//
+//        Pageable pageable = PageRequest.of(page, size);
+//        Specification<Transaction> clientIdSpec = transactionSpecification.withClientId(clientId);
+//        Specification<Transaction> categoryNameSpec = transactionSpecification.withCategoryName(categoryName);
+//        Specification<Transaction> combinedSpec = Specification.where(clientIdSpec).and(categoryNameSpec);
+//        Page<Transaction> pages = transactionRepository.findAll(combinedSpec, pageable);
+//        return pages.map(dtoMapper::transactionToDto);
     }
+
 
     @Override
     public List<Transaction> findAllIncomeTransactions() {
@@ -85,5 +109,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> findAllExpenseTransactions() {
         return transactionRepository.findTransactionsByCategoryTransactionType(EXPENSE_TRANSACTION_TYPE);
+    }
+
+    private Pageable createPageRequestUsing(int page, int size) {
+        return PageRequest.of(page, size);
     }
 }

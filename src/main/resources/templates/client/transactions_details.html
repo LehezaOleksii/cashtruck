@@ -35,6 +35,24 @@
             </tr>
         </tbody>
     </table>
+
+<!--        <nav aria-label="Page navigation example" class="d-flex justify-content-center">-->
+<!--            <ul class="pagination">-->
+<!--                <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">-->
+<!--                    <a class="page-link" th:if="${currentPage > 0}" th:href="@{'/clients/' + ${clientId} + '/'+${categoryName}+'?page=' + ${currentPage - 1} + '&size=' + ${10}}" aria-label="Previous">-->
+<!--                        <span aria-hidden="true">&laquo;</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--                <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">-->
+<!--                    <a class="page-link" th:href="@{'/clients/' + ${clientId} + '/'+${categoryName}+'?page=' + ${pageNumber} + '&size=' + ${10}}" th:text="${pageNumber + 1}"></a>-->
+<!--                </li>-->
+<!--                <li class="page-item" th:class="${currentPage == totalPages - 1 ? 'disabled' : ''}">-->
+<!--                    <a class="page-link" th:if="${currentPage < totalPages - 1}" th:href="@{'/clients/' + ${clientId} + '/'+${categoryName}+'?page=' + ${currentPage + 1} + '&size=' + ${10}}" aria-label="Next">-->
+<!--                        <span aria-hidden="true">&raquo;</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </nav>-->
     
         <!-- <div class="my-container">
             <div class="card-body text-center" >

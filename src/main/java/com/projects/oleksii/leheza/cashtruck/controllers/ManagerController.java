@@ -3,12 +3,14 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -44,17 +46,22 @@ public class ManagerController {
 //    }
 
     @GetMapping(path = "/{managerId}/users")
-    ModelAndView getClientsList(@PathVariable("managerId") Long managerId) {
+    ModelAndView getClientsList(@PathVariable("managerId") Long managerId,
+                                @RequestParam(value = "page", defaultValue = "0") int page,
+                                @RequestParam(value = "size", defaultValue = "10") int size) {
         ModelAndView modelAndView = new ModelAndView("manager/users");
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
-        modelAndView.addObject("users", userService.findAll());
+        Page<UserDto> usersPage = userService.findAll(page, size);
+        modelAndView.addObject("users", usersPage.getContent());
+        modelAndView.addObject("currentPage", usersPage.getNumber());
+        modelAndView.addObject("totalPages", usersPage.getTotalPages());
         modelAndView.addObject("filterCriteria", new UserSearchCriteria());
         return modelAndView;
     }
 
     @GetMapping(path = "/{managerId}/users/{userId}")
-    ModelAndView getClientsList(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
+    ModelAndView getClientById(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         ModelAndView modelAndView;
         if (userService.getUserById(userId).getRole().equals((Role.CLIENT.toString()))) {
             modelAndView = new ModelAndView("manager/client_info");
@@ -122,11 +129,17 @@ public class ManagerController {
     }
 
     @GetMapping(path = "/{managerId}/users/filter")
-    ModelAndView getUsersByFilter(@PathVariable("managerId") Long managerId, @ModelAttribute("filterCriteria") UserSearchCriteria userFilterCriteria) {
+    ModelAndView getUsersByFilter(@PathVariable("managerId") Long managerId,
+                                  @ModelAttribute("filterCriteria") UserSearchCriteria userFilterCriteria,
+                                  @RequestParam(value = "page", defaultValue = "0") int page,
+                                  @RequestParam(value = "size", defaultValue = "10") int size) {
         ModelAndView modelAndView = new ModelAndView("manager/users");
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
-        modelAndView.addObject("users", userService.findUsersWithFilters(userFilterCriteria));
+        Page<UserDto> usersPage = userService.findUsersWithFilters(page, size, userFilterCriteria);
+        modelAndView.addObject("users", usersPage);
+        modelAndView.addObject("currentPage", usersPage.getNumber());
+        modelAndView.addObject("totalPages", usersPage.getTotalPages());
         modelAndView.addObject("filterCriteria", new UserSearchCriteria());
         return modelAndView;
     }
