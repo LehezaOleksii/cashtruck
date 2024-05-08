@@ -10,6 +10,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.filter.UserSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
@@ -50,6 +51,7 @@ public class UserServiceImpl implements UserService {
     private final ImageService imageService;
     private final DtoMapper dtoMapper;
     private final UserSpecification userSpecification;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Override
     public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
@@ -250,7 +252,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Page<UserDto> findUsersWithFilters(int page, int size, UserSearchCriteria criteria) {
         Sort sort = Sort.by("firstName");
-        Page<User> userPage = userSpecification.getUsersWithCriterias(criteria,page,size,sort);
+        Page<User> userPage = userSpecification.getUsersWithCriterias(criteria, page, size, sort);
         return userPage.map(dtoMapper::userToDto);
     }
 
@@ -274,6 +276,13 @@ public class UserServiceImpl implements UserService {
         } else {
             System.out.println("User does not have enough permissions");
         }
+    }
+
+    @Override
+    public void updateUserPlan(Long userId, SubscriptionStatus status) {
+        User user = userRepository.findById(userId).get();
+        user.setSubscription(subscriptionRepository.findBySubscriptionStatus(status));
+        userRepository.save(user);
     }
 
     private ClientStatisticDto createStatisticDto(User client) {

@@ -25,6 +25,7 @@ public class UserDto {
     private String avatar;
     private String role;
     private String status;
+    private String subscription;
     private List<Transaction> incomes;
     private List<Transaction> expenses;
 }

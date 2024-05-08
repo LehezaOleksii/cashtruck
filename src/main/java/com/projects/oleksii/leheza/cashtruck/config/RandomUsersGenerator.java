@@ -3,6 +3,8 @@ package com.projects.oleksii.leheza.cashtruck.config;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
+import com.projects.oleksii.leheza.cashtruck.repository.SubscriptionRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class RandomUsersGenerator {
     private final BankTransactionService bankTransactionService;
     private final CategoryService categoryService;
     private final UserRepository userRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     private final Random random;
     private final Faker faker;
@@ -58,6 +61,7 @@ public class RandomUsersGenerator {
         user.setEmail("oleksii.leheza@gmail.com");
         user.setRole(Role.CLIENT);
         user.setStatus(ActiveStatus.ACTIVE);
+        user.setSubscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE));
         userService.saveUser(user);
     }
 
@@ -80,7 +84,8 @@ public class RandomUsersGenerator {
             String fullName = firstName + lastName;
             Saving saving = savings.get(index - 1);
             saveBankCardHolderName(fullName, saving);
-            User user = User.builder()
+            User user = new User();
+            user = user.toBuilder()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(faker.internet().emailAddress())
@@ -89,6 +94,7 @@ public class RandomUsersGenerator {
                     .transactions(allTransactions)
                     .role(Role.CLIENT)
                     .status(ActiveStatus.INACTIVE)
+                    .subscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE))
                     .build();
             userService.saveUser(user);
             savingService.assignBankCardsToClient((long) index, saving.getBankCards().stream().toList());

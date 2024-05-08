@@ -9,6 +9,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -63,4 +64,6 @@ public interface UserService {
     void blockUser(Long userId);
 
     void unblockUser(Long userId);
+
+    void updateUserPlan(Long userId, SubscriptionStatus status);
 }

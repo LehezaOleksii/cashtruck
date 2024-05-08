@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
+import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
@@ -29,6 +30,7 @@ public class ClientController {
     private final SavingService savingService;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
+    private String stripePublicKey = "pk_test_51PDMQi2N1Bginh2bUyYqHhWzip5F9uR8B2BFcGtBorVSDcThERpj5eNYK4gOqrGyUaoQ79aZdb8e0Lt7RfnLsFaM00Qhes8t5J";
 
 
     @PostMapping(path = "/login")
@@ -85,9 +87,12 @@ public class ClientController {
         }
         bankCardService.save(bankCardDto);
         if (!bankCardService.isClientHasCard(userId, bankCardDto)) {
-            savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
+            try {
+                savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
+            } catch (IllegalArgumentException e) {
+                System.out.println("CARD LIMIT");
+            }
         }
-
         return new ModelAndView("redirect:/clients/" + userId);
     }
 
@@ -103,7 +108,7 @@ public class ClientController {
     @PutMapping("/{userId}/bank_cards")
     public ModelAndView updateBankCardData(@PathVariable Long userId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto) {
         bankCardService.save(bankCardDto);
-        savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
+//        savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
         return new ModelAndView("redirect:/clients/" + userId);
     }
 
@@ -133,7 +138,7 @@ public class ClientController {
         Page<TransactionDto> transactionPage = transactionService.findTransactionsByClientIdAndCategoryName(userId, categoryName, page, size);
         modelAndView.addObject("currentPage", transactionPage.getNumber());
         modelAndView.addObject("totalPages", transactionPage.getTotalPages());
-        modelAndView.addObject("transactions",transactionPage);
+        modelAndView.addObject("transactions", transactionPage);
         //TODO exceptions with page number
         return modelAndView;
     }
@@ -163,5 +168,16 @@ public class ClientController {
             modelAndView.addObject("client", userService.getHeaderClientData(userId));
             return new ModelAndView("redirect:/clients/" + userId);
         }
+    }
+
+    @GetMapping("/{clientId}/premium")
+    public ModelAndView getPlansList(@PathVariable Long clientId) {
+        ModelAndView modelAndView = new ModelAndView("client/plans");
+        modelAndView.addObject("client", userService.getHeaderClientData(clientId));
+        modelAndView.addObject("clientId", clientId);
+        modelAndView.addObject("client_plan", userService.getUserById(clientId).getSubscription());
+        modelAndView.addObject("payment_request", new PaymentCreateRequest());
+        modelAndView.addObject("stripePublicKey", stripePublicKey);
+        return modelAndView;
     }
 }

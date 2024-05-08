@@ -93,6 +93,7 @@ public class DtoMapper {
                         .collect(Collectors.toList()))
                 .role(String.valueOf(user.getRole()))
                 .status(String.valueOf(user.getStatus()))
+                .subscription(user.getSubscription().getSubscriptionStatus().toString())
                 .build();
         if (user.getAvatar() != null) {
             dto.setAvatar(imageConvertor.convertByteImageToString(user.getAvatar().getImageBytes()));

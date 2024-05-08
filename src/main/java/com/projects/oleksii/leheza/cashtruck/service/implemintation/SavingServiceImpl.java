@@ -40,8 +40,8 @@ public class SavingServiceImpl implements SavingService {
         }
         User user = userRepository.findById(userId).get();
         Saving saving = user.getSaving();
-        if (saving == null) {
-            throw new IllegalStateException("Client does not have saving");
+        if (saving.getBankCards().size() > user.getSubscription().getMaxCardsSupport()) {
+            throw new IllegalStateException("Client plan does not maintain this functionality");
         }
         if (saving.getBankCards().stream()
                 .anyMatch(bc -> bc.getBankName().equals(bankCard.getCardNumber()))) {
@@ -51,7 +51,7 @@ public class SavingServiceImpl implements SavingService {
         savingRepository.save(saving);
     }
 
-    @Override
+    @Override //TODO delete
     public void assignBankCardsToClient(Long userId, List<BankCard> bankCards) throws IllegalStateException {
         for (BankCard bankCard : bankCards) {
             assignBankCardToClient(userId, bankCard);
@@ -60,6 +60,14 @@ public class SavingServiceImpl implements SavingService {
 
     @Override
     public void assignBankCardDtoToClient(Long userId, CreateBankCardDto bankCardDto) {
+        if (!userRepository.findById(userId).isPresent()) {
+            throw new IllegalStateException("Client dose not exist");
+        }
+        User user = userRepository.findById(userId).get();
+        Saving saving = user.getSaving();
+        if (saving.getBankCards().size() > user.getSubscription().getMaxCardsSupport()) {
+            throw new IllegalStateException("Client plan does not maintain this functionality");
+        }
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())

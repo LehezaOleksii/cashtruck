@@ -13,7 +13,7 @@ public interface SavingService {
 
      void saveAll(Collection<Saving>savings);
 
-     void assignBankCardToClient(Long clientId, BankCard bankCard);
+     void assignBankCardToClient(Long clientId, BankCard bankCard) throws IllegalArgumentException;
      void assignBankCardsToClient(Long clientId, List<BankCard>bankCards);
      void assignBankCardDtoToClient(Long clientId, CreateBankCardDto bankCard);
 }

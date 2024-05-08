@@ -9,12 +9,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
 @Setter
-@AllArgsConstructor
 @RequiredArgsConstructor
+@AllArgsConstructor
 @ToString
 @Builder(toBuilder = true)
 @Entity
@@ -40,7 +41,7 @@ public class User {
     @NotBlank
     private String password;
     @NotNull
-    @Enumerated(EnumType.STRING)//???????
+    @Enumerated(EnumType.STRING)//TODO???????
     private Role role;
     @OneToOne
     private Image avatar;
@@ -53,8 +54,12 @@ public class User {
     @NotNull
     @Enumerated(EnumType.STRING)
     private ActiveStatus status;
+    @NotNull
+    @ManyToOne
+    private Subscription subscription;
+    private BigDecimal balance = new BigDecimal(0);
 
-//    public Role getLeadRole() {
+    //    public Role getLeadRole() {
 //        return roles.stream()
 //                .min(comparingInt(Role::getOrder))
 //                .orElse(null);
