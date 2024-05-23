@@ -72,7 +72,13 @@
 
         <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
           <div class="card-body my-container" style="height: auto">
-            <h4 class="pt-4 mb-4 custom-dark-grey">Current Plan</h4>
+            <h4 class="pt-4 mb-4 custom-dark-grey">
+              <span>
+                Subscription:
+              </span>
+              <span th:text="${user.subscription}">
+              </span>
+            </h4>
             <div class="row">
               <div class="col-xl-6">
                 <div class="mb-3">
@@ -91,14 +97,9 @@
                   </p>
                 </div>
                 <div class="mt-2 row">
-                  <div class="col-6">
-                    <button class="btn btn-primary custom-back-violet w-100">
+                  <div class="col-10">
+                    <button class="btn btn-primary custom-back-violet w-100" data-bs-toggle="modal" data-bs-target="#upgradePlanModal">
                       Upgrade Plan
-                    </button>
-                  </div>
-                  <div class="col-6">
-                    <button class="btn custom-back-red w-100">
-                      Cancel Subscription
                     </button>
                   </div>
                 </div>
@@ -217,6 +218,42 @@
           </div>
         </div>
       </div>
+      <!-- Upgrade Plan Modal -->
+      <div id="userId" style="display: none" th:text="${userId}"></div>
+      <div id="managerId" style="display: none" th:text="${managerId}"></div>
+      <div class="modal fade" id="upgradePlanModal" tabindex="-1" aria-labelledby="upgradePlanModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="upgradePlanModalLabel">Upgrade Plan</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <form id="upgradePlanForm">
+                <div class="mb-3">
+                  <label for="statusSelect" class="form-label">Select Status:</label>
+                  <select class="form-select" id="statusSelect" name="status">
+                    <option value="FREE">Free</option>
+                    <option value="PLUS">Plus</option>
+                    <option value="PRO">Professional</option>
+                  </select>
+                </div>
+                <button type="button" class="btn btn-primary custom-back-violet" id="submitUpgradePlan">Update Status</button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <script>
+        document.getElementById('submitUpgradePlan').addEventListener('click', function() {
+          var clientId = document.getElementById('userId').innerText;
+          var managerId = document.getElementById('managerId').innerText;
+          var status = document.getElementById('statusSelect').value;
+          var updateUrl = '/managers/' + managerId + '/users/' + clientId + '/plan/update?status=' + status;
+          window.location.href = updateUrl;
+        });
+      </script>
+
     </main>
   </body>
 </html>

@@ -5,6 +5,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
@@ -166,6 +167,12 @@ public class ManagerController {
         ModelAndView modelAndView = new ModelAndView("manager/create_plan");
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         return modelAndView;
+    }
+
+    @GetMapping(path = "/{managerId}/users/{userId}/plan/update")
+    ModelAndView updatePlanStatus(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId, @RequestParam("status") String status) {
+        userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
+        return new ModelAndView("redirect:/managers/" + managerId + "/users/" + userId);
     }
 
     @GetMapping(path = "/{managerId}/emails")
