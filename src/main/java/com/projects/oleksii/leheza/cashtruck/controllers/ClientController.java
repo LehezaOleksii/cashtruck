@@ -64,6 +64,7 @@ public class ClientController {
     public ModelAndView clientBankCardsForm(@PathVariable Long userId, @PathVariable(required = false) Long bankCardId) {
         ModelAndView modelAndView = new ModelAndView("client/add_bank_card");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));//TODO use DTO
+        modelAndView.addObject("clientId", userService.getUserById(userId).getId());//TODO use DTO
         if (Optional.ofNullable(bankCardId).isPresent()) {
             BankCard bankCard = bankCardService.getById(bankCardId);
             modelAndView.addObject("bank_card", CreateBankCardDto.builder().bankName(bankCard.getBankName())
@@ -79,21 +80,21 @@ public class ClientController {
         return modelAndView;
     }
 
-    @PostMapping("/{userId}/bank_cards")
-    public ModelAndView saveBankCardToClient(@PathVariable Long userId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto, BindingResult bindingResult) {
+    @PostMapping("/{clientId}/bank_cards")
+    public ModelAndView saveBankCardToClient(@PathVariable Long clientId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
             return new ModelAndView("client/add_bank_card")
-                    .addObject("client", userService.getHeaderClientData(userId));
+                    .addObject("client", userService.getHeaderClientData(clientId));
         }
-        bankCardService.save(bankCardDto);
-        if (!bankCardService.isClientHasCard(userId, bankCardDto)) {
+        if (!bankCardService.isClientHasCard(clientId, bankCardDto)) {
             try {
-                savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
+               BankCard bankCard = bankCardService.save(bankCardDto);
+                savingService.assignBankCardToClient(clientId, bankCard);
             } catch (IllegalArgumentException e) {
-                System.out.println("CARD LIMIT");
+                return new ModelAndView("redirect:/clients/" + clientId+"/premium");
             }
         }
-        return new ModelAndView("redirect:/clients/" + userId);
+        return new ModelAndView("redirect:/clients/" + clientId);
     }
 
     @GetMapping("/{userId}/bank_cards/update")

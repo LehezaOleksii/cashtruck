@@ -9,7 +9,7 @@ public interface BankCardService {
 
     void save(BankCard bankCard);
 
-    void save(CreateBankCardDto bankCard);
+    BankCard save(CreateBankCardDto bankCard);
 
     BankCard getBankCardByBankNumber(String bankNumber);
 

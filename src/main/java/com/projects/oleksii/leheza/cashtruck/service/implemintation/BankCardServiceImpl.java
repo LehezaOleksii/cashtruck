@@ -28,7 +28,7 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public void save(CreateBankCardDto bankCardDto) {
+    public BankCard save(CreateBankCardDto bankCardDto) {
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())
@@ -40,7 +40,7 @@ public class BankCardServiceImpl implements BankCardService {
         if (bankCardDto.getId() != null) {
             bankCard.setId(bankCardDto.getId());
         }
-        bankCardRepository.save(bankCard);
+        return bankCardRepository.save(bankCard);
     }
 
     @Override

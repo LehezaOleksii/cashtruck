@@ -34,19 +34,20 @@ public class SavingServiceImpl implements SavingService {
     }
 
     @Override
-    public void assignBankCardToClient(Long userId, BankCard bankCard) throws IllegalStateException {
+    public void assignBankCardToClient(Long userId, BankCard bankCard) throws IllegalArgumentException {
         if (!userRepository.findById(userId).isPresent()) {
             throw new IllegalStateException("Client dose not exist");
         }
         User user = userRepository.findById(userId).get();
         Saving saving = user.getSaving();
-        if (saving.getBankCards().size() > user.getSubscription().getMaxCardsSupport()) {
-            throw new IllegalStateException("Client plan does not maintain this functionality");
-        }
         if (saving.getBankCards().stream()
-                .anyMatch(bc -> bc.getBankName().equals(bankCard.getCardNumber()))) {
+                .anyMatch(bc -> bc.getCardNumber().equals(bankCard.getCardNumber()))) {
             return;
         }
+        if (saving.getBankCards().size()+1 > user.getSubscription().getMaxCardsSupport()) {
+            throw new IllegalArgumentException("Client plan does not maintain this functionality");
+        }
+
         saving.getBankCards().add(bankCard);
         savingRepository.save(saving);
     }

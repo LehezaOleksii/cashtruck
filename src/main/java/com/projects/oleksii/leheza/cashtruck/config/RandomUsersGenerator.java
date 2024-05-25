@@ -97,7 +97,6 @@ public class RandomUsersGenerator {
                     .subscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE))
                     .build();
             userService.saveUser(user);
-            savingService.assignBankCardsToClient((long) index, saving.getBankCards().stream().toList());
         });
     }
 
