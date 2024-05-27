@@ -27,35 +27,23 @@
               <div>
                 <div>
                   <span class="custom-dark-grey">First name:</span>
-                  <span class="custom-fear-grey">First name</span>
+                  <span class="custom-fear-grey" th:text="${user.firstName}"></span>
                 </div>
                 <div>
                   <span class="custom-dark-grey">Last name:</span>
-                  <span class="custom-fear-grey">Last name</span>
+                  <span class="custom-fear-grey" th:text="${user.lastName}"></span>
                 </div>
                 <div>
                   <span class="custom-dark-grey">Email:</span>
-                  <span class="custom-fear-grey">Email</span>
+                  <span class="custom-fear-grey" th:text="${user.email}"></span>
                 </div>
                 <div>
                   <span class="custom-dark-grey">Status:</span>
-                  <span class="custom-fear-grey">Status</span>
+                  <span class="custom-fear-grey" th:text="${user.status}"></span>
                 </div>
                 <div>
                   <span class="custom-dark-grey">Role:</span>
-                  <span class="custom-fear-grey">Role</span>
-                </div>
-                <div>
-                  <span class="custom-dark-grey">Contact: </span>
-                  <span class="custom-fear-grey">Contact</span>
-                </div>
-                <div>
-                  <span class="custom-dark-grey">Languages: </span>
-                  <span class="custom-fear-grey">Languages</span>
-                </div>
-                <div>
-                  <span class="custom-dark-grey">Country:</span>
-                  <span class="custom-fear-grey">Country</span>
+                  <span class="custom-fear-grey" th:text="${user.role}"></span>
                 </div>
                 <div class="d-flex justify-content-center mt-3">
                   <button class="btn btn-primary custom-back-violet me-3 col-3">

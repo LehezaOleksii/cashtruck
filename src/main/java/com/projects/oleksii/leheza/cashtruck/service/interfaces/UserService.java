@@ -66,4 +66,6 @@ public interface UserService {
     void unblockUser(Long userId);
 
     void updateUserPlan(Long userId, SubscriptionStatus status);
+
+    List<Long> findUserIdsWithExpiredSubscriptions();
 }

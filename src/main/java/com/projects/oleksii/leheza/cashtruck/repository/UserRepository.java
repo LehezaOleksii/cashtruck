@@ -30,4 +30,7 @@ public interface UserRepository extends
     Page<User> findAll(Specification<User> specification, Pageable pageable);
 
     Page<User> findAll(Pageable pageable);
+
+    @Query("SELECT u.id FROM User u WHERE u.subscriptionFinishDate <= CURRENT_DATE")
+    List<Long> findUserIdsWithExpiredSubscriptions();
 }

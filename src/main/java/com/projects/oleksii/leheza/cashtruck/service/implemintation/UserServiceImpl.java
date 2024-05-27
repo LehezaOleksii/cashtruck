@@ -285,6 +285,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public List<Long> findUserIdsWithExpiredSubscriptions() {
+        return userRepository.findUserIdsWithExpiredSubscriptions();
+    }
+
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
         Long clientId = client.getId();

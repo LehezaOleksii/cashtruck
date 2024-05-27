@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -57,6 +58,7 @@ public class User {
     @NotNull
     @ManyToOne
     private Subscription subscription;
+    private Date subscriptionFinishDate;
     private BigDecimal balance = new BigDecimal(0);
 
     //    public Role getLeadRole() {

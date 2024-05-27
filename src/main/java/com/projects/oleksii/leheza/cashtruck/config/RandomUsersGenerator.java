@@ -62,6 +62,7 @@ public class RandomUsersGenerator {
         user.setRole(Role.CLIENT);
         user.setStatus(ActiveStatus.ACTIVE);
         user.setSubscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE));
+        user.setSubscriptionFinishDate(new Date());
         userService.saveUser(user);
     }
 
@@ -85,6 +86,10 @@ public class RandomUsersGenerator {
             Saving saving = savings.get(index - 1);
             saveBankCardHolderName(fullName, saving);
             User user = new User();
+            int randomDays = ThreadLocalRandom.current().nextInt(7, 31);
+            LocalDate currentDate = LocalDate.now();
+            LocalDate subscriptionFinishDate = currentDate.plusDays(randomDays);
+            Date subscriptionFinishDateLegacy = Date.from(subscriptionFinishDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
             user = user.toBuilder()
                     .firstName(firstName)
                     .lastName(lastName)
@@ -95,6 +100,7 @@ public class RandomUsersGenerator {
                     .role(Role.CLIENT)
                     .status(ActiveStatus.INACTIVE)
                     .subscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE))
+                    .subscriptionFinishDate(subscriptionFinishDateLegacy)
                     .build();
             userService.saveUser(user);
         });
