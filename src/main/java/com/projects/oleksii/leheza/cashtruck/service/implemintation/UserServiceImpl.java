@@ -140,9 +140,7 @@ public class UserServiceImpl implements UserService {
                 .firstName(userUpdateDto.getFirstName())
                 .lastName(userUpdateDto.getLastName())
                 .password(userUpdateDto.getPassword())
-                .country(userUpdateDto.getCountry())
-                .phoneNumber(userUpdateDto.getPhoneNumber())
-                .language(userUpdateDto.getLanguage())
+                .status(ActiveStatus.valueOf(userUpdateDto.getStatus()))
                 .email(updatedEmail).build();
         userRepository.save(currentUser);
     }
@@ -156,9 +154,6 @@ public class UserServiceImpl implements UserService {
             throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
         }
         User user = currentClient.toBuilder()
-                .phoneNumber(userDto.getPhoneNumber())
-                .country(userDto.getCountry())
-                .language(userDto.getLanguage())
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .email(userDto.getEmail())
@@ -359,7 +354,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean existByEmail(String email) {
-        return email.equals(userRepository.findByEmailIgnoreCase(email).getEmail());
+        if (userRepository.findByEmailIgnoreCase(email) != null) {
+            String emailInRepository = userRepository.findByEmailIgnoreCase(email).getEmail();
+            return email.equals(emailInRepository);
+        } else {
+            return false;
+        }
 //        return adminRepository.findAdminByUser_Email(email).isPresent();
     }
 

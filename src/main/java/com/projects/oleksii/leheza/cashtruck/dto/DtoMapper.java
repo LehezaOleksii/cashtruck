@@ -10,6 +10,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
+import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
@@ -116,6 +117,7 @@ public class DtoMapper {
                 .country(clientdto.getCountry())
                 .saving(clientdto.getSaving())
                 .transactions(transactions)
+                .status(ActiveStatus.valueOf(clientdto.getStatus()))
                 .build();
     }
 
@@ -133,9 +135,7 @@ public class DtoMapper {
                 .lastName(user.getLastName())
                 .email(user.getEmail())
                 .password(user.getPassword())
-                .language(user.getLanguage())
-                .country(user.getCountry())
-                .phoneNumber(user.getPhoneNumber())
+                .status(String.valueOf(user.getStatus()))
                 .build();
     }
 
@@ -145,11 +145,8 @@ public class DtoMapper {
                 .firstName(userUpdateDto.getFirstName())
                 .lastName(userUpdateDto.getLastName())
                 .avatar(new Image(imageConvertor.convertStringToByteImage(userUpdateDto.getAvatar())))
-                .language(userUpdateDto.getLanguage())
                 .email(userUpdateDto.getEmail())
                 .password(userUpdateDto.getPassword())
-                .phoneNumber(userUpdateDto.getPhoneNumber())
-                .country(userUpdateDto.getCountry())
                 .build();
     }
 

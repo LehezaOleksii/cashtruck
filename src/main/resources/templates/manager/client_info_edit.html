@@ -1,10 +1,96 @@
 <!DOCTYPE html>
-<html lang="en">
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorator="layout/manager/layout"
+>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
 </head>
-<body>
+<body th:object="${user}">
+<main layout:fragment="content">
+    <form method="post" th:object="${clientDto}" th:action="@{'/managers/' + ${manager.id}+'/users/'+ ${user.id}+'/update'}">
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
+            <span th:text="${errorMessage}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
 
+        <div class="overlay">
+            <div class="overlay-content">
+                <div class="profile-container">
+                    <h5 class="text-center info-card-font bold mb-5">Edit profile information</h5>
+                    <hr>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="profile-atribute">First name</div>
+                            <div class="form-outline">
+                                <input id="firstName" type="text" placeholder="First Name" class="form-control" th:field="*{firstName}"  required/>
+                                <small th:if="${#fields.hasErrors('firstName')}"
+                                       th:errors="*{firstName}"
+                                       th:text="${#strings.listJoin(#fields.errors('firstName'), ', ')}" class="text-danger">
+                                    Please provide a valid name.
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="profile-atribute">Last Name</div>
+                            <div class="form-outline">
+                                <input id="lastName" type="text" class="form-control" th:field="*{lastName}" placeholder="Last name" required>
+                                <small th:if="${#fields.hasErrors('lastName')}"
+                                       th:errors="*{lastName}"
+                                       th:text="${#strings.listJoin(#fields.errors('lastName'), ', ')}" class="text-danger">
+                                    Please provide a valid card number.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="profile-atribute">Email</div>
+                            <div class="form-outline">
+                                <input id="email" type="text" th:field="*{email}" placeholder="Email" class="form-control"   required/>
+                                <small th:if="${#fields.hasErrors('email')}"
+                                       th:errors="*{email}"
+                                       th:text="${#strings.listJoin(#fields.errors('email'), ', ')}" class="text-danger">
+                                    Please provide a valid email.
+                                </small>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="profile-atribute">Password</div>
+                            <div class="form-outline">
+                                <input id="password" type="text" th:field="*{password}" placeholder="Password" class="form-control" required/>
+                                <small th:if="${#fields.hasErrors('password')}"
+                                       th:errors="*{password}"
+                                       th:text="${#strings.listJoin(#fields.errors('password'), ', ')}" class="text-danger">
+                                    Please provide a valid password.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="profile-atribute">Status</div>
+                            <div class="form-outline">
+                                <select id="status" name="status" class="form-control">
+                                    <option th:each="status : ${statuses}" th:value="${status}" th:text="${status.toString()}" th:selected="${clientDto.status == status}"></option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4 ">
+                        <div class="col justify-content-end">
+                            <button class= "btn custom-back-violet mt-2" type="submit" style="width: 160px;">Update</button>
+                        </div>
+                        <div class="col">
+                            <a th:href="@{'/managers/' + ${user.id}+'/users/'+${clientDto.id}}" class="btn mt-2 custom-back-grey" style="width: 160px;">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
 </body>
 </html>

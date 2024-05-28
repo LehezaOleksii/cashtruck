@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
+import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
@@ -72,6 +73,35 @@ public class ManagerController {
         modelAndView.addObject("user", userService.getUserById(userId));
         modelAndView.addObject("manager", userService.getUserById(managerId));
         return modelAndView;
+    }
+
+    @GetMapping(path = "/{managerId}/users/{userId}/update/form")
+    ModelAndView updateClientFormById(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
+        ModelAndView modelAndView = new ModelAndView("manager/client_info_edit");
+        modelAndView.addObject("user", userService.getUserById(userId));
+        modelAndView.addObject("manager", userService.getUserById(managerId));
+        UserUpdateDto userUpdateDto = userService.getClientUpdateDto(userId);
+        modelAndView.addObject("clientDto", userUpdateDto);
+        modelAndView.addObject("statuses", ActiveStatus.values());
+        return modelAndView;
+    }
+
+
+    @PostMapping("/{managerId}/users/{userId}/update")
+    public ModelAndView updateClientAccount(@PathVariable Long managerId,
+                                            @PathVariable Long userId,
+                                            @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto,
+                                            BindingResult bindingResult) {
+
+        if (bindingResult.hasFieldErrors()) {
+            return new ModelAndView("manager/client_info_edit")
+                    .addObject("manager", userService.getHeaderClientData(managerId))
+                    .addObject("user", userService.getUserById(userId))
+                    .addObject("managerId", managerId);
+        } else {
+            userService.updateUserInfo(userId, userUpdateDto);
+            return new ModelAndView("redirect:/managers/" + managerId + "/users/" + userId);
+        }
     }
 
     @GetMapping(path = "/{managerId}/users/{userId}/block")
