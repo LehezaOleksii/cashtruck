@@ -97,7 +97,9 @@ public class ManagerController {
             return new ModelAndView("manager/client_info_edit")
                     .addObject("manager", userService.getHeaderClientData(managerId))
                     .addObject("user", userService.getUserById(userId))
-                    .addObject("managerId", managerId);
+                    .addObject("managerId", managerId)
+                    .addObject("statuses", ActiveStatus.values());
+
         } else {
             userService.updateUserInfo(userId, userUpdateDto);
             return new ModelAndView("redirect:/managers/" + managerId + "/users/" + userId);
