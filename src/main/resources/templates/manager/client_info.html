@@ -22,8 +22,8 @@
                              th:if="${user.avatar == null}" height="110" width="110">
 
                         <div class="user-info text-center">
-                            <h4>name</h4>
-                            <span>role</span>
+                            <h4><span th:text="${user.firstName}"></span> <span th:text="${user.lastName}"></span></h4>
+                            <span th:text="${user.role}"></span>
                         </div>
                     </div>
                     <h5 class="pb-2 custom-dark-grey border-bottom mb-4">Details</h5>
@@ -184,16 +184,6 @@
             <div class="my-container card-body mt-4" style="height: auto">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="pt-2 pb-2">Payment Methods</h5>
-                    <div class="card-action-element">
-                        <button
-                                class="btn btn-primary btn-sm custom-back-violet"
-                                type="button"
-                                data-bs-toggle="modal"
-                                data-bs-target="#addNewCCModal"
-                        >
-                            <i class="bx bx-plus bx-xs me-1"></i>Change Card
-                        </button>
-                    </div>
                 </div>
 
                 <div class="cardMaster border p-3 rounded mb-3">
@@ -211,68 +201,28 @@
                         </div>
                     </div>
                 </div>
-                <div class="d-flex order-sm-0 order-1">
-                    <button class="btn btn-primary custom-back-violet me-3">
-                        Edit
-                    </button>
-                    <button class="btn btn-label-secondary custom-back-grey">
-                        Delete
-                    </button>
-                </div>
             </div>
         </div>
     </div>
     <div class="my-container card-body mt-4" style="height: auto">
         <div class="d-flex justify-content-between align-items-center mt-2">
             <h5>Client Cards</h5>
-            <div class="d-flex justify-content-center">
-                <div class="card-action-element mb-3">
-                    <button
-                            class="btn btn-primary btn-sm custom-back-violet"
-                            type="button"
-                            data-bs-toggle="modal"
-                            data-bs-target="#addNewCCModal"
-                    >
-                        <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                width="24"
-                                height="24"
-                                fill="currentColor"
-                                class="bi bi-plus"
-                                viewBox="0 0 16 16"
-                        >
-                            <path
-                                    d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"
-                            />
-                        </svg>
-                        Add Card
-                    </button>
-                </div>
-            </div>
         </div>
 
-        <div class="cardMaster border p-3 rounded mb-3">
-            <div
-                    class="d-flex justify-content-between flex-sm-row flex-column"
-            >
+        <!-- Iterate over the list of bank cards -->
+        <div th:each="card : ${bank_cards}" class="cardMaster border p-3 rounded mb-3">
+            <div class="d-flex justify-content-between flex-sm-row flex-column">
                 <div class="card-information">
-                    <h6 class="mb-1">Kaith Morrison</h6>
-                    <span class="card-number">∗∗∗∗ ∗∗∗∗ ∗∗∗∗ 9856</span>
+                    <h6 class="mb-1" th:text="${card.nameOnCard}">Card Holder Name</h6>
+                    <span class="card-number" th:text="${card.cardNumber}">Card Number</span>
                 </div>
                 <div class="d-flex flex-column text-start text-lg-end">
-                    <div class="d-flex order-sm-0 order-1">
-                        <button class="btn btn-primary custom-back-violet me-3">
-                            Edit
-                        </button>
-                        <button class="btn custom-back-grey">Delete</button>
-                    </div>
-                    <small class="mt-sm-auto mt-2 order-sm-1 order-0"
-                    >Card expires at 12/26</small
-                    >
+                    <small class="mt-sm-auto mt-2 order-sm-1 order-0" th:text="'Card expires at ' + ${card.expiringDate}">Card Expiry Date</small>
                 </div>
             </div>
         </div>
     </div>
+
     <!-- Upgrade Plan Modal -->
     <div id="userId" style="display: none" th:text="${userId}"></div>
     <div id="managerId" style="display: none" th:text="${managerId}"></div>

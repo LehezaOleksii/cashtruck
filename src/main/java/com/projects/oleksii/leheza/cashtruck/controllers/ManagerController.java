@@ -72,6 +72,7 @@ public class ManagerController {
         }
         modelAndView.addObject("user", userService.getUserById(userId));
         modelAndView.addObject("manager", userService.getUserById(managerId));
+        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         return modelAndView;
     }
 
