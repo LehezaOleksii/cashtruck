@@ -42,12 +42,10 @@ public class SavingServiceImpl implements SavingService {
         Saving saving = user.getSaving();
         if (saving.getBankCards().stream()
                 .anyMatch(bc -> bc.getCardNumber().equals(bankCard.getCardNumber()))) {
-            return;
         }
         if (saving.getBankCards().size()+1 > user.getSubscription().getMaxCardsSupport()) {
             throw new IllegalArgumentException("Client plan does not maintain this functionality");
         }
-
         saving.getBankCards().add(bankCard);
         savingRepository.save(saving);
     }

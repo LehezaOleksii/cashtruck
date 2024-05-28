@@ -1,67 +1,135 @@
 <!DOCTYPE html>
 <html
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="layout/manager/layout"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorator="layout/manager/layout"
 >
-  <head>
-    <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8"/>
     <title>Cash truck</title>
-  </head>
-  <body th:object="${manager}">
-    <main layout:fragment="content">
-      <div class="my-container">
-        <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
-          <h1 class="display-3 custom-dark-grey">Plans</h1>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+          integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+          crossorigin="anonymous">
+
+</head>
+<body th:object="${manager}">
+<main layout:fragment="content">
+    <div class="pricing-header px-3 py-3 pt-md-5 pb-md-4 mx-auto text-center">
+        <h1 class="display-3 custom-dark-grey">Plans</h1>
+    </div>
+    <div class="container">
+        <div class="card-deck mb-3 text-center">
+            <!-- Free Plan -->
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal custom-dark-grey">Free</h4>
+                </div>
+                <div class="card-body my-container">
+                    <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>3 cards support</li>
+                        <li>Email support</li>
+                        <li>Help center access</li>
+                    </ul>
+                    <div th:if="${client_plan == 'FREE'}" class="btn btn-lg btn-block btn-primary">Current plan</div>
+                    <a th:if="${client_plan != 'FREE'}" th:href="@{'/clients/' + ${client.id} + '/premium/payment_form?plan=FREE'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
+                </div>
+            </div>
+            <!-- Plus Plan -->
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal custom-dark-grey">Plus</h4>
+                </div>
+                <div class="card-body my-container">
+                    <h1 class="card-title pricing-card-title">$5 <small class="text-muted">/ mo</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>10 card supports</li>
+                        <li>Priority email support</li>
+                        <li>Help center access</li>
+                    </ul>
+                    <div th:if="${client_plan == 'PLUS'}" class="btn btn-lg btn-block btn-primary">Current</div>
+                    <a th:if="${client_plan != 'PLUS'}" th:href="@{'/clients/' + ${client.id} + '/premium/payment_form?plan=PLUS'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
+                </div>
+            </div>
+            <!-- Pro Plan -->
+            <div class="card mb-4 box-shadow">
+                <div class="card-header">
+                    <h4 class="my-0 font-weight-normal custom-dark-grey">Professional</h4>
+                </div>
+                <div class="card-body my-container">
+                    <h1 class="card-title pricing-card-title">$15 <small class="text-muted">/ mo</small></h1>
+                    <ul class="list-unstyled mt-3 mb-4">
+                        <li>unlimited card supports</li>
+                        <li>Phone and email support</li>
+                        <li>Help center access</li>
+                    </ul>
+                    <div th:if="${client_plan == 'PRO'}" class="btn btn-lg btn-block btn-primary">Current</div>
+                    <a th:if="${client_plan != 'PRO'}" th:href="@{'/clients/' + ${client.id} + '/premium/payment_form?plan=PRO'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
+                </div>
+            </div>
         </div>
-<!--        <h2 class="text-center custom-dark-grey mt-4">Plans</h2>-->
-        <div class="container">
-          <div class="card-deck mb-3 text-center">
-            <div class="card mb-4 box-shadow">
-              <div class="card-header">
-                <h4 class="my-0 font-weight-normal custom-dark-grey">Free</h4>
-              </div>
-              <div class="card-body my-container">
-                <h1 class="card-title pricing-card-title">$0 <small class="text-muted">/ mo</small></h1>
-                <ul class="list-unstyled mt-3 mb-4">
-                  <li>3 cards support</li>
-                  <li>Email support</li>
-                  <li>Help center access</li>
-                </ul>
-                <div class="btn btn-lg btn-block btn-primary">Current</div>
-              </div>
-            </div>
-            <div class="card mb-4 box-shadow">
-              <div class="card-header">
-                <h4 class="my-0 font-weight-normal custom-dark-grey">Plus</h4>
-              </div>
-              <div class="card-body my-container">
-                <h1 class="card-title pricing-card-title">$5 <small class="text-muted">/ mo</small></h1>
-                <ul class="list-unstyled mt-3 mb-4">
-                  <li>10 card supports</li>
-                  <li>Priority email support</li>
-                  <li>Help center access</li>
-                </ul>
-                <button type="button" class="btn btn-lg btn-block btn-primary custom-back-violet"> Get started</button>
-              </div>
-            </div>
-            <div class="card mb-4 box-shadow">
-              <div class="card-header">
-                <h4 class="my-0 font-weight-normal custom-dark-grey">Pro</h4>
-              </div>
-              <div class="card-body my-container">
-                <h1 class="card-title pricing-card-title">$15 <small class="text-muted">/ mo</small></h1>
-                <ul class="list-unstyled mt-3 mb-4">
-                  <li>unlimited card supports</li>
-                  <li>Phone and email support</li>
-                  <li>Help center access</li>
-                </ul>
-                <button type="button" class="btn btn-lg btn-block btn-primary custom-back-violet">Get started</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-  </body>
+    </div>
+<!--    <div id="solid-payment-form-container">-->
+<!--        <div class="my-container card-body">-->
+<!--            <h2 class="custom-dark-grey">Payment menu</h2>-->
+<!--            <div class="row justify-content-center mt-5">-->
+<!--                <div class="col-md-6">-->
+<!--                    <form th:action="@{'/clients/' + ${client.id} + '/premium/payment_form'}" method="GET" enctype="application/json" >-->
+<!--                        <input type="hidden" name="public_key" value="[YOUR_PUBLIC_KEY]">-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="subscription">Choose Subscription</label>-->
+<!--                            <select class="form-control" id="subscription" name="subscription" onchange="updatePrice()" required>-->
+<!--                                <option value="PLUS">Plus</option>-->
+<!--                                <option value="PRO">Pro</option>-->
+<!--                            </select>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="card_number">Card Number</label>-->
+<!--                            <input type="text" class="form-control" id="card_number" name="cardNumber" placeholder="Card number" pattern="[0-9]{16}" title="Card number must be exactly 16 digits" required>-->
+<!--                        </div>-->
+<!--                        <div class="form-row">-->
+<!--                            <div class="form-group col-md-6">-->
+<!--                                <label for="expiry_date">Expiry Date (MM/YY)</label>-->
+<!--                                <input type="text" class="form-control" id="expiry_date" name="dateValue" placeholder="MM/YY" required>-->
+<!--                            </div>-->
+<!--                            <div class="form-group col-md-6">-->
+<!--                                <label for="cvv">CVV</label>-->
+<!--                                <input type="text" class="form-control" id="cvv" name="cvc" placeholder="CVV" required>-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <label for="amount">Price</label>-->
+<!--                            <input type="text" class="form-control" id="amount" name="amount" readonly required>-->
+<!--&lt;!&ndash;                            <script>&ndash;&gt;-->
+<!--&lt;!&ndash;                                function updatePrice() {&ndash;&gt;-->
+<!--&lt;!&ndash;                                    var subscription = document.getElementById("subscription").value;&ndash;&gt;-->
+<!--&lt;!&ndash;                                    var price = (subscription === "PLUS") ? 50 : 150;&ndash;&gt;-->
+<!--&lt;!&ndash;                                    document.getElementById("amount").value = price;&ndash;&gt;-->
+<!--&lt;!&ndash;                                }&ndash;&gt;-->
+<!--&lt;!&ndash;                                updatePrice();&ndash;&gt;-->
+<!--&lt;!&ndash;                            </script>&ndash;&gt;-->
+<!--                        </div>-->
+<!--                        <div class="form-group">-->
+<!--                            <input type="hidden" id="payment_method" name="paymentMethod" value="card"> &lt;!&ndash; Hidden field for payment method &ndash;&gt;-->
+<!--                        </div>-->
+<!--                        <button type="submit" class="btn btn-primary custom-back-violet">Pay Now</button>-->
+<!--                    </form>-->
+
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+<!--    <script-->
+<!--            src='https://checkout.stripe.com/checkout.js'-->
+<!--            class='stripe-button'-->
+<!--            th:attr='data-key=${stripePublicKey},-->
+<!--         data-amount=${amount},-->
+<!--         data-currency=${currency}'-->
+<!--            data-name='Baeldung'-->
+<!--            data-description='Spring course checkout'-->
+<!--            data-locale='auto'-->
+<!--            data-zip-code='false'>-->
+<!--    </script>-->
+</main>
+</body>
 </html>

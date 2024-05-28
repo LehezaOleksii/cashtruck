@@ -1,14 +1,18 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
+import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +25,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -31,6 +36,10 @@ public class ManagerController {
     private final UserService userService;
     private final ImageConvertor imageConvertor;
     private final EmailServiceImpl emailService;
+    private final BankCardService bankCardService;
+    private final SavingService savingService;
+    private final TransactionService transactionService;
+    private final CategoryService categoryService;
 
     @PutMapping(path = "/update/{userId}")
     ModelAndView updateManagerInfo(@PathVariable("userId") Long managerId, @ModelAttribute("manager") UserUpdateDto userUpdateDto) {
@@ -225,4 +234,101 @@ public class ManagerController {
         modelAndView.addObject("email", new EmailContext());
         return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
+
+    @GetMapping(path = "/{userId}")
+    public ModelAndView showClientDashboard(@PathVariable(value = "userId") Long clientId) {
+        UserHeaderDto manager = userService.getHeaderClientData(clientId);
+        if (manager == null) {
+            return new ModelAndView("login");
+        }
+        ModelAndView modelAndView = new ModelAndView("manager/dashboard");
+        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(clientId));
+        modelAndView.addObject("manager", manager);
+        modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(clientId));
+        return modelAndView;
+    }
+
+    @GetMapping({"/{userId}/bank_cards/save", "/{userId}/bank_cards/{bankCardId}/save"})
+    public ModelAndView clientBankCardsForm(@PathVariable Long userId, @PathVariable(required = false) Long bankCardId) {
+        ModelAndView modelAndView = new ModelAndView("manager/add_bank_card");
+        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("managerId", userService.getUserById(userId).getId());
+        if (Optional.ofNullable(bankCardId).isPresent()) {
+            BankCard bankCard = bankCardService.getById(bankCardId);
+            modelAndView.addObject("bank_card", CreateBankCardDto.builder().bankName(bankCard.getBankName())
+                    .nameOnCard(bankCard.getNameOnCard())
+                    .id(bankCardId)
+                    .expiringDate(bankCard.getExpiringDate())
+                    .cardNumber(bankCard.getCardNumber())
+                    .balance(Double.parseDouble(bankCard.getBalance().toString()))
+                    .cvv(bankCard.getCvv()).build());
+        } else {
+            modelAndView.addObject("bank_card", new CreateBankCardDto());
+        }
+        return modelAndView;
+    }
+
+    @PostMapping("/{managerId}/bank_cards")
+    public ModelAndView saveBankCardToClient(@PathVariable Long managerId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto, BindingResult bindingResult) {
+        if (bindingResult.hasFieldErrors()) {
+            return new ModelAndView("manager/add_bank_card")
+                    .addObject("manager", userService.getHeaderClientData(managerId));
+        }
+        if (!bankCardService.isClientHasCard(managerId, bankCardDto)) {
+            try {
+                BankCard bankCard = bankCardService.save(bankCardDto);
+                savingService.assignBankCardToClient(managerId, bankCard);
+            } catch (IllegalArgumentException e) {
+                return new ModelAndView("redirect:/managers/" + managerId + "/premium");
+            }
+        }
+        return new ModelAndView("redirect:/managers/" + managerId);
+    }
+
+    @GetMapping("/{userId}/bank_cards/update")
+    public ModelAndView updateBankCardForm(@PathVariable Long userId) {
+        ModelAndView modelAndView = new ModelAndView("manager/update_delete_bank_card");
+        UserHeaderDto userHeaderDto = userService.getHeaderClientData(userId);
+        modelAndView.addObject("manager", userHeaderDto);
+        modelAndView.addObject("bank_cards", userService.getUserById(userId).getSaving().getBankCards());
+        return modelAndView;
+    }
+
+    @PutMapping("/{userId}/bank_cards")
+    public ModelAndView updateBankCardData(@PathVariable Long userId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto) {
+        bankCardService.save(bankCardDto);
+        return new ModelAndView("redirect:/managers/" + userId);
+    }
+
+    @GetMapping("/{userId}/bank_cards/{bankCardId}/remove")
+    public ModelAndView removeBankCard(@PathVariable Long userId, @PathVariable Long bankCardId) {
+        bankCardService.removeBankCardForClient(bankCardId, userId);
+        return new ModelAndView("redirect:/managers/" + userId);
+    }
+
+    @GetMapping("/{userId}/categories")
+    public ModelAndView viewIncomeAndExpensesDashboard(@PathVariable Long userId) {
+        ModelAndView modelAndView = new ModelAndView("manager/categories");
+        modelAndView.addObject("manager", userService.getHeaderClientData(userId));//TODO Optimise maybe (it will be a lot of dto)
+        modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(userId));
+        modelAndView.addObject("expenses_categories", transactionService.findClientExpenseCategoriesByClientId(userId));
+        return modelAndView;
+    }
+
+    @GetMapping("/{userId}/categories/{categoryName}")
+    public ModelAndView viewTransactionsByCategoryName(@PathVariable Long userId,
+                                                       @PathVariable String categoryName,
+                                                       @RequestParam(value = "page", defaultValue = "0") int page,
+                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
+        ModelAndView modelAndView = new ModelAndView("manager/transactions_details");
+        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("category", categoryService.findByName(categoryName));
+        Page<TransactionDto> transactionPage = transactionService.findTransactionsByClientIdAndCategoryName(userId, categoryName, page, size);
+        modelAndView.addObject("currentPage", transactionPage.getNumber());
+        modelAndView.addObject("totalPages", transactionPage.getTotalPages());
+        modelAndView.addObject("transactions", transactionPage);
+        //TODO exceptions with page number
+        return modelAndView;
+    }
+
 }
