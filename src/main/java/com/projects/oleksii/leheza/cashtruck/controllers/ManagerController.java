@@ -109,7 +109,7 @@ public class ManagerController {
     @GetMapping(path = "/{managerId}/users/{userId}/block")
     RedirectView blockUser(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         userService.blockUser(userId);
-        return new RedirectView("/managers/" + managerId + "/users");
+        return new RedirectView("/managers/" + managerId + "/users/" + userId);
     }
 
     @GetMapping(path = "/{managerId}/users/{userId}/unblock")

@@ -52,9 +52,43 @@
                             <button class="btn btn-primary custom-back-violet me-3 col-3" id="submitEditUser">
                                 Edit
                             </button>
-                            <button class="btn custom-back-red col-3">
-                                Block
+                            <button id="BlockUser" class="btn custom-back-red col-3">
+                              Block
                             </button>
+                            <script>
+                                // Show the modal when the button is clicked
+                                document.getElementById('BlockUser').addEventListener('click', function() {
+                                    $('#confirmationModal').modal('show');
+                                });
+                            </script>
+                            <!-- Modal -->
+                            <div class="modal" tabindex="-1" role="dialog" id="confirmationModal">
+                                <div class="modal-dialog" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Block User Confirmation</h5>
+                                        </div>
+                                        <div class="modal-body">
+                                            <p><i class="fas fa-exclamation-triangle text-warning"></i> Are you sure you want to block the user?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn custom-back-red" id="confirmDelete">Block</button>
+                                            <script>
+                                                document.getElementById('confirmDelete').addEventListener('click', function() {
+                                                    var userId = document.getElementById('userId').innerText;
+                                                    var managerId = document.getElementById('managerId').innerText;
+                                                    var blockUrl = '/managers/' + managerId + '/users/' + userId + '/block';
+                                                    window.location.href = blockUrl;});
+                                                // Handle cancel button to close the modal
+                                                document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
+                                                    $('#confirmationModal').modal('hide');
+                                                });
+                                            </script>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -74,14 +108,18 @@
                     <div class="col-xl-6">
                         <div class="mb-3">
                             <div class="custom-fair-grey">
-                                <h5>User Current Plan is Basic</h5>
+                                <h5>User Current Plan is <span th:text="${user.subscription.toString()}"></span></h5>
                             </div>
-                            <div>A simple start for everyone</div>
-                            <small>$199 Per Month</small>
+                            <small>$<span th:text="${user.subscriptionPrice}"></span> Per Month</small>
                         </div>
                         <div>
                             <div class="custom-fair-grey">
-                                <h5>Active until Dec 09, 2021</h5>
+                                <h5 th:if="${user.subscriptionFinishDate != null}">
+                                    Active until: <span th:text="${#dates.format(user.subscriptionFinishDate, 'MM dd yyyy')}"></span>
+                                </h5>
+                                <h5 th:unless="${user.subscriptionFinishDate != null}">
+                                   User has not subscribe
+                                </h5>
                             </div>
                             <p>
                                 We will send you a notification upon Subscription expiration
@@ -103,18 +141,43 @@
                         </div>
                         <div class="d-flex justify-content-between mb-2">
                             <h6>Days</h6>
-                            <h6>24 of 30 Days</h6>
+                            <h6 style="display: none" id="subscriptionFinishDate" th:text="${user.getSubscriptionFinishDate()}"></h6>
+                            <h6 id="remainingTime"></h6>
+                            <script>
+                                function calculateRemainingTime() {
+                                    var subscriptionFinishDate = new Date(document.getElementById("subscriptionFinishDate").innerText);
+                                    var currentDate = new Date();
+                                    var remainingTime = subscriptionFinishDate.getTime() - currentDate.getTime();
+                                    var remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
+                                    document.getElementById("remainingTime").innerText = remainingDays + " of 30 Days";
+                                }
+                                window.onload = function() {
+                                    calculateRemainingTime();
+                                };
+                            </script>
+
                         </div>
-                        <div class="progress">
-                            <div
-                                    class="progress-bar w-75 custom-back-violet"
-                                    role="progressbar"
-                                    aria-valuenow="75"
-                                    aria-valuemin="0"
-                                    aria-valuemax="100"
-                            ></div>
+                        <div class="progress flex-row-reverse">
+                            <div class="progress-bar custom-back-violet" role="progressbar" th:style="'width:' + progressPercentage + '%'" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
-                        <small>6 days remaining until your plan requires update</small>
+                        <script>
+                            function calculateRemainingTime() {
+                                var subscriptionFinishDate = new Date(document.getElementById("subscriptionFinishDate").innerText);
+                                var currentDate = new Date();
+                                var remainingTime = subscriptionFinishDate.getTime() - currentDate.getTime();
+                                var remainingDays = Math.ceil(remainingTime / (1000 * 60 * 60 * 24));
+                                var progressPercentage = ((30 - remainingDays) / 30) * 100;
+                                document.getElementById("remainingTime").innerText = remainingDays + " of 30 Days";
+                                document.querySelector(".progress-bar").style.width = progressPercentage + "%";
+                            }
+                            window.onload = function() {
+                                calculateRemainingTime();
+                            };
+                        </script>
+
+
+
+                        <small th:text="'Days remaining until your plan requires update'"></small>
                     </div>
                 </div>
             </div>
@@ -218,7 +281,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="upgradePlanModalLabel">Upgrade Plan</h5>
+                    <h5 class="modal-title" id="upgradePlanModalLabel">Update Plan</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
