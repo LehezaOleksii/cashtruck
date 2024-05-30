@@ -60,7 +60,12 @@ public class ManagerController {
     ModelAndView getClientsList(@PathVariable("managerId") Long managerId,
                                 @RequestParam(value = "page", defaultValue = "0") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size) {
-        ModelAndView modelAndView = new ModelAndView("manager/users");
+        ModelAndView modelAndView = null;
+        if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.MANAGER)) {
+            modelAndView = new ModelAndView("manager/users");
+        } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
+            modelAndView = new ModelAndView("admin/users");
+        }
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         Page<UserDto> usersPage = userService.findAll(page, size);
@@ -176,7 +181,12 @@ public class ManagerController {
                                   @ModelAttribute("filterCriteria") UserSearchCriteria userFilterCriteria,
                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "size", defaultValue = "10") int size) {
-        ModelAndView modelAndView = new ModelAndView("manager/users");
+        ModelAndView modelAndView = null;
+        if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.MANAGER)) {
+            modelAndView = new ModelAndView("manager/users");
+        } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
+            modelAndView = new ModelAndView("admin/users");
+        }
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         Page<UserDto> usersPage = userService.findUsersWithFilters(page, size, userFilterCriteria);

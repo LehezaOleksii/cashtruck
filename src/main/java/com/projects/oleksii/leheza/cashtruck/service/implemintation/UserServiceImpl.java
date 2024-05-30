@@ -285,6 +285,13 @@ public class UserServiceImpl implements UserService {
         return userRepository.findUserIdsWithExpiredSubscriptions();
     }
 
+    @Override
+    public void updateUserRole(Long userId, Role role) {
+        User user = userRepository.findById(userId).get();
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
         Long clientId = client.getId();

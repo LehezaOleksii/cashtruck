@@ -40,7 +40,9 @@
                     <div class="col-md-4">
                         <select  name="plan" class="form-select px-2" aria-label="Default select example">
                             <option value="" selected>Select plan</option>
-                            <option value="select plan"> plan</option>
+                            <option value="FREE">Free</option>
+                            <option value="PLUS">Plus</option>
+                            <option value="PRO">Pro</option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -127,6 +129,12 @@
                                             <a class="user-profile cursor-pointer" th:data-user-id="${user.id}">
                                             <li><button id = "user-profile" class="dropdown-item" type="button"  th:data-user-id="${user.id}">Detailed information</button></li>
                                             </a>
+                                            <li>
+                                                <button type="button" class="btn dropdown-item" data-bs-toggle="modal"
+                                                        data-bs-target="#upgradeRoleModal" th:data-user-id="${user.id}">
+                                                    Upgrade role
+                                                </button>
+                                            </li>
                                             <li th:if="${user.status =='Banned'}"><button class="dropdown-item" type="button" id="unblockUser"  th:data-user-id="${user.id}">Unblock</button></li>
                                             <li th:if="${user.status !='Banned'}"><button class="dropdown-item" type="button" id="blockUser"  th:data-user-id="${user.id}">Block</button></li>
                                         </ul>
@@ -177,7 +185,6 @@
                     });
                 </script>
                 <script>
-
                     document.querySelectorAll('#user-profile').forEach(function(unblockUserLink) {
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
@@ -215,7 +222,54 @@
                 </div>
             </div>
         </div>
+        <!-- Upgrade Role Modal -->
+        <div class="modal fade" id="upgradeRoleModal" tabindex="-1" aria-labelledby="upgradeRoleModalLabel"
+             aria-hidden="true">
+            <input type="hidden" id="selectedUserId">
+
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="upgradeRoleModalLabel">Update Role</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="upgradeRoleForm">
+                            <div class="mb-3">
+                                <label for="roleSelect" class="form-label">Select Role:</label>
+                                <select class="form-select" id="roleSelect" name="role">
+                                    <option value="CLIENT">Client</option>
+                                    <option value="MANAGER">Manager</option>
+                                    <option value="ADMIN">Admin</option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary custom-back-violet" id="submitUpgradeRole">
+                                Update Role
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.querySelectorAll('#upgradeRoleModal').forEach(function(upgradeRoleModal) {
+                upgradeRoleModal.addEventListener('show.bs.modal', function (event) {
+                    var button = event.relatedTarget; // Button that triggered the modal
+                    var userId = button.getAttribute('data-user-id'); // Extract info from data-* attributes
+                    document.getElementById('selectedUserId').value = userId; // Set the value to the hidden field
+                });
+            });
+            document.querySelectorAll('#submitUpgradeRole').forEach(function(submitUpgradeRole) {
+                submitUpgradeRole.addEventListener('click', function () {
+                    var userId = document.getElementById('selectedUserId').value; // Get the user id from the hidden field
+                    var managerId = document.getElementById('managerId').innerText;
+                    var status = document.getElementById('roleSelect').value;
+                    var updateUrl = '/admins/' + managerId + '/users/' + userId + '/role/update?role=' + status;
+                    window.location.href = updateUrl;
+                });
+            });
+
+        </script>
     </main>
 </body>
-
 </html>

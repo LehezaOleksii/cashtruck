@@ -13,10 +13,4 @@ public enum Role {
     Role(int order) {
         this.order = order;
     }
-
-    @Override
-    public String toString() {
-        String roleName = name().toLowerCase();
-        return Character.toUpperCase(roleName.charAt(0)) + roleName.substring(1);
-    }
 }

@@ -9,6 +9,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
@@ -68,4 +69,6 @@ public interface UserService {
     void updateUserPlan(Long userId, SubscriptionStatus status);
 
     List<Long> findUserIdsWithExpiredSubscriptions();
+
+    void updateUserRole(Long userId, Role role);
 }

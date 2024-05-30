@@ -1,9 +1,14 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 @Controller
 @RequiredArgsConstructor
@@ -11,56 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AdminController {
 
     private final UserService userService;
-//    @PostMapping(path = "/create/admin")
-//    ModelAndView createAdmin(@RequestBody CreateAdminDto createAdminDto) {
-//        ModelAndView modelAndView;
-//        if (adminService.findAdminByEmail(createAdminDto.getEmail()) != null) {
-//            modelAndView = new ModelAndView("redirect:/admin/create/admin");
-//            modelAndView.addObject("admin", createAdminDto);
-//            return modelAndView;
-//        }
-//        adminService.saveAdmin(createAdminDto);
-//        modelAndView = new ModelAndView("admin/dashboard");
-//        return modelAndView;
-//    }
-//
-//    @PutMapping(path = "/change/admin/{adminId}")
-//    ModelAndView changeAdminInfo(@PathVariable("adminId") Long adminId, @RequestBody CreateAdminDto createAdminDto) {
-//        try {
-//            adminService.updateAdminInfo(adminId, createAdminDto);
-//            System.out.println("UPDATE admin");
-//        } catch (Exception e) {
-//            return new ModelAndView("admin/dashboard/{adminId}");
-//        }
-//        return new ModelAndView("redirect:/client/dashboard/{clientId}");
-//    }
-//
-//
-//    @GetMapping(path = "/show/client/all")
-//    public ModelAndView showAllClients() {
-//        ModelAndView modelAndView = new ModelAndView("admin/show/client/all");
-//        modelAndView.addObject("clients", clientService.findAll());
-//        return modelAndView;
-//    }
-//
-//    @GetMapping(path = "/show/client/{clientId}")
-//    public ModelAndView showClinetInfo(@PathVariable("clientId") Long clientId) {
-//        ModelAndView modelAndView = new ModelAndView("admin/show/client");
-//        modelAndView.addObject("client", clientService.getDtoClient(clientId));
-//        return modelAndView;
-//    }
-//
-//    @GetMapping(path = "/show/manager/all")
-//    public ModelAndView showAllManager() {
-//        ModelAndView modelAndView = new ModelAndView("admin/show/manager/all");
-//        modelAndView.addObject("managers", managerService.findAllManagers());
-//        return modelAndView;
-//    }
-//
-//    @GetMapping(path = "/show/manager/{managerId}")
-//    public ModelAndView showManagerInfo(@PathVariable("managerId") Long managerId) {
-//        ModelAndView modelAndView = new ModelAndView("admin/show/manager");
-//        modelAndView.addObject("manager", managerService.findManagerById(managerId));
-//        return modelAndView;
-//    }
+
+    @GetMapping(path = "/{adminId}/users/{userId}/role/update")
+    ModelAndView updatePlanStatus(@PathVariable("adminId") Long adminId, @PathVariable("userId") Long userId,
+                                  @RequestParam("role") String status) {
+        userService.updateUserRole(userId, Role.valueOf(status));
+        return new ModelAndView("redirect:/managers/" + adminId + "/users");
+    }
 }
