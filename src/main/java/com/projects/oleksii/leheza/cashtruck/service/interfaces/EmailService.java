@@ -4,7 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 
 public interface EmailService {
 
-    void sendEmailWithAttachment(String from, EmailContext emailContext);
+    void sendEmailWithAttachment(EmailContext emailContext);
 
     void sendConformationEmailRequest(String to, String token);
 

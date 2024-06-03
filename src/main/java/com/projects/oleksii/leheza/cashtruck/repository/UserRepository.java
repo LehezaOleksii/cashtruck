@@ -38,4 +38,7 @@ public interface UserRepository extends
     List<User> findByRole(Role role);
 
     List<User> findByEmailContaining(String partialEmail);
+
+    @Query("SELECT u.email FROM User u WHERE u.role = :role")
+    List<String> findAllEmailsByRole(@Param("role") Role role);
 }

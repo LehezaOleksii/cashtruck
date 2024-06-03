@@ -239,9 +239,17 @@ public class ManagerController {
     @PostMapping(path = "/{managerId}/emails/send")
     ModelAndView sendEmail(@PathVariable("managerId") Long managerId,
                            @Valid @ModelAttribute("email") EmailContext email) {
-        emailService.sendEmailWithAttachment(userService.getUserById(managerId).getEmail(), email);
+        emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
+
+    @PostMapping(path = "/{managerId}/emails/send/clients/all")
+    ModelAndView sendEmailsForAllClients(@PathVariable("managerId") Long managerId,
+                                         @Valid @ModelAttribute("email") EmailContext email) {
+        userService.sendEmailForAllClients(email);
+        return new ModelAndView("redirect:/managers/" + managerId + "/emails");
+    }
+
 
     @GetMapping(path = "/{userId}")
     public ModelAndView showClientDashboard(@PathVariable(value = "userId") Long clientId) {

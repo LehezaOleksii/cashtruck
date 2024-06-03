@@ -190,7 +190,7 @@ public class ClientController {
         ModelAndView modelAndView = new ModelAndView("client/emails");
         modelAndView.addObject("client", userService.getUserDto(clientId));
         modelAndView.addObject("email", new EmailContext());
-        modelAndView.addObject("managers",userService.getUsersByRole(Role.MANAGER));
+        modelAndView.addObject("managers", userService.getUsersByRole(Role.MANAGER));
         return modelAndView;
     }
 
@@ -198,7 +198,7 @@ public class ClientController {
     @PostMapping(path = "/{clientId}/emails/send")
     ModelAndView sendEmail(@PathVariable("clientId") Long clientId,
                            @Valid @ModelAttribute("email") EmailContext email) {
-        emailService.sendEmailWithAttachment(userService.getUserById(clientId).getEmail(), email);
+        emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/clients/" + clientId + "/emails");
     }
 }

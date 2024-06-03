@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
@@ -77,4 +78,6 @@ public interface UserService {
     List<UserDto> findAllDtos();
 
     List<UserDto> searchEmailsByPattern(String email);
+
+    void sendEmailForAllClients(EmailContext email);
 }

@@ -14,6 +14,7 @@ import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.filter.UserSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserService {
     private final DtoMapper dtoMapper;
     private final UserSpecification userSpecification;
     private final SubscriptionRepository subscriptionRepository;
+    private final EmailService emailService;
 
     @Override
     public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
@@ -311,6 +313,14 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByEmailContaining(email).stream()
                 .map(dtoMapper::userToDto)
                 .toList();
+    }
+
+    @Override
+    public void sendEmailForAllClients( EmailContext email) {
+        String[] emails = userRepository.findAllEmailsByRole(Role.CLIENT)
+                .toArray(String[]::new);
+        email.setTo(emails.toString());
+        emailService.sendEmailWithAttachment(email);
     }
 
     private ClientStatisticDto createStatisticDto(User client) {
