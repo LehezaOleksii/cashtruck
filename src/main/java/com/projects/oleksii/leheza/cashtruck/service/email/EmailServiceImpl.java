@@ -4,6 +4,7 @@ package com.projects.oleksii.leheza.cashtruck.service.email;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
@@ -17,22 +18,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
-public class EmailServiceImpl {
+public class EmailServiceImpl implements EmailService {
 
     private static final String UTF_8 = "UTF-8";
     private static final String NEW_USER_ACCOUNT_VERIFICATION = "New User Account Verification";
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
-
-    @Async
-    public void sendEmail(String fromAddress, String toAddress, String subject, String message) {
-        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
-        simpleMailMessage.setFrom("leheza.oleksii@gmail.com"); //TODO replace with fromAddress
-        simpleMailMessage.setTo(toAddress);
-        simpleMailMessage.setSubject(subject);
-        simpleMailMessage.setText(message);
-        mailSender.send(simpleMailMessage);
-    }
 
     @Async
     public void sendEmailWithAttachment(String from, EmailContext emailContext) {
@@ -75,12 +66,12 @@ public class EmailServiceImpl {
     }
 
     @Async
-    public static String getEmailMessage(String name, String host, String token) {
+    public String getEmailMessage(String name, String host, String token) {
         return "Hello " + name + ", \n\nYour new account has been created. Please click the link below to verify your account. \n\n" +
                 getVerificationUrl(host, token) + "\n\nThe support Team";
     }
 
-    public static String getVerificationUrl(String host, String token) {
+    public String getVerificationUrl(String host, String token) {
         return host + "/api/users?token=" + token;
     }
 

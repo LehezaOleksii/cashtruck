@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.repository;
 
 import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -33,4 +34,6 @@ public interface UserRepository extends
 
     @Query("SELECT u.id FROM User u WHERE u.subscriptionFinishDate <= CURRENT_DATE")
     List<Long> findUserIdsWithExpiredSubscriptions();
+
+    List<User> findByRole(Role role);
 }

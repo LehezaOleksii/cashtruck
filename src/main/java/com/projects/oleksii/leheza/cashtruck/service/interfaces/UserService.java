@@ -71,4 +71,6 @@ public interface UserService {
     List<Long> findUserIdsWithExpiredSubscriptions();
 
     void updateUserRole(Long userId, Role role);
+
+    List<UserDto> getUsersByRole(Role role);
 }

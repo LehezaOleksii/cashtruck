@@ -292,6 +292,13 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public List<UserDto> getUsersByRole(Role role) {
+        return userRepository.findByRole(role).stream()
+                .map(dtoMapper::userToDto)
+                .toList();
+    }
+
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
         Long clientId = client.getId();

@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
@@ -8,6 +9,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +32,7 @@ public class ClientController {
     private final SavingService savingService;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
+    private final EmailService emailService;
     private String stripePublicKey = "pk_test_51PDMQi2N1Bginh2bUyYqHhWzip5F9uR8B2BFcGtBorVSDcThERpj5eNYK4gOqrGyUaoQ79aZdb8e0Lt7RfnLsFaM00Qhes8t5J";
 
 
@@ -88,10 +91,10 @@ public class ClientController {
         }
         if (!bankCardService.isClientHasCard(clientId, bankCardDto)) {
             try {
-               BankCard bankCard = bankCardService.save(bankCardDto);
+                BankCard bankCard = bankCardService.save(bankCardDto);
                 savingService.assignBankCardToClient(clientId, bankCard);
             } catch (IllegalArgumentException e) {
-                return new ModelAndView("redirect:/clients/" + clientId+"/premium");
+                return new ModelAndView("redirect:/clients/" + clientId + "/premium");
             }
         }
         return new ModelAndView("redirect:/clients/" + clientId);
@@ -180,5 +183,25 @@ public class ClientController {
         modelAndView.addObject("payment_request", new PaymentCreateRequest());
         modelAndView.addObject("stripePublicKey", stripePublicKey);
         return modelAndView;
+    }
+
+    @GetMapping(path = "/{clientId}/emails")
+    ModelAndView getEmailsMenu(@PathVariable("clientId") Long clientId) {
+        ModelAndView modelAndView = new ModelAndView("client/emails");
+        modelAndView.addObject("client", userService.getUserDto(clientId));
+        modelAndView.addObject("email", new EmailContext());
+        modelAndView.addObject("managers",userService.getUsersByRole(Role.MANAGER));
+        return modelAndView;
+    }
+
+
+    @PostMapping(path = "/{clientId}/emails/send")
+    ModelAndView sendEmail(@PathVariable("clientId") Long clientId,
+                           @Valid @ModelAttribute("email") EmailContext email) {
+        emailService.sendEmailWithAttachment(userService.getUserById(clientId).getEmail(), email);
+        ModelAndView modelAndView = new ModelAndView("client/emails");
+        modelAndView.addObject("client", userService.getUserDto(clientId));
+        modelAndView.addObject("email", new EmailContext());
+        return new ModelAndView("redirect:/clients/" + clientId + "/emails");
     }
 }
