@@ -73,4 +73,8 @@ public interface UserService {
     void updateUserRole(Long userId, Role role);
 
     List<UserDto> getUsersByRole(Role role);
+
+    List<UserDto> findAllDtos();
+
+    List<UserDto> searchEmailsByPattern(String email);
 }

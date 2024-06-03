@@ -232,6 +232,7 @@ public class ManagerController {
         ModelAndView modelAndView = new ModelAndView("manager/emails");
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         modelAndView.addObject("email", new EmailContext());
+        modelAndView.addObject("users", userService.findAllDtos());
         return modelAndView;
     }
 
@@ -239,9 +240,6 @@ public class ManagerController {
     ModelAndView sendEmail(@PathVariable("managerId") Long managerId,
                            @Valid @ModelAttribute("email") EmailContext email) {
         emailService.sendEmailWithAttachment(userService.getUserById(managerId).getEmail(), email);
-        ModelAndView modelAndView = new ModelAndView("manager/emails");
-        modelAndView.addObject("manager", userService.getUserDto(managerId));
-        modelAndView.addObject("email", new EmailContext());
         return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
 
@@ -341,4 +339,12 @@ public class ManagerController {
         return modelAndView;
     }
 
+    @GetMapping(path = "/{managerId}/emails/search")
+    public ModelAndView searchEmails(@PathVariable("managerId") Long managerId, @RequestParam("pattern") String pattern) {
+        ModelAndView modelAndView = new ModelAndView("manager/emails");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("email", new EmailContext());
+        modelAndView.addObject("users", userService.searchEmailsByPattern(pattern));
+        return modelAndView;
+    }
 }

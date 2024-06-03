@@ -20,24 +20,6 @@
             </a>
  
           </div>
-          <ul class="custom-dark-grey email-filter-folders list-unstyled pb-1 mt-5">
-            <li class="d-flex mb-2" data-target="inbox"> 
-              <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center"> 
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-envelope" viewBox="0 0 16 16">
-                  <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm2-1a1 1 0 0 0-1 1v.217l7 4.2 7-4.2V4a1 1 0 0 0-1-1zm13 2.383-4.708 2.825L15 11.105zm-.034 6.876-5.64-3.471L8 9.583l-1.326-.795-5.64 3.47A1 1 0 0 0 2 13h12a1 1 0 0 0 .966-.741M1 11.105l4.708-2.897L1 5.383z"/>
-                </svg>
-                <span class="align-middle ml-2">Inbox</span> 
-              </a> 
-            </li>
-            <li class="d-flex" data-target="sent"> 
-              <a href="javascript:void(0);" class="d-flex flex-wrap align-items-center"> 
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-send" viewBox="0 0 16 16">
-                  <path d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"/>
-                </svg>
-                <span class="align-middle ms-2">Sent</span> 
-              </a>
-            </li> 
-          </ul>
           
         </div>        
         <div class="col-9 p-0"> 
@@ -47,9 +29,21 @@
                 <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
               </svg>
             </span>
-            <input type="text" class="form-control border-0 py-0" placeholder="Search mail">
-          </div> 
-        <div class="border-bottom pr-3 pt-2 pb-2"> 
+            <input type="text" id="searchQuery" class="form-control border-0 py-0" placeholder="Search mail">
+            <button type="button" onclick="searchEmails()" class="btn btn-primary">Search</button>
+          </div>
+          <div style="display:none;" th:text="${manager.id}"></div>
+          <script>
+            function searchEmails() {
+              var managerId = document.getElementById('userId').innerText;
+              var email = document.getElementById('searchQuery').value;
+              var searchUrl = '/managers/' + managerId + '/emails/search?pattern=' + encodeURIComponent(email);
+              window.location.href = searchUrl;
+            }
+
+          </script>
+
+          <div class="border-bottom pr-3 pt-2 pb-2">
           <div class="d-flex">
             <span class="d-sm-block d-none mx-3 text-muted">1-10 of 653</span> 
             <div>
@@ -63,17 +57,19 @@
           </div>
         </div>
         <ul class="card-body pl-3">
-          <li class="mb-1 d-flex justify-content-between"> 
-            <div>
-              <!-- <img class="rounded-circle text-decoration-none me-2" th:if="${user.avatar != null}" th:src="'data:image/jpeg;base64,' + ${user.avatar}" width="34" height="34"> -->
-              <img class="rounded-circle text-decoration-none me-2" width="34" height="34"> 
-              <span class="ml-2">FirstName</span> 
-              <span class="ml-2">lastName</span> 
-              <span class="ml-2">title</span> 
+          <li class="mb-1 d-flex justify-content-between" th:each="user : ${users}">
+            <div class="mb-2">
+              <img class="rounded-circle text-decoration-none me-2" th:if="${user.avatar != null}" th:src="'data:image/jpeg;base64,' + ${user.avatar}" width="34" height="34">
+              <img class="rounded-circle text-decoration-none me-2" width="34" height="34">
+              <span th:text="${user.firstName}"></span>
+              <span th:text="${user.lastName}"></span>
+              <span class="mx-3 custom-dark-grey" th:text="${user.email}"></span>
             </div>
-            <div>
-              <span class="mr-4">time</span>
-            </div>
+
+            <ul id="userList" class="card-body pl-3">
+              <!-- Display users here -->
+            </ul>
+
           </li> 
       </ul> 
         </div>

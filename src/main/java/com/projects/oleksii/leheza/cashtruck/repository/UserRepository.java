@@ -36,4 +36,6 @@ public interface UserRepository extends
     List<Long> findUserIdsWithExpiredSubscriptions();
 
     List<User> findByRole(Role role);
+
+    List<User> findByEmailContaining(String partialEmail);
 }

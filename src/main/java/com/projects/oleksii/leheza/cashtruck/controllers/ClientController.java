@@ -199,9 +199,6 @@ public class ClientController {
     ModelAndView sendEmail(@PathVariable("clientId") Long clientId,
                            @Valid @ModelAttribute("email") EmailContext email) {
         emailService.sendEmailWithAttachment(userService.getUserById(clientId).getEmail(), email);
-        ModelAndView modelAndView = new ModelAndView("client/emails");
-        modelAndView.addObject("client", userService.getUserDto(clientId));
-        modelAndView.addObject("email", new EmailContext());
         return new ModelAndView("redirect:/clients/" + clientId + "/emails");
     }
 }

@@ -299,6 +299,20 @@ public class UserServiceImpl implements UserService {
                 .toList();
     }
 
+    @Override
+    public List<UserDto> findAllDtos() {
+        return userRepository.findAll().stream()
+                .map(dtoMapper::userToDto)
+                .toList();
+    }
+
+    @Override
+    public List<UserDto> searchEmailsByPattern(String email) {
+        return userRepository.findByEmailContaining(email).stream()
+                .map(dtoMapper::userToDto)
+                .toList();
+    }
+
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
         Long clientId = client.getId();
