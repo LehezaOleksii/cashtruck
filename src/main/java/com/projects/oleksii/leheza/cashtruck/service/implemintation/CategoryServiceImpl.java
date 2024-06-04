@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.Category;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -44,6 +45,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto findByName(String categoryName) {
-        return dtoMapper.categoryToDto(categoryRepository.findByName(categoryName).get());
+        return dtoMapper.categoryToDto(categoryRepository.findByName(categoryName)
+                .orElseThrow(() -> new ResourceNotFoundException("Category with name" + categoryName + " was not found")));
     }
 }

@@ -12,6 +12,9 @@ import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.exception.ImageException;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceAlreadyExistException;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.filter.UserSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.*;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
@@ -31,10 +34,7 @@ import java.beans.Transient;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -57,7 +57,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
-        if (!Optional.ofNullable(createUserDto).isPresent()) {
+        if (Optional.ofNullable(createUserDto).isEmpty()) {
             throw new IllegalStateException("Client is empty");
         }
         if (existByEmail(createUserDto.getEmail())) {
@@ -75,12 +75,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User saveUser(User user) {
-        if (!Optional.ofNullable(user).isPresent()) {
-            throw new IllegalStateException("Client is empty");
-        }
-//        if (existByEmail(client.getCustomUser().getEmail())) {
-//            throw new IllegalStateException("Email taken");
-//        }
         return userRepository.save(user);
     }
 
@@ -89,7 +83,7 @@ public class UserServiceImpl implements UserService {
         Confirmation confirmation = confirmationRepository.findByToken(token);
         User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail());
         if (user == null) {
-            throw new RuntimeException();
+            throw new ResourceNotFoundException("User with email:" + confirmation.getUser().getEmail() + " not exist");
         }
         user.setStatus(ActiveStatus.ACTIVE);
         userRepository.save(user);
@@ -136,7 +130,7 @@ public class UserServiceImpl implements UserService {
         String updatedEmail = userUpdateDto.getEmail();
         String currentEmail = currentUser.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
-            throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
+            throw new ResourceAlreadyExistException("Client with email: " + updatedEmail + " has already exist");
         }
         currentUser = currentUser.toBuilder()
                 .firstName(userUpdateDto.getFirstName())
@@ -153,7 +147,7 @@ public class UserServiceImpl implements UserService {
         String updatedEmail = userDto.getEmail();
         String currentEmail = currentClient.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
-            throw new IllegalStateException("Client with " + updatedEmail + " has already exist");
+            throw new ResourceAlreadyExistException("Client with email: " + updatedEmail + " has already exist");
         }
         User user = currentClient.toBuilder()
                 .firstName(userDto.getFirstName())
@@ -168,7 +162,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserUpdateDto getClientUpdateDto(Long clientId) {
-        return dtoMapper.clientToClientUpdateDto(userRepository.findById(clientId).get());
+        return dtoMapper.clientToClientUpdateDto(userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist")));
     }
 
     @Override
@@ -177,12 +172,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserDto(Long userId) {
-        return dtoMapper.userToDto(userRepository.findById(userId).get());
+        return dtoMapper.userToDto(userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist")));
     }
 
     @Override
     public CreateUserDto getCreateUserDto(Long userId) {
-        return dtoMapper.clientToCreateDto(userRepository.findById(userId).get());
+        return dtoMapper.clientToCreateDto(userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist")));
     }
 
     @Override
@@ -194,11 +191,12 @@ public class UserServiceImpl implements UserService {
     @Override//TODO use only one method (update) save tranisction
     public void addTransaction(Long clientId, Transaction transaction) {
         Optional.ofNullable(transaction)
-                .orElseThrow(() -> new IllegalArgumentException("Transaction cannot be null"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction can not be null"));
         Optional.ofNullable(transaction.getBankTransaction())
-                .orElseThrow(() -> new IllegalArgumentException("Transaction transaction cannot be null"));
+                .orElseThrow(() -> new ResourceNotFoundException("Transaction can not be null"));
         transactionRepository.save(transaction);
-        User client = userRepository.findById(clientId).get();
+        User client = userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
         List<Transaction> transactions = client.getTransactions();
         transactions.add(transaction);
         client.setTransactions(transactions);
@@ -208,7 +206,9 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<BankCard> getBankCardsByUserId(Long clientId) {
         if (userRepository.findById(clientId).isPresent()) {
-            return userRepository.findById(clientId).get().getSaving().getBankCards().stream().toList();
+            return userRepository.findById(clientId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"))
+                    .getSaving().getBankCards().stream().toList();
         } else {
             return new ArrayList<>();
         }
@@ -235,13 +235,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transient
     public void updateAvatar(Long userId, MultipartFile avatar) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         try {
             Image image = new Image(avatar.getBytes());
             imageRepository.save(image);
             user.setAvatar(image);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new ImageException(e.getMessage());
         }
         userRepository.save(user);
     }
@@ -255,29 +256,32 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void blockUser(Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         if (user.getRole() == Role.CLIENT) {
             user.setStatus(ActiveStatus.BANNED);
             userRepository.save(user);
         } else {
-            System.out.println("User does not have enough permissions");
+            throw new SecurityException("User does not have enough permissions to change another user active status");
         }
     }
 
     @Override
     public void unblockUser(Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         if (user.getRole() == Role.CLIENT) {
             user.setStatus(ActiveStatus.ACTIVE);
             userRepository.save(user);
         } else {
-            System.out.println("User does not have enough permissions");
+            throw new SecurityException("User does not have enough permissions to change another user active status");
         }
     }
 
     @Override
     public void updateUserPlan(Long userId, SubscriptionStatus status) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         user.setSubscription(subscriptionRepository.findBySubscriptionStatus(status));
         userRepository.save(user);
     }
@@ -289,7 +293,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void updateUserRole(Long userId, Role role) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         user.setRole(role);
         userRepository.save(user);
     }
@@ -316,10 +321,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void sendEmailForAllClients( EmailContext email) {
+    public void sendEmailForAllClients(EmailContext email) {
         String[] emails = userRepository.findAllEmailsByRole(Role.CLIENT)
                 .toArray(String[]::new);
-        email.setTo(emails.toString());
+        email.setTo(Arrays.toString(emails));
         emailService.sendEmailWithAttachment(email);
     }
 

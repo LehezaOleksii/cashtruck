@@ -43,10 +43,10 @@ public class ClientController {
             User user = userService.saveClient(createUserDto);
             modelAndView = new ModelAndView("redirect:/client/login");
             modelAndView.addObject("client", userService.getHeaderClientData(user.getId()));
-            //TODO error email is already taken
             return modelAndView;
         } else {
-            return null; //TODO
+            return null;
+//            throw new ResourceAlreadyExistException(""); //TODO
         }
     }
 
@@ -198,6 +198,7 @@ public class ClientController {
     @PostMapping(path = "/{clientId}/emails/send")
     ModelAndView sendEmail(@PathVariable("clientId") Long clientId,
                            @Valid @ModelAttribute("email") EmailContext email) {
+        emailService.sendEmailWithAttachment(email);
         emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/clients/" + clientId + "/emails");
     }
