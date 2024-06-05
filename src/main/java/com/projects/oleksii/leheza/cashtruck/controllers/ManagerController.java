@@ -11,6 +11,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
+import com.projects.oleksii.leheza.cashtruck.exception.SecurityException;
 import com.projects.oleksii.leheza.cashtruck.service.email.EmailServiceImpl;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
@@ -65,6 +66,8 @@ public class ManagerController {
             modelAndView = new ModelAndView("manager/users");
         } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
             modelAndView = new ModelAndView("admin/users");
+        } else {
+            throw new SecurityException("User does not have enough permission for this action");
         }
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
@@ -186,6 +189,8 @@ public class ManagerController {
             modelAndView = new ModelAndView("manager/users");
         } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
             modelAndView = new ModelAndView("admin/users");
+        } else {
+            throw new SecurityException("User does not have enough permission for this action");
         }
         modelAndView.addObject("managerId", managerId);
         modelAndView.addObject("manager", userService.getUserDto(managerId));
