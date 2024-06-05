@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserInfo(Long userId, UserUpdateDto userUpdateDto) {
+    public UserDto updateUserInfo(Long userId, UserUpdateDto userUpdateDto) {
         User currentUser = userRepository.findById(userId).get();
         String updatedEmail = userUpdateDto.getEmail();
         String currentEmail = currentUser.getEmail();
@@ -138,11 +138,11 @@ public class UserServiceImpl implements UserService {
                 .password(userUpdateDto.getPassword())
                 .status(ActiveStatus.valueOf(userUpdateDto.getStatus()))
                 .email(updatedEmail).build();
-        userRepository.save(currentUser);
+        return dtoMapper.userToDto(userRepository.save(currentUser));
     }
 
     @Override
-    public void updateClient(Long clientId, UserUpdateDto userDto) {
+    public UserDto updateClient(Long clientId, UserUpdateDto userDto) {
         User currentClient = userRepository.findById(clientId).get();
         String updatedEmail = userDto.getEmail();
         String currentEmail = currentClient.getEmail();
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
                 .avatar(imageRepository.save(new Image(imageConvertor.convertStringToByteImage(userDto.getAvatar()))))
 //                .role(UserRole.Client)
                 .build();
-        userRepository.save(user);
+        return dtoMapper.userToDto(userRepository.save(user));
     }
 
     @Override
@@ -189,7 +189,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override//TODO use only one method (update) save tranisction
-    public void addTransaction(Long clientId, Transaction transaction) {
+    public Transaction addTransaction(Long clientId, Transaction transaction) {
         Optional.ofNullable(transaction)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction can not be null"));
         Optional.ofNullable(transaction.getBankTransaction())
@@ -201,6 +201,7 @@ public class UserServiceImpl implements UserService {
         transactions.add(transaction);
         client.setTransactions(transactions);
         userRepository.save(client);
+        return transaction;
     }
 
     @Override
@@ -234,17 +235,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transient
-    public void updateAvatar(Long userId, MultipartFile avatar) {
+    public Image updateAvatar(Long userId, MultipartFile avatar) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
+        Image image;
         try {
-            Image image = new Image(avatar.getBytes());
+            image = new Image(avatar.getBytes());
             imageRepository.save(image);
             user.setAvatar(image);
         } catch (IOException e) {
             throw new ImageException(e.getMessage());
         }
         userRepository.save(user);
+        return image;
     }
 
     @Override
@@ -279,11 +282,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserPlan(Long userId, SubscriptionStatus status) {
+    public SubscriptionStatus updateUserPlan(Long userId, SubscriptionStatus status) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         user.setSubscription(subscriptionRepository.findBySubscriptionStatus(status));
         userRepository.save(user);
+        return user.getSubscription().getSubscriptionStatus();
     }
 
     @Override
@@ -292,11 +296,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void updateUserRole(Long userId, Role role) {
+    public Role updateUserRole(Long userId, Role role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         user.setRole(role);
         userRepository.save(user);
+        return user.getRole();
     }
 
     @Override

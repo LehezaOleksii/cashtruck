@@ -30,8 +30,8 @@ public class SavingServiceImpl implements SavingService {
     }
 
     @Override
-    public void saveAll(Collection<Saving> savings) {
-        savingRepository.saveAll(savings);
+    public Collection<Saving> saveAll(Collection<Saving> savings) {
+        return savingRepository.saveAll(savings);
     }
 
     @Override

@@ -25,8 +25,8 @@ public class BankCardServiceImpl implements BankCardService {
 
 
     @Override
-    public void save(BankCard bankCard) {
-        bankCardRepository.save(bankCard);
+    public BankCard save(BankCard bankCard) {
+       return bankCardRepository.save(bankCard);
     }
 
     @Override

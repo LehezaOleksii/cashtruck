@@ -1,9 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
-import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
-import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -37,9 +34,9 @@ public interface UserService {
 
     void deleteUserById(Long id);
 
-    void updateUserInfo(Long userId, UserUpdateDto userUpdateDto);
+    UserDto updateUserInfo(Long userId, UserUpdateDto userUpdateDto);
 
-    void updateClient(Long clientId, UserUpdateDto userDto);
+    UserDto updateClient(Long clientId, UserUpdateDto userDto);
 
     UserUpdateDto getClientUpdateDto(Long clientId);
 
@@ -52,14 +49,14 @@ public interface UserService {
     //For UI
     ClientStatisticDto getClientStatisticByUserId(Long userId);
 
-    void addTransaction(Long userId, Transaction transaction);
+    Transaction addTransaction(Long userId, Transaction transaction);
     //TODO use only one method (update) use tranisction
 
     List<BankCard> getBankCardsByUserId(Long userId);
 
     UserHeaderDto getHeaderClientData(Long userId);
 
-    void updateAvatar(Long userId, MultipartFile avatar);
+    Image updateAvatar(Long userId, MultipartFile avatar);
 
     Page<UserDto> findUsersWithFilters(int page, int size, UserSearchCriteria criteria);
 
@@ -67,11 +64,11 @@ public interface UserService {
 
     void unblockUser(Long userId);
 
-    void updateUserPlan(Long userId, SubscriptionStatus status);
+    SubscriptionStatus updateUserPlan(Long userId, SubscriptionStatus status);
 
     List<Long> findUserIdsWithExpiredSubscriptions();
 
-    void updateUserRole(Long userId, Role role);
+    Role updateUserRole(Long userId, Role role);
 
     List<UserDto> getUsersByRole(Role role);
 

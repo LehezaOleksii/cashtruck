@@ -10,7 +10,7 @@ public interface SavingService {
 
      List<Saving> findAll();
 
-     void saveAll(Collection<Saving>savings);
+     Collection<Saving> saveAll(Collection<Saving>savings);
 
      void assignBankCardToClient(Long clientId, BankCard bankCard) throws IllegalArgumentException;
 }

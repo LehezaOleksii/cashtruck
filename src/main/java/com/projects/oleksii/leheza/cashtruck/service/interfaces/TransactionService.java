@@ -21,7 +21,7 @@ public interface TransactionService {
 
     List<Transaction> findAll();
 
-    void save(Transaction transaction); //TODO return Optional/entity
+    Transaction save(Transaction transaction); //TODO return Optional/entity
 
     List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId);
 
