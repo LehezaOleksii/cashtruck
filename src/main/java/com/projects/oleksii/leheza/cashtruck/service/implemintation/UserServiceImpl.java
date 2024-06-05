@@ -2,6 +2,7 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
+import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -35,6 +36,8 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.*;
+
+import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
@@ -97,6 +100,25 @@ public class UserServiceImpl implements UserService {
         Pageable pageable = PageRequest.of(page, size, sort);
         Page<User> userPage = userRepository.findAll(pageable);
         return userPage.map(dtoMapper::userToDto);
+    }
+
+    @Override
+    public PageDto<UserDto> findAll(Integer pageNumber, Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        List<UserDto> users = userRepository.findAll(pageable).stream()
+                .map(dtoMapper::userToUserDto).toList();
+        PageDto<UserDto> forumCategoryPageDto = PageDto.<UserDto>builder()
+                .data(users)
+                .page(pageNumber)
+                .size(pageSize)
+                .totalSize(users.size())
+                .build();
+        if (!isNull(pageNumber) && !isNull(pageSize)) {
+            forumCategoryPageDto = forumCategoryPageDto.toBuilder()
+                    .totalPage((int) Math.ceil((double) users.size() / pageSize))
+                    .build();
+        }
+        return forumCategoryPageDto;
     }
 
     @Override
@@ -240,9 +262,13 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         Image image;
         try {
-            image = new Image(avatar.getBytes());
-            imageRepository.save(image);
-            user.setAvatar(image);
+            if (avatar != null) {
+                image = new Image(avatar.getBytes());
+                imageRepository.save(image);
+                user.setAvatar(image);
+            } else {
+                throw new ImageException("Image does not provided");
+            }
         } catch (IOException e) {
             throw new ImageException(e.getMessage());
         }
@@ -319,10 +345,27 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDto> searchEmailsByPattern(String email) {
+    public List<UserDto> getUserListByEmailPattern(String email) {
         return userRepository.findByEmailContaining(email).stream()
                 .map(dtoMapper::userToDto)
                 .toList();
+    }
+
+    @Override
+    public PageDto<UserDto> getUserPageByEmailPattern(String email, Integer pageNumber, Integer pageSize) {
+        List<UserDto> users = userRepository.findByEmailContaining(email).stream()
+                .map(dtoMapper::userToDto)
+                .toList();
+        PageDto<UserDto> userPageDto = PageDto.<UserDto>builder()
+                .data(users)
+                .page(pageNumber)
+                .size(pageSize)
+                .totalSize(users.size())
+                .build();
+        userPageDto = userPageDto.toBuilder()
+                .totalPage((int) Math.ceil((double) users.size() / pageSize))
+                .build();
+        return userPageDto;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -23,6 +24,8 @@ public interface UserService {
     Boolean verifyEmailToken(String token);
 
     Page<UserDto> findAll(int page, int size);
+
+    PageDto<UserDto> findAll(Integer page, Integer size);
 
     List<User> findAllManagers();// TODO filter?
 
@@ -74,7 +77,9 @@ public interface UserService {
 
     List<UserDto> findAllDtos();
 
-    List<UserDto> searchEmailsByPattern(String email);
+    List<UserDto> getUserListByEmailPattern(String email);
+
+    PageDto<UserDto> getUserPageByEmailPattern(String email, Integer pageNumber, Integer pageSize);
 
     void sendEmailForAllClients(EmailContext email);
 }

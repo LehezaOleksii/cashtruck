@@ -357,7 +357,7 @@ public class ManagerController {
         ModelAndView modelAndView = new ModelAndView("manager/emails");
         modelAndView.addObject("manager", userService.getUserDto(managerId));
         modelAndView.addObject("email", new EmailContext());
-        modelAndView.addObject("users", userService.searchEmailsByPattern(pattern));
+        modelAndView.addObject("users", userService.getUserListByEmailPattern(pattern));
         return modelAndView;
     }
 }

@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
+import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
@@ -81,10 +82,10 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int page, int size) {
+    public Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int pageNumber, int pageSize) {
         User user = userRepository.findById(clientId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
-        Pageable pageRequest = createPageRequestUsing(page, size);
+        Pageable pageRequest = createPageRequestUsing(pageNumber, pageSize);
         List<TransactionDto> transactions = user.getTransactions().stream()
                 .filter(transaction -> transaction.getCategory().getName().equals(categoryName))
                 .map(dtoMapper::transactionToDto)
@@ -95,6 +96,25 @@ public class TransactionServiceImpl implements TransactionService {
         return new PageImpl<>(pageContent, pageRequest, transactions.size());
     }
 
+    @Override
+    public PageDto<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, Integer pageNumber, Integer pageSize) {
+        User user = userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
+        List<TransactionDto> transactions = user.getTransactions().stream()
+                .filter(transaction -> transaction.getCategory().getName().equals(categoryName))
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        PageDto<TransactionDto> transactionsPageDto = PageDto.<TransactionDto>builder()
+                .data(transactions)
+                .page(pageNumber)
+                .size(pageSize)
+                .totalSize(transactions.size())
+                .build();
+        transactionsPageDto = transactionsPageDto.toBuilder()
+                .totalPage((int) Math.ceil((double) transactions.size() / pageSize))
+                .build();
+        return transactionsPageDto;
+    }
 
     @Override
     public List<Transaction> findAllIncomeTransactions() {
