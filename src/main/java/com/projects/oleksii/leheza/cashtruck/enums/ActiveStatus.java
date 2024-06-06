@@ -1,7 +1,11 @@
 package com.projects.oleksii.leheza.cashtruck.enums;
 
-public enum ActiveStatus { // TODO add satus to clients
+public enum ActiveStatus {
     ACTIVE,
-    AWAY,
-    INACTIVE;
+    INACTIVE,
+    BANNED;
+
+    public static boolean isEnabled(ActiveStatus status) {
+        return status == ACTIVE;
+    }
 }

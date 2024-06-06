@@ -1,6 +1,5 @@
 package com.projects.oleksii.leheza.cashtruck.dto.create;
 
-import jakarta.persistence.Column;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.hibernate.validator.constraints.CreditCardNumber;
@@ -15,6 +14,7 @@ import java.util.Date;
 @Builder(toBuilder = true)
 public class CreateBankCardDto {
 
+    @NotNull
     @Min(0)
     Long id;
     @NotNull

@@ -1,7 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankTransaction;
-import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.repository.BankTransactionRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankTransactionService;
 import lombok.RequiredArgsConstructor;
@@ -17,14 +16,14 @@ public class BankTransactionServiceImpl implements BankTransactionService {
     private final BankTransactionRepository bankTransactionRepository;
 
     @Override
-    public void save(BankTransaction bankTransaction) { //TODO transaction logic
-        bankTransactionRepository.save(bankTransaction);
+    public BankTransaction save(BankTransaction bankTransaction) { //TODO transaction logic
+        return bankTransactionRepository.save(bankTransaction);
     }
 
     @Override
-    public void saveTransaction(BankTransaction bankTransaction, LocalDateTime time) {
+    public BankTransaction saveTransaction(BankTransaction bankTransaction, LocalDateTime time) {
         bankTransaction.setTime(time);
-        bankTransactionRepository.save(bankTransaction);
+        return bankTransactionRepository.save(bankTransaction);
     }
 
     @Override
@@ -33,7 +32,7 @@ public class BankTransactionServiceImpl implements BankTransactionService {
     }
 
     @Override
-    public void saveAll(List<BankTransaction> bankTransactions) {
-        bankTransactionRepository.saveAll(bankTransactions);
+    public List<BankTransaction> saveAll(List<BankTransaction> bankTransactions) {
+        return bankTransactionRepository.saveAll(bankTransactions);
     }
 }

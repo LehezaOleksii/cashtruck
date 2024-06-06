@@ -1,12 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
+import com.projects.oleksii.leheza.cashtruck.exception.UserPlanException;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.SavingService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,7 +20,7 @@ import java.util.List;
 public class SavingServiceImpl implements SavingService {
 
     private final SavingRepository savingRepository;
-    private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
     private final BankCardRepository bankCardRepository;
 
 
@@ -29,45 +30,21 @@ public class SavingServiceImpl implements SavingService {
     }
 
     @Override
-    public void saveAll(Collection<Saving> savings) {
-        savingRepository.saveAll(savings);
+    public Collection<Saving> saveAll(Collection<Saving> savings) {
+        return savingRepository.saveAll(savings);
     }
 
     @Override
-    public void assignBankCardToClient(Long clientId, BankCard bankCard) throws IllegalStateException {
-        if (!clientRepository.findById(clientId).isPresent()) {
-            throw new IllegalStateException("Client dose not exist");
-        }
-        Client client = clientRepository.findById(clientId).get();
-        Saving saving = client.getSaving();
-        if (saving == null) {
-            throw new IllegalStateException("Client does not have saving");
-        }
-        if (saving.getBankCards().stream()
-                .anyMatch(bc -> bc.getBankName().equals(bankCard.getCardNumber()))) {
-            return;
+    public void assignBankCardToClient(Long userId, BankCard bankCard) throws IllegalArgumentException {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
+        Saving saving = user.getSaving();
+        saving.getBankCards().stream()
+                .anyMatch(bc -> bc.getCardNumber().equals(bankCard.getCardNumber()));
+        if (saving.getBankCards().size() + 1 > user.getSubscription().getMaxCardsSupport()) {
+            throw new UserPlanException("Client plan does not maintain this functionality");
         }
         saving.getBankCards().add(bankCard);
         savingRepository.save(saving);
-    }
-
-    @Override
-    public void assignBankCardsToClient(Long clientId, List<BankCard> bankCards) throws IllegalStateException {
-        for (BankCard bankCard : bankCards) {
-            assignBankCardToClient(clientId, bankCard);
-        }
-    }
-
-    @Override
-    public void assignBankCardDtoToClient(Long clientId, CreateBankCardDto bankCardDto) {
-        BankCard bankCard = BankCard.builder()
-                .cvv(bankCardDto.getCvv())
-                .bankName(bankCardDto.getBankName())
-                .cardNumber(bankCardDto.getCardNumber())
-                .nameOnCard(bankCardDto.getNameOnCard())
-                .expiringDate(bankCardDto.getExpiringDate())
-                .build();
-        bankCardRepository.save(bankCard);
-        assignBankCardToClient(clientId, bankCard);
     }
 }

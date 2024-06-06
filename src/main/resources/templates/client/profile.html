@@ -26,7 +26,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="image-preview d-flex justify-content-center align-items-center">
-                                <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" height="110" width="110" th:if="${clientDto.avatar == null}">
+                                <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${clientDto.avatar == null}" height="110" width="110" >
                                 <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${clientDto.avatar != null}" th:src="'data:image/jpeg;base64,' + ${clientDto.avatar}" height="110" width="110">                               
                             </div>
 

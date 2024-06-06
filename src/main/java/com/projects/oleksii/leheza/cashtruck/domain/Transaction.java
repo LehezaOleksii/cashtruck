@@ -19,9 +19,12 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_sequence")
     private Long id;
     @ManyToOne
-    @JoinColumn(foreignKey = @ForeignKey(name = "fk_category"))
+    @JoinColumn(name = "category_id", referencedColumnName = "id")
     private Category category;
     @OneToOne
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_transaction_bank_transaction"))
     private BankTransaction bankTransaction;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 }

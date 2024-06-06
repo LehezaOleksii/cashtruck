@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
-  </head> 
+  </head>
   <body >
   <content layout:fragment="content">
 <script th:inline="javascript">
@@ -20,7 +20,7 @@
         return true;
     }
 </script>
- 
+
      <!-- Credit card form -->
           <div class="mt-4" style="margin-left: 60px;">
             <div class="card mb-4">
@@ -29,16 +29,16 @@
               </div>
               <div class="card-body">
 <form method="post" th:object="${bank_card}" th:action="@{'/clients/' + ${client.id} + '/bank_cards'}" onsubmit="return validateForm();">
- <!-- choose bank --> 
-<div class="dropdown mb-3">  
+ <!-- choose bank -->
+<div class="dropdown mb-3">
     <select id="bankNameButton" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:field="*{bankName}" text="Select a bank">
     <option class="dropdown-item custom-back-white" style="color:black" value="Monobank">Monobank</option>
     <option class="dropdown-item custom-back-white" style="color:black" value="Privat bank">Privat bank</option>
     <option class="dropdown-item custom-back-white" style="color:black" value="Alfa bank">Alfa bank</option>
-</select> 
-</div> 
+</select>
+</div>
 <input type="hidden" th:field="*{id}" style="display: none;"/>
-<input type="hidden" th:field="*{balance}" style="display: none;"/>  
+<input type="hidden" th:field="*{balance}" style="display: none;"/>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         var expiringDateInput = document.getElementById('expiringDate');
@@ -53,7 +53,7 @@
     });
 </script>
 
-    <!-- Input for bankName --> 
+    <!-- Input for bankName -->
     <div class="row mb-4">
         <div class="col">
             <div class="form-outline">
@@ -121,7 +121,7 @@
 
               </div>
             </div>
-          </div> 
+          </div>
         </content>
   </body>
 </html>

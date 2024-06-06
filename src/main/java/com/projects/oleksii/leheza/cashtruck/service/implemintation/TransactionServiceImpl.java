@@ -1,19 +1,27 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Client;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
+import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
+import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
+import com.projects.oleksii.leheza.cashtruck.filter.TransactionSpecification;
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -25,8 +33,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
-    private final ClientRepository clientRepository;
+    private final UserRepository userRepository;
     private final DtoMapper dtoMapper;
+    private final TransactionSpecification transactionSpecification;
 
     @Override
     public List<Transaction> findAll() {
@@ -34,14 +43,15 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void save(Transaction transaction) {
-        transactionRepository.save(transaction);
+    public Transaction save(Transaction transaction) {
+        return transactionRepository.save(transaction);
     }
 
     @Override
     public List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId) {
-        Client client = clientRepository.findById(clientId).get();
-        List<TransactionDto> transactionDtos = client.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
+        User user = userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
+        List<TransactionDto> transactionDtos = user.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
         return categoryRepository.findCategoriesByClientId(INCOME_TRANSACTION_TYPE, clientId).stream()
                 .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
                 .toList();
@@ -49,8 +59,9 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public List<CategoryInfoDto> findClientExpenseCategoriesByClientId(Long clientId) {
-        Client client = clientRepository.findById(clientId).get();
-        List<TransactionDto> transactionDtos = client.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
+        User user = userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
+        List<TransactionDto> transactionDtos = user.getTransactions().stream().map(dtoMapper::transactionToDto).toList();
         return categoryRepository.findCategoriesByClientId(EXPENSE_TRANSACTION_TYPE, clientId).stream()
                 .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
                 .toList();
@@ -71,10 +82,38 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public List<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName) {
-        return transactionRepository.findTransactionsByClientIdAndCategoryName(clientId, categoryName).stream()
+    public Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int pageNumber, int pageSize) {
+        User user = userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
+        Pageable pageRequest = createPageRequestUsing(pageNumber, pageSize);
+        List<TransactionDto> transactions = user.getTransactions().stream()
+                .filter(transaction -> transaction.getCategory().getName().equals(categoryName))
+                .map(dtoMapper::transactionToDto)
+                .collect(Collectors.toList());
+        int start = (int) pageRequest.getOffset();
+        int end = Math.min((start + pageRequest.getPageSize()), transactions.size());
+        List<TransactionDto> pageContent = transactions.subList(start, end);
+        return new PageImpl<>(pageContent, pageRequest, transactions.size());
+    }
+
+    @Override
+    public PageDto<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, Integer pageNumber, Integer pageSize) {
+        User user = userRepository.findById(clientId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
+        List<TransactionDto> transactions = user.getTransactions().stream()
+                .filter(transaction -> transaction.getCategory().getName().equals(categoryName))
                 .map(dtoMapper::transactionToDto)
                 .toList();
+        PageDto<TransactionDto> transactionsPageDto = PageDto.<TransactionDto>builder()
+                .data(transactions)
+                .page(pageNumber)
+                .size(pageSize)
+                .totalSize(transactions.size())
+                .build();
+        transactionsPageDto = transactionsPageDto.toBuilder()
+                .totalPage((int) Math.ceil((double) transactions.size() / pageSize))
+                .build();
+        return transactionsPageDto;
     }
 
     @Override
@@ -85,5 +124,9 @@ public class TransactionServiceImpl implements TransactionService {
     @Override
     public List<Transaction> findAllExpenseTransactions() {
         return transactionRepository.findTransactionsByCategoryTransactionType(EXPENSE_TRANSACTION_TYPE);
+    }
+
+    private Pageable createPageRequestUsing(int page, int size) {
+        return PageRequest.of(page, size);
     }
 }

@@ -3,6 +3,21 @@
   text-decoration: none;  
 }
 
+a {
+  color: inherit; 
+  text-decoration: none; 
+}
+
+a:hover {
+  color: #696CFF;
+  text-decoration: none; 
+
+}
+
+ul {
+  list-style: none;
+}
+
 hr {
   margin-top: 1rem;
   margin-bottom: 1rem;
@@ -29,7 +44,9 @@ body {
     height: 100%;
 } 
 
-
+.navigation {
+  box-shadow: 10px 0 5px -2px rgba(0, 0, 0, 0.02);
+}
 
     /* --- navbar styles ---*/
     .line-container {
@@ -148,8 +165,25 @@ body {
     color: red;
 } 
 
+.custom-red:hover {
+  color: red;
+}
+
 .custom-green {
     color: #71DD37;
+}
+
+.custom-grey {
+  color: grey;
+}
+
+.custom-fair-grey {
+  color: #697A8D;
+}
+
+
+.custom-dark-grey {
+  color:#566A7F;
 }
 
 .custom-back-red {
@@ -192,7 +226,7 @@ body {
 height: 50px; 
 }
    
- .custom-font-size-cli-dash {
+.custom-font-size-cli-dash {
   font-size: 16px; 
 }
  
@@ -203,6 +237,7 @@ height: 50px;
     background-color: #696CFF;
     color: #fff;  
   } 
+
 
   /* Style the unchecked radio buttons and labels */
   input[type="radio"].btn-check:not(:checked).custom-back-white + label {
@@ -269,3 +304,5 @@ height: 50px;
 .my-table td:last-child {
   border-right: none;
 }
+
+

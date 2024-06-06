@@ -48,7 +48,7 @@
         
        <div class="additional-info mt-4">       
         <div type="hidden" class="cardId" id="cardId" th:text="${card != null ? card.id : '-'}" style="display: none;"></div>
-        <div type="hidden" class="clientId" id="clientId" th:text="${clientId}" style="display: none;"></div>  
+        <div type="hidden" class="userId" id="userId" th:text="${userId}" style="display: none;"></div>
               <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div> 
               <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
@@ -61,8 +61,8 @@
               <script>
                 document.getElementById('changeBankCard').addEventListener('click', function() {
                 var cardId = document.getElementById('cardId').innerText;
-                var clientId = document.getElementById('clientId').innerText;  
-                var updateUrl = '/clients/' + clientId + '/bank_cards/' + cardId + '/save'; 
+                var userId = document.getElementById('userId').innerText;  
+                var updateUrl = '/clients/' + userId + '/bank_cards/' + cardId + '/save'; 
                 window.location.href = updateUrl;});
               </script>
 
@@ -94,8 +94,8 @@
         <script>
           document.getElementById('confirmDelete').addEventListener('click', function() {
           var cardId = document.getElementById('cardId').innerText;
-          var clientId = document.getElementById('clientId').innerText;  
-          var deleteUrl = '/clients/' + clientId + '/bank_cards/' + cardId + '/remove'; 
+          var userId = document.getElementById('userId').innerText;  
+          var deleteUrl = '/clients/' + userId + '/bank_cards/' + cardId + '/remove'; 
           window.location.href = deleteUrl;});
             // Handle cancel button to close the modal
 document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {

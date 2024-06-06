@@ -2,6 +2,8 @@ package com.projects.oleksii.leheza.cashtruck;
 
 import com.projects.oleksii.leheza.cashtruck.config.MainEntitiesGenerator;
 import com.projects.oleksii.leheza.cashtruck.config.RandomUsersGenerator;
+import com.projects.oleksii.leheza.cashtruck.service.implemintation.UserServiceImpl;
+import com.projects.oleksii.leheza.cashtruck.service.subscription.SubscriptionChecker;
 import net.datafaker.Faker;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.boot.CommandLineRunner;
@@ -9,10 +11,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import java.util.Random;
 
 @SpringBootApplication
+@EnableScheduling
 public class CashtruckApplication {
 
     public static void main(String[] args) {
@@ -20,17 +24,15 @@ public class CashtruckApplication {
     }
 
     @Bean
-    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator) {
+    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator, UserServiceImpl userService) {
         return args -> {
             mainEntitiesGenerator.generateMainEntities();
             randomUsersGenerator.generateRandomClientFields(10, 5, 1, 30, 200);
+            SubscriptionChecker subscriptionChecker = new SubscriptionChecker(userService);
+            subscriptionChecker.checkAndUpdateSubscriptionStatus();
         };
     }
 
-    //	@Bean
-//	BCryptPasswordEncoder passwordEncoder(){
-//		return new BCryptPasswordEncoder();
-//	}
     @Bean
     @Scope("prototype")
     Random getRandom() {

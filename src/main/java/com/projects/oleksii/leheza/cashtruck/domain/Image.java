@@ -1,7 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import jakarta.persistence.*;
 import lombok.*;
+
+import jakarta.persistence.*;
 
 @Getter
 @Setter

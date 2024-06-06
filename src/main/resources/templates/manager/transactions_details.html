@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/manager/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+  </head>  
+  <body>
+    <main layout:fragment="content">
+<div class="container mt-4">
+    <div class="mx-auto">
+      <table class="table my-table my-container">
+        <thead>
+            <tr>
+                <th class="control sorting_disabled" rowspan="1" colspan="1" style="width: 3px;" aria-label=""></th>
+                <th scope="col">Transaction</th>
+                <th scope="col">Category</th>
+                <th scope="col">Sum</th>
+                <th scope="col">Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="transaction, rowStat : ${transactions}">
+                <td scope="row" th:text="${rowStat.index + 1}"></td>
+                <td class="bankTransaction-name" th:text="${transaction.name}">Mark</td>
+                <td th:text="${category.name}"></td>
+                <td>
+                    <span class="bankTransaction-price"
+                          th:text="${#numbers.formatDecimal(transaction.sum, 1, 2, 'POINT')}">0.00</span> $
+                </td>
+                <td th:text="${#temporals.format(transaction.time, 'dd.MM.yyyy')}"></td>
+            </tr>
+        </tbody>
+    </table>
+
+        <nav aria-label="Page navigation example" class="d-flex justify-content-center">
+            <ul class="pagination">
+                <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
+                    <a class="page-link" th:if="${currentPage > 0}" th:href="@{'/clients/' + ${client.id} + '/categories/'+${categoryName}+'?page=' + ${currentPage - 1} + '&size=' + ${10}}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">
+                    <a class="page-link" th:href="@{'/clients/' + ${client.id} + '/categories/'+${categoryName}+'?page=' + ${pageNumber} + '&size=' + ${10}}" th:text="${pageNumber + 1}"></a>
+                </li>
+                <li class="page-item" th:class="${currentPage == totalPages - 1 ? 'disabled' : ''}">
+                    <a class="page-link" th:if="${currentPage < totalPages - 1}" th:href="@{'/clients/' + ${client.id} + '/categories/'+${categoryName}+'?page=' + ${currentPage + 1} + '&size=' + ${10}}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- <div class="my-container">
+            <div class="card-body text-center" >
+                <h4 class="mb-4" th:text="${category.name}"></h4>
+                <ul class="list-group mb-4">
+                    <li  th:each="transaction : ${transactions}" class="list-group-item d-flex justify-content-between align-items-center ">
+                      <div >
+                        <span><img th:src="@{/images/client/cc-primary.png}"></span>
+                        <span class="bankTransaction-name" th:text = "${transaction.name}"></span>
+                        </div>
+                        <div>
+                          <span class="m-4">
+                              <span class="bankTransaction-price" th:text= "${#numbers.formatDecimal(transaction.sum, 1, 2, 'POINT')}">0.00</span> $
+                          </span>
+                              <span th:text="${#temporals.format(transaction.time, 'dd.MM.yyyy')}"></span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+             </div> -->
+        </div>
+    </div>
+</main>
+  </body>
+</html>

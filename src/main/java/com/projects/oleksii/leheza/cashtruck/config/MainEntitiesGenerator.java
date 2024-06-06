@@ -1,16 +1,22 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Category;
+import com.projects.oleksii.leheza.cashtruck.domain.Subscription;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.SubscriptionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
+
+import java.math.BigDecimal;
 
 @Configuration //TODO?
 @RequiredArgsConstructor
 public class MainEntitiesGenerator {
 
     private final CategoryRepository categoryRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     private final TransactionType transactionTypeExpense = TransactionType.EXPENSE;
     private final TransactionType transactionTypeIncome = TransactionType.INCOME;
@@ -19,6 +25,7 @@ public class MainEntitiesGenerator {
     public void generateMainEntities() {
         generateExpensesCategories();
         generateIncomeCategories();
+        generatePlans();
     }
 
     private void generateExpensesCategories() {
@@ -63,5 +70,14 @@ public class MainEntitiesGenerator {
         categoryRepository.save(incomeCategoryBusiness);
         categoryRepository.save(incomeCategoryReceiveMoney);
         categoryRepository.save(incomeCategoryGetCash);
+    }
+
+    private void generatePlans() {
+        Subscription subscriptionFree = new Subscription(SubscriptionStatus.FREE, new BigDecimal(0), 3);
+        Subscription subscriptionPlus = new Subscription(SubscriptionStatus.PLUS, new BigDecimal(5), 10);
+        Subscription subscriptionPro = new Subscription(SubscriptionStatus.PRO, new BigDecimal(15), Integer.MAX_VALUE);
+        subscriptionRepository.save(subscriptionFree);
+        subscriptionRepository.save(subscriptionPlus);
+        subscriptionRepository.save(subscriptionPro);
     }
 }

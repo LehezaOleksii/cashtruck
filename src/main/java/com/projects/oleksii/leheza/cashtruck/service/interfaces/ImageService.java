@@ -4,7 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.Image;
 
 public interface ImageService {
 
-    void save(Image image);
+    Image save(Image image);
 
     String getDefaultAvatarImage();
 }

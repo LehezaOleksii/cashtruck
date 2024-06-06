@@ -2,34 +2,35 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Saving;
+import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.ClientRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.ClientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class BankCardServiceImpl implements BankCardService {
 
     private final BankCardRepository bankCardRepository;
-    private final ClientRepository clientRepository;
-    private final ClientService clientService;
+    private final UserRepository userRepository;
 
 
     @Override
-    public void save(BankCard bankCard) {
-        bankCardRepository.save(bankCard);
+    public BankCard save(BankCard bankCard) {
+       return bankCardRepository.save(bankCard);
     }
 
     @Override
-    public void save(CreateBankCardDto bankCardDto) {
+    public BankCard save(CreateBankCardDto bankCardDto) {
         BankCard bankCard = BankCard.builder()
                 .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())
@@ -41,19 +42,19 @@ public class BankCardServiceImpl implements BankCardService {
         if (bankCardDto.getId() != null) {
             bankCard.setId(bankCardDto.getId());
         }
-        bankCardRepository.save(bankCard);
+        return bankCardRepository.save(bankCard);
     }
 
     @Override
-    public BankCard getBankCardByBankNumber(String bankNumber) throws IllegalStateException {
+    public BankCard getBankCardByBankNumber(String bankNumber) {
         return bankCardRepository.findCardByNumber(bankNumber)
-                .orElseThrow(() -> new IllegalStateException("No BankCard found for bank number: " + bankNumber));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Bankcard with number:" + bankNumber + " was not found"));
     }
 
     @Override
     public BankCard getById(Long id) {
-        return bankCardRepository.findById(id).get();
+        return bankCardRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Bankcard with id:" + id + " was not found"));
     }
 
     @Override
@@ -62,20 +63,29 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public boolean isClientHasCard(Long clientId, CreateBankCardDto bankCardDto) {
-        return clientService.getBankCardsByClientId(clientId)
-                .stream()
-                .anyMatch(card -> card.getCardNumber().equals(bankCardDto.getCardNumber()));
+    public boolean isClientHasCard(Long userId, CreateBankCardDto bankCardDto) {
+        if (userRepository.findById(userId).isPresent()) {
+            return bankCardRepository.getBankCardsByUserId(userId)
+                    .stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .anyMatch(card -> card.getCardNumber().equals(bankCardDto.getCardNumber()));
+        } else {
+            throw new ResourceNotFoundException("User was not found when checking the existence of the card");
+        }
     }
 
     @Override
-    public void removeBankCardForClient(Long bankCardId, Long clientId) {
-        clientRepository.findById(clientId)
-                .ifPresent(client -> {
-                    Saving saving = client.getSaving();
-                    saving.getBankCards()
-                            .removeIf(bc -> Objects.equals(bc.getId(), bankCardId));
-                    clientRepository.save(client);
-                });
+    public void removeBankCardForClient(Long bankCardId, Long userId) {
+        Optional<User> clientOptional = userRepository.findById(userId);
+        if (clientOptional.isPresent()) {
+            User client = clientOptional.get();
+            Saving saving = client.getSaving();
+            saving.getBankCards()
+                    .removeIf(bc -> Objects.equals(bc.getId(), bankCardId));
+            userRepository.save(client);
+        } else {
+            throw new ResourceNotFoundException("User has not exist");
+        }
     }
 }

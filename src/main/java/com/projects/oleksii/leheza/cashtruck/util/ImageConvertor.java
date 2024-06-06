@@ -3,7 +3,6 @@ package com.projects.oleksii.leheza.cashtruck.util;
 import org.springframework.stereotype.Component;
 
 import java.util.Base64;
-import java.util.Objects;
 
 @Component
 public class ImageConvertor {

@@ -1,10 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import java.math.BigDecimal;
-import java.util.Set;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import jakarta.persistence.*;
-import lombok.*;
+import java.math.BigDecimal;
+import java.util.Set;
 
 @Data
 @AllArgsConstructor
