@@ -2,6 +2,7 @@ package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -54,6 +55,8 @@ public interface UserService {
 
     Transaction addTransaction(Long userId, Transaction transaction);
     //TODO use only one method (update) use tranisction
+    Transaction addTransaction(Long userId, CreateTransactionDto transaction);
+
 
     List<BankCard> getBankCardsByUserId(Long userId);
 

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/client/layout">
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash truck</title>
+</head>
+<body th:object="${client}">
+<content layout:fragment="content">
+
+    <!-- Transaction Modal -->
+    <div id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title custom-dark-grey" id="transactionModalLabel">Create Transaction</h5>
+                </div>
+                <div class="modal-body">
+                    <form method="post" th:object="${transaction}" th:action="@{'/clients/' + ${client.id} + '/transactions/save'}">
+                        <!-- Transaction Type -->
+                        <div class="mb-3">
+                            <label for="transactionType" class="form-label">Transaction Type</label>
+                            <select id="transactionType" class="form-select" th:field="*{transactionType}" required>
+                                <option value="">Select Transaction Type</option>
+                                <option value="INCOME">Income</option>
+                                <option value="EXPENSE">Expense</option>
+                            </select>
+                        </div>
+                        <!-- Category -->
+                        <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category</label>
+                            <select id="categoryName" class="form-select" th:field="*{categoryName}" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <optgroup th:each="category : ${incomes}" label="Incomes">
+                                    <option th:value="${category.name}" th:text="${category.name}"></option>
+                                </optgroup>
+                                <optgroup th:each="category : ${expenses}" label="Expenses">
+                                    <option th:value="${category.name}" th:text="${category.name}"></option>
+                                </optgroup>
+                            </select>
+                        </div>
+                        <!-- Card Number -->
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Credit Card Number</label>
+                            <input type="text" class="form-control" id="cardNumber" th:field="*{cardNumber}" placeholder="Credit card number" required>
+                            <div>
+                                <small th:if="${#fields.hasErrors('cardNumber')}"
+                                       th:errors="*{cardNumber}"
+                                       class="text-danger">Invalid card number.</small>
+                            </div>
+                        </div>
+                        <!-- Transaction Time -->
+                        <div class="mb-3">
+                            <label for="time" class="form-label">Transaction Time</label>
+                            <input type="datetime-local" class="form-control" id="time" th:field="*{time}" required>
+                            <div>
+                                <small th:if="${#fields.hasErrors('time')}"
+                                       th:errors="*{time}"
+                                       class="text-danger">Invalid time.</small>
+                            </div>
+                        </div>
+                        <!-- Sum -->
+                        <div class="mb-3">
+                            <label for="sum" class="form-label">Sum</label>
+                            <input class="form-control" id="sum" th:field="*{sum}" placeholder="Sum" min="0" required>
+                            <div>
+                                <small th:if="${#fields.hasErrors('sum')}"
+                                       th:errors="*{sum}"
+                                       class="text-danger">Invalid sum.</small>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</content>
+</body>
+</html>

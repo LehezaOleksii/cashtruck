@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -224,6 +225,11 @@ public class UserServiceImpl implements UserService {
         client.setTransactions(transactions);
         userRepository.save(client);
         return transaction;
+    }
+
+    @Override
+    public Transaction addTransaction(Long userId, CreateTransactionDto transaction) {
+        return null;
     }
 
     @Override
