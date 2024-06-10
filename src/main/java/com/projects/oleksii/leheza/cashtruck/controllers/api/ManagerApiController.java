@@ -1,11 +1,14 @@
 package com.projects.oleksii.leheza.cashtruck.controllers.api;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.Category;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
@@ -321,5 +324,50 @@ public class ManagerApiController {
                                                          @RequestParam("pattern") String pattern) {
         PageDto<UserDto> page = userService.getUserPageByEmailPattern(pattern, pageNumber, pageSize);
         return new ResponseEntity<>(page, HttpStatus.OK);
+    }
+
+    @Operation(summary = "Get all categories", description = "Get all income and expenses categories")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Categories found successfully",
+                    content = @Content(schema = @Schema(implementation = CategoryDto.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @GetMapping(path = "/categories")
+    public ResponseEntity<PageDto<CategoryDto>> saveCategories(@RequestParam(value = "pageNumber", defaultValue = "0") Integer pageNumber,
+                                                               @RequestParam(value = "pageSize", defaultValue = "10") Integer pageSize) {
+        return new ResponseEntity<>(categoryService.findAll(pageNumber, pageSize), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Create new category", description = "Create new category from create category dto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Category created successfully",
+                    content = @Content(schema = @Schema(implementation = Category.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PostMapping(path = "/categories")
+    public ResponseEntity<Category> getCategories(@RequestBody CreateCategoryDto category) {
+        return new ResponseEntity<>(categoryService.save(category), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "Update new category", description = "Update new category from create category dto")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Category update successfully",
+                    content = @Content(schema = @Schema(implementation = Category.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Category is not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PutMapping(path = "/categories")
+    public ResponseEntity<Category> updateCategory(@RequestBody CreateCategoryDto category) {
+        return new ResponseEntity<>(categoryService.save(category), HttpStatus.OK);
     }
 }

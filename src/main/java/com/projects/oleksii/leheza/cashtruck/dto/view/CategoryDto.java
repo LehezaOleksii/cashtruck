@@ -16,6 +16,7 @@ import jakarta.validation.constraints.NotEmpty;
 @Builder(toBuilder = true)
 public class CategoryDto {
 
+    private Long id;
     @Enumerated(EnumType.ORDINAL)
     private TransactionType transactionType;
     @NotEmpty

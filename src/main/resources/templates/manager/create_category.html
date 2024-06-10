@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/manager/layout">
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash truck</title>
+</head>
+<body th:object="${manager}">
+<content layout:fragment="content">
+    <div id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title custom-dark-grey" id="transactionModalLabel">Create Transaction</h5>
+                </div>
+                <span class="modal-body">
+                    <form method="post" th:object="${category}"
+                          th:action="@{'/managers/' + ${manager.id} + '/categories/create'}">
+                        <!-- Category -->
+                        <input type="hidden" th:field="*{id}" style="display: none;"/>
+                        <div class="mb-3">
+                            <label for="transactionType" class="form-label">Category name</label>
+                            <select id="transactionType" class="form-select" th:field="*{transactionType}" required>
+                                <option value="" disabled selected>Select Category</option>
+                                <optgroup label="Incomes">
+                                </optgroup>
+                                <option value="INCOME">Income</option>
+                                <option value="EXPENSE">Expense</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="category name" class="form-label">Category name</label>
+                            <input type="text" class="form-control" id="category name" placeholder="category name"
+                                   th:field="*{categoryName}" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary custom-back-violet">Submit</button>
+                    </form>
+            </div>
+        </div>
+    </div>
+    </div>
+</content>
+</body>
+</html>

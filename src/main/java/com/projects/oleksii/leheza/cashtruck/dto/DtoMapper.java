@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.dto;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -57,8 +58,17 @@ public class DtoMapper {
 
     public CategoryDto categoryToDto(Category category) {
         return CategoryDto.builder()
+                .id(category.getId())
                 .transactionType(category.getTransactionType())
                 .name(category.getName())
+                .build();
+    }
+
+    public CreateCategoryDto categoryToCreateDto(Category category) {
+        return CreateCategoryDto.builder()
+                .id(category.getId())
+                .transactionType(category.getTransactionType())
+                .categoryName(category.getName())
                 .build();
     }
 
@@ -192,6 +202,14 @@ public class DtoMapper {
                 .name(transactionDto.getTransactionName())
                 .time(LocalDateTime.parse(transactionDto.getTime()))
                 .sum(transactionDto.getSum())
+                .build();
+    }
+
+    public Category categoryDtoToCategory(CreateCategoryDto categoryDto) {
+        return Category.builder()
+                .id(categoryDto.getId())
+                .name(categoryDto.getCategoryName())
+                .transactionType(categoryDto.getTransactionType())
                 .build();
     }
 }

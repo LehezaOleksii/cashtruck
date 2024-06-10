@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -328,7 +329,7 @@ public class ManagerController {
         return new ModelAndView("redirect:/managers/" + userId);
     }
 
-    @GetMapping("/{userId}/categories")
+    @GetMapping("/{userId}/income_expense_categories")
     public ModelAndView viewIncomeAndExpensesDashboard(@PathVariable Long userId) {
         ModelAndView modelAndView = new ModelAndView("manager/categories");
         modelAndView.addObject("manager", userService.getHeaderClientData(userId));//TODO Optimise maybe (it will be a lot of dto)
@@ -377,5 +378,37 @@ public class ManagerController {
     ModelAndView saveTransaction(@PathVariable("managerId") Long managerId, @ModelAttribute CreateTransactionDto transaction) {
         userService.addTransaction(managerId, transaction);
         return new ModelAndView("redirect:/managers/" + managerId);
+    }
+
+    @GetMapping(path = "/{managerId}/categories")
+    ModelAndView createNewCategoryForm(@PathVariable("managerId") Long managerId) {
+        ModelAndView modelAndView = new ModelAndView("manager/create_category");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("category", new CreateCategoryDto());
+        return modelAndView;
+    }
+
+    @PostMapping(path = "/{managerId}/categories/create")
+    ModelAndView createNewCategory(@PathVariable("managerId") Long managerId,
+                                   @ModelAttribute("category") CreateCategoryDto categoryDto) {
+        categoryService.save(categoryDto);
+        return new ModelAndView("redirect:/managers/" + managerId);
+    }
+
+    @GetMapping(path = "/{managerId}/categories/table")
+    ModelAndView GetCategoriesTable(@PathVariable("managerId") Long managerId) {
+        ModelAndView modelAndView = new ModelAndView("manager/category_table");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("categories", categoryService.findAllDtos());
+        return modelAndView;
+    }
+
+    @GetMapping(path = "/{managerId}/categories/{categoryId}/update")
+    ModelAndView updateCategoryForm(@PathVariable("managerId") Long managerId,
+                                    @PathVariable("categoryId") Long categoryId) {
+        ModelAndView modelAndView = new ModelAndView("manager/create_category");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("category",categoryService.findById(categoryId));
+        return modelAndView;
     }
 }

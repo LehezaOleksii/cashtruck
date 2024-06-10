@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/manager/layout">
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash Truck</title>
+    <!-- Ensure Bootstrap CSS is included -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <!-- Include Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+</head>
+<body th:object="${manager}">
+<main layout:fragment="content">
+    <div id="managerId" th:text="${manager.id}" style="display: none"></div>
+    <div class="my-container mt-4">
+        <div class="mx-auto">
+            <table class="table mt-3">
+                <thead>
+                <tr>
+                    <th scope="col" class="text-center">Category ID</th>
+                    <th scope="col" class="text-center">Category Name</th>
+                    <th scope="col" class="text-center">Transaction Type</th>
+                    <th scope="col" class="text-center">Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="category, rowStat : ${categories}">
+                    <td>
+                        <div class="text-center">
+                            <div class="d-flex flex-column">
+                                <span th:text="${category.id}"></span>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="text-center">
+                            <div class="d-flex flex-column">
+                                <span th:text="${category.name}"></span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="text-center"><span th:text="${category.transactionType}"></span></td>
+                    <td class="text-center">
+                        <span class="me-2">
+                            <a class="cursor-pointer edit-category user-profile" th:data-category-id="${category.id}">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                    <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                                    <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                                </svg>
+                            </a>
+                        </span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    document.querySelectorAll('.user-profile').forEach(function (userProfileLink) {
+                        userProfileLink.addEventListener('click', function () {
+                            var categoryId = this.getAttribute('data-category-id');
+                            var managerId = document.getElementById('managerId').innerText;
+                            window.location.href = '/managers/' + managerId + '/categories/' + categoryId + '/update';
+                        });
+                    });
+                });
+            </script>
+        </div>
+    </div>
+</main>
+</body>
+</html>
