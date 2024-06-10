@@ -83,6 +83,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public Boolean verifyEmailToken(String token) {
         Confirmation confirmation = confirmationRepository.findByToken(token);
         User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail());
@@ -165,6 +166,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserDto updateClient(Long clientId, UserUpdateDto userDto) {
         User currentClient = userRepository.findById(clientId).get();
         String updatedEmail = userDto.getEmail();
@@ -211,7 +213,8 @@ public class UserServiceImpl implements UserService {
         return optionalClient.map(this::createStatisticDto).orElseGet(ClientStatisticDto::new);
     }
 
-    @Override//TODO use only one method (update) save tranisction
+    @Override
+    @Transactional
     public Transaction addTransaction(Long clientId, Transaction transaction) {
         Optional.ofNullable(transaction)
                 .orElseThrow(() -> new ResourceNotFoundException("Transaction can not be null"));
@@ -263,6 +266,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transient
+    @Transactional
     public Image updateAvatar(Long userId, MultipartFile avatar) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));

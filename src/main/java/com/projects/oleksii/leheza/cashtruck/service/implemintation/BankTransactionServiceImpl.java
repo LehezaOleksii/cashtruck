@@ -16,7 +16,7 @@ public class BankTransactionServiceImpl implements BankTransactionService {
     private final BankTransactionRepository bankTransactionRepository;
 
     @Override
-    public BankTransaction save(BankTransaction bankTransaction) { //TODO transaction logic
+    public BankTransaction save(BankTransaction bankTransaction) {
         return bankTransactionRepository.save(bankTransaction);
     }
 
