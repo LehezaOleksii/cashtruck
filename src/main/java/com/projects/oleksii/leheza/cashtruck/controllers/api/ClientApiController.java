@@ -251,11 +251,13 @@ public class ClientApiController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(summary = "Send email", description = "Send email.")
+    @Operation(summary = "Add transaction to application", description = "Add transaction data to the application")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "Email sent successfully",
+            @ApiResponse(responseCode = "201", description = "Transaction created successfully",
                     content = @Content(schema = @Schema(implementation = User.class))),
             @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Resource is not found",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -264,6 +266,6 @@ public class ClientApiController {
     public ResponseEntity<TransactionDto> saveTransaction(@PathVariable Long userId,
                                                           @Valid @RequestBody CreateTransactionDto transaction) {
         userService.addTransaction(userId, transaction);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 }
