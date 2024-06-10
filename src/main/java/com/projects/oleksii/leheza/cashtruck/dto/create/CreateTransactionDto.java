@@ -1,7 +1,5 @@
 package com.projects.oleksii.leheza.cashtruck.dto.create;
 
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
@@ -18,11 +16,12 @@ import java.math.BigDecimal;
 @Builder(toBuilder = true)
 public class CreateTransactionDto {
 
-    @Enumerated(EnumType.ORDINAL)
-    private String transactionType;
     @NotEmpty
     @NotBlank
     private String categoryName;
+    @NotEmpty
+    @NotBlank
+    private String transactionName;
     @CreditCardNumber(message = "Invalid credit card number")
     private String cardNumber;
     @PastOrPresent

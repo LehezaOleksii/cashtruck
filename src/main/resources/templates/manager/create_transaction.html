@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org"
       xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-      layout:decorator="layout/client/layout">
+      layout:decorator="layout/manager/layout">
 <head>
     <meta charset="utf-8"/>
     <title>Cash truck</title>
 </head>
-<body th:object="${client}">
+<body th:object="${manager}">
 <content layout:fragment="content">
     <!-- Check if bank_cards is empty -->
     <div class="card card-body" th:if="${bank_cards.isEmpty()}">
         <div class="alert alert-warning" role="alert">
             You have no bank cards associated with your account. Please add bank cards.
         </div>
-        <a style="width:100%;" th:href="@{/clients/{userId}/bank_cards/save(userId=${client.id})}">
+        <a style="width:100%;" th:href="@{/managers/{userId}/bank_cards/save(userId=${manager.id})}">
             <button class="custom-back-violet col-4 mx-auto">
                 <span>Add Bank Cards</span>
             </button>
@@ -31,7 +31,7 @@
                     </div>
                     <div class="modal-body">
                         <form method="post" th:object="${transaction}"
-                              th:action="@{'/clients/' + ${client.id} + '/transactions/save'}">
+                              th:action="@{'/managers/' + ${manager.id} + '/transactions/save'}">
                             <!-- Category -->
                             <div class="mb-3">
                                 <label for="categoryName" class="form-label">Category</label>

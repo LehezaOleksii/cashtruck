@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
@@ -359,5 +360,22 @@ public class ManagerController {
         modelAndView.addObject("email", new EmailContext());
         modelAndView.addObject("users", userService.getUserListByEmailPattern(pattern));
         return modelAndView;
+    }
+
+    @GetMapping(path = "/{managerId}/transactions")
+    ModelAndView createTransactionForm(@PathVariable("managerId") Long managerId) {
+        ModelAndView modelAndView = new ModelAndView("manager/create_transaction");
+        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("incomes", categoryService.findAllIncomeCategories());
+        modelAndView.addObject("expenses", categoryService.findAllExpensesCategories());
+        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
+        modelAndView.addObject("transaction", new CreateTransactionDto());
+        return modelAndView;
+    }
+
+    @PostMapping(path = "/{managerId}/transactions/save")
+    ModelAndView saveTransaction(@PathVariable("managerId") Long managerId, @ModelAttribute CreateTransactionDto transaction) {
+        userService.addTransaction(managerId, transaction);
+        return new ModelAndView("redirect:/managers/" + managerId);
     }
 }

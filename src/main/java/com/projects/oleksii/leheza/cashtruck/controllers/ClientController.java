@@ -210,12 +210,13 @@ public class ClientController {
         modelAndView.addObject("client", userService.getUserDto(userId));
         modelAndView.addObject("incomes", categoryService.findAllIncomeCategories());
         modelAndView.addObject("expenses", categoryService.findAllExpensesCategories());
+        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         modelAndView.addObject("transaction", new CreateTransactionDto());
         return modelAndView;
     }
 
     @PostMapping(path = "/{userId}/transactions/save")
-    ModelAndView saveTransaction(@PathVariable("userId") Long userId, @RequestBody CreateTransactionDto transaction) {
+    ModelAndView saveTransaction(@PathVariable("userId") Long userId, @ModelAttribute CreateTransactionDto transaction) {
         userService.addTransaction(userId, transaction);
         return new ModelAndView("redirect:/clients/" + userId);
     }

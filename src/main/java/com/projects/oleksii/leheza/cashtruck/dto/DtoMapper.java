@@ -1,9 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.dto;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Category;
-import com.projects.oleksii.leheza.cashtruck.domain.Image;
-import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
@@ -18,6 +16,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -185,6 +184,14 @@ public class DtoMapper {
                 .password(userDto.getPassword())
                 .phoneNumber(userDto.getPhoneNumber())
                 .country(userDto.getCountry())
+                .build();
+    }
+
+    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto) {
+        return BankTransaction.builder()
+                .name(transactionDto.getTransactionName())
+                .time(LocalDateTime.parse(transactionDto.getTime()))
+                .sum(transactionDto.getSum())
                 .build();
     }
 }

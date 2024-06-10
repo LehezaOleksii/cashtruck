@@ -8,6 +8,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
@@ -54,6 +55,7 @@ public class UserServiceImpl implements UserService {
     private final ImageConvertor imageConvertor;
     private final ImageRepository imageRepository;
     private final ImageService imageService;
+    private final CategoryRepository categoryRepository;
     private final DtoMapper dtoMapper;
     private final UserSpecification userSpecification;
     private final SubscriptionRepository subscriptionRepository;
@@ -231,8 +233,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Transaction addTransaction(Long userId, CreateTransactionDto transaction) {
-        return null;
+    public TransactionDto addTransaction(Long userId, CreateTransactionDto createTransactionDto) {
+        BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto);
+        bankTransactionRepository.save(bankTransaction);
+        Optional<Category> categoryOptional = categoryRepository.findByName(createTransactionDto.getCategoryName());
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (userOptional.isPresent()) {
+            if (categoryOptional.isPresent()) {
+                Transaction transaction = Transaction.builder()
+                        .user(userOptional.get())
+                        .bankTransaction(bankTransaction)
+                        .category(categoryOptional.get())
+                        .build();
+                transactionRepository.save(transaction);
+                return dtoMapper.transactionToDto(transaction);
+            } else {
+                throw new ResourceNotFoundException("Category with name:" + userId + " does not found");
+            }
+        } else {
+            throw new ResourceNotFoundException("User with id: " + userId + " does not found");
+        }
     }
 
     @Override

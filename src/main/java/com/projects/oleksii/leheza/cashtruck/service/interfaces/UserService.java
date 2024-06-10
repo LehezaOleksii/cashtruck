@@ -7,6 +7,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
@@ -55,7 +56,7 @@ public interface UserService {
 
     Transaction addTransaction(Long userId, Transaction transaction);
     //TODO use only one method (update) use tranisction
-    Transaction addTransaction(Long userId, CreateTransactionDto transaction);
+    TransactionDto addTransaction(Long userId, CreateTransactionDto transaction);
 
 
     List<BankCard> getBankCardsByUserId(Long userId);

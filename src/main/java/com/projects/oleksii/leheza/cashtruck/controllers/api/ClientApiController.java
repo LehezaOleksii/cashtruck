@@ -5,6 +5,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
@@ -247,6 +248,22 @@ public class ClientApiController {
     @PostMapping(path = "/emails")
     public ResponseEntity<Void> sendEmail(@Valid @RequestBody EmailContext email) {
         emailService.sendEmailWithAttachment(email);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "Send email", description = "Send email.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Email sent successfully",
+                    content = @Content(schema = @Schema(implementation = User.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PostMapping(path = "{userId}/transactions")
+    public ResponseEntity<TransactionDto> saveTransaction(@PathVariable Long userId,
+                                                          @Valid @RequestBody CreateTransactionDto transaction) {
+        userService.addTransaction(userId, transaction);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }
