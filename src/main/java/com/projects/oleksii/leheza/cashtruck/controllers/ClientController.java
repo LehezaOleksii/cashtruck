@@ -207,9 +207,9 @@ public class ClientController {
     @PostMapping(path = "/{userId}/emails/send")
     ModelAndView sendEmail(@PathVariable("userId") Long userId,
                            @Valid @ModelAttribute("email") EmailContext email) {
-        log.info("start sending email to user with email: {}", email.getEmail());
+        log.info("start sending email to user with email: {}", email.getTo());
         emailService.sendEmailWithAttachment(email);
-        log.info("finish sending email to user with email: {}", email.getEmail());
+        log.info("finish sending email to user with email: {}", email.getTo());
         return new ModelAndView("redirect:/clients/" + userId + "/emails");
     }
 

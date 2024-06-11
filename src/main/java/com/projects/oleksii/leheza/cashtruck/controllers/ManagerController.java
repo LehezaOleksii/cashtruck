@@ -255,7 +255,7 @@ public class ManagerController {
     @PostMapping(path = "/{managerId}/emails/send")
     ModelAndView sendEmail(@PathVariable("managerId") Long managerId,
                            @Valid @ModelAttribute("email") EmailContext email) {
-        log.info("Start sending email. send for user with email: {}", email.getEmail());
+        log.info("Start sending email. send for user with email: {}", email.getTo());
         emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
