@@ -14,6 +14,7 @@ import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -25,6 +26,7 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping(path = "/clients")
 public class ClientController {
 
@@ -40,12 +42,14 @@ public class ClientController {
     @PostMapping(path = "/login")
     public ModelAndView registerNewClient(@RequestBody CreateUserDto createUserDto) {
         ModelAndView modelAndView;
-        if (userService.findByEmail(createUserDto.getEmail()) != null) {
+        if (userService.findByEmail(createUserDto.getEmail()) == null) {
+            log.info("start saving user card with email:{}", createUserDto.getEmail());
             User user = userService.saveClient(createUserDto);
             modelAndView = new ModelAndView("redirect:/client/login");
             modelAndView.addObject("client", userService.getHeaderClientData(user.getId()));
             return modelAndView;
         } else {
+            log.warn("user with email already exist:{}", createUserDto.getEmail());
             return null;
 //            throw new ResourceAlreadyExistException(""); //TODO
         }
@@ -87,6 +91,7 @@ public class ClientController {
     @PostMapping("/{userId}/bank_cards")
     public ModelAndView saveBankCardToClient(@PathVariable Long userId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto, BindingResult bindingResult) {
         if (bindingResult.hasFieldErrors()) {
+            log.warn("validation problems were occurring at the save bank card process. userId:{} ,bank card number{}", userId, bankCardDto.getCardNumber());
             return new ModelAndView("client/add_bank_card")
                     .addObject("client", userService.getHeaderClientData(userId));
         }
@@ -95,6 +100,7 @@ public class ClientController {
                 BankCard bankCard = bankCardService.save(bankCardDto);
                 savingService.assignBankCardToClient(userId, bankCard);
             } catch (IllegalArgumentException e) {
+                log.warn("user with id: {} has bank card with number:{}", userId, bankCardDto.getCardNumber());
                 return new ModelAndView("redirect:/clients/" + userId + "/premium");
             }
         }
@@ -161,6 +167,7 @@ public class ClientController {
     @PostMapping("/{userId}/update")
     public ModelAndView updateClientAccount(@PathVariable Long userId, @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
         if (bindingResult.hasFieldErrors()) {
+            log.warn("validation problems were occurring at the update client account. userId:{}", userId);
             return new ModelAndView("client/profile")
                     .addObject("client", userService.getHeaderClientData(userId))
                     .addObject("userId", userId);
@@ -169,6 +176,7 @@ public class ClientController {
                 userService.updateAvatar(userId, avatar);
             }
             userService.updateUserInfo(userId, userUpdateDto);
+            log.info("update client information. client id:{}", userId);
             ModelAndView modelAndView = new ModelAndView("redirect:/clients/" + userId + "/profile");
             modelAndView.addObject("client", userService.getHeaderClientData(userId));
             return new ModelAndView("redirect:/clients/" + userId);
@@ -199,8 +207,9 @@ public class ClientController {
     @PostMapping(path = "/{userId}/emails/send")
     ModelAndView sendEmail(@PathVariable("userId") Long userId,
                            @Valid @ModelAttribute("email") EmailContext email) {
+        log.info("start sending email to user with email: {}", email.getEmail());
         emailService.sendEmailWithAttachment(email);
-        emailService.sendEmailWithAttachment(email);
+        log.info("finish sending email to user with email: {}", email.getEmail());
         return new ModelAndView("redirect:/clients/" + userId + "/emails");
     }
 

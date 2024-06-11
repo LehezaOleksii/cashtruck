@@ -10,6 +10,7 @@ import com.projects.oleksii.leheza.cashtruck.repository.SavingRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.SavingService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -17,6 +18,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SavingServiceImpl implements SavingService {
 
     private final SavingRepository savingRepository;
@@ -42,6 +44,7 @@ public class SavingServiceImpl implements SavingService {
         saving.getBankCards().stream()
                 .anyMatch(bc -> bc.getCardNumber().equals(bankCard.getCardNumber()));
         if (saving.getBankCards().size() + 1 > user.getSubscription().getMaxCardsSupport()) {
+            log.warn("User with id:{} does not have enough bank cards size({}) limit to add card)", userId, saving.getBankCards().size());
             throw new UserPlanException("Client plan does not maintain this functionality");
         }
         saving.getBankCards().add(bankCard);

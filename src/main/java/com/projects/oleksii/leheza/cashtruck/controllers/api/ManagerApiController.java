@@ -25,6 +25,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +40,7 @@ import java.util.List;
 @RequestMapping("/api/managers")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 @Tag(name = "Managers", description = "Methods related to managers")
 public class ManagerApiController {
 
@@ -165,6 +167,7 @@ public class ManagerApiController {
     public ResponseEntity<UserDto> updateClientProfile(@PathVariable("clientId") Long clientId,
                                                        @Valid @RequestBody UserUpdateDto userUpdateDto,
                                                        @RequestParam("image") MultipartFile avatar) {
+        log.info("start updating client profile for user with id:{}", clientId);
         if (!avatar.isEmpty()) {
             try {
                 userUpdateDto.setAvatar(imageConvertor.convertByteImageToString(avatar.getBytes()));
@@ -209,6 +212,7 @@ public class ManagerApiController {
     @PutMapping(path = "/users/{userId}/plan")
     public ResponseEntity<SubscriptionStatus> updatePlanStatus(@PathVariable("userId") Long userId,
                                                                @RequestParam("status") String status) {
+        log.info("start updating plan status for user with id:{}", userId);
         SubscriptionStatus subscriptionStatus = userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
         return new ResponseEntity<>(subscriptionStatus, HttpStatus.OK);
     }
@@ -223,6 +227,7 @@ public class ManagerApiController {
     })
     @PostMapping(path = "/emails")
     public ResponseEntity<Void> sendEmail(@Valid @RequestBody EmailContext email) {
+        log.info("start sending an email for user with email:{}", email.getEmail());
         emailService.sendEmailWithAttachment(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }
@@ -237,6 +242,7 @@ public class ManagerApiController {
     })
     @PostMapping(path = "/emails/send/clients/all")
     public ResponseEntity<Void> sendEmailsForAllClients(@Valid @RequestBody EmailContext email) {
+        log.info("start sending emails for user all users");
         userService.sendEmailForAllClients(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }

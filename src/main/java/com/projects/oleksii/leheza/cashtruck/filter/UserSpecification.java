@@ -7,6 +7,7 @@ import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -19,11 +20,13 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class UserSpecification {
 
     private final UserRepository userRepository;
 
     public Page<User> getUsersWithCriterias(UserSearchCriteria criterias, int page, int size, Sort sort) {
+        log.info("Start creating user specifications");
         List<Specification<User>> specifications = new ArrayList<>();
         if (criterias.getStatus() != null && !criterias.getStatus().isEmpty()) {
             specifications.add(statusLike(criterias));

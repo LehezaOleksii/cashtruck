@@ -10,6 +10,7 @@ import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.CategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CategoryServiceImpl implements CategoryService {
 
     private static final TransactionType transactionTypeIncome = TransactionType.INCOME;
@@ -41,6 +43,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category save(CreateCategoryDto category) {
+        log.info("create new category with name: {}", category.getCategoryName());
         return categoryRepository.save(dtoMapper.categoryDtoToCategory(category));
     }
 

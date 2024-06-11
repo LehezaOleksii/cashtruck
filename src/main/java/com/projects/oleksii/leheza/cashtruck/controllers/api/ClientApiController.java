@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -33,6 +34,7 @@ import java.util.List;
 @RequestMapping("/api/clients")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 @Tag(name = "Admins", description = "Methods related to admins")
 public class ClientApiController {
 
@@ -55,6 +57,7 @@ public class ClientApiController {
     })
     @PostMapping()
     public ResponseEntity<User> registerNewClient(@RequestBody CreateUserDto createUserDto) {
+        log.info("start register new user with email:{}", createUserDto.getEmail());
         User user = userService.saveClient(createUserDto);
         return new ResponseEntity<>(user, HttpStatus.CREATED);
     }
@@ -247,6 +250,7 @@ public class ClientApiController {
     })
     @PostMapping(path = "/emails")
     public ResponseEntity<Void> sendEmail(@Valid @RequestBody EmailContext email) {
+        log.info("start sending email for user with email:{}", email.getEmail());
         emailService.sendEmailWithAttachment(email);
         return new ResponseEntity<>(HttpStatus.OK);
     }

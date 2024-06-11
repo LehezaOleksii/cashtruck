@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/admins")
 @RequiredArgsConstructor
 @Validated
+@Slf4j
 @Tag(name = "Admins", description = "Methods related to admins")
 public class AdminApiController {
 
@@ -37,6 +39,7 @@ public class AdminApiController {
     @PutMapping(path = "/users/{userId}")
     ResponseEntity<Role> updateUserPlanStatus(@PathVariable("userId") Long userId,
                                               @RequestBody String status) {
+        log.info("start updating user role with id:{}", userId);
         Role role = userService.updateUserRole(userId, Role.valueOf(status));
         return new ResponseEntity<>(role, HttpStatus.OK);
     }

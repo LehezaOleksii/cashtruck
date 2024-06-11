@@ -19,6 +19,7 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -32,6 +33,7 @@ import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping(path = "/managers")
 public class ManagerController {
 
@@ -47,7 +49,8 @@ public class ManagerController {
     @PutMapping(path = "/update/{userId}")
     ModelAndView updateManagerInfo(@PathVariable("userId") Long managerId, @ModelAttribute("manager") UserUpdateDto userUpdateDto) {
         ModelAndView modelAndView = new ModelAndView();
-//        userService.updateUserInfo(managerId, userUpdateDto);
+        log.info("Start Updating manager info. User email: {}", userUpdateDto.getEmail());
+        userService.updateUserInfo(managerId, userUpdateDto);
         return modelAndView;
     }
 
@@ -63,7 +66,7 @@ public class ManagerController {
     ModelAndView getClientsList(@PathVariable("managerId") Long managerId,
                                 @RequestParam(value = "page", defaultValue = "0") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size) {
-        ModelAndView modelAndView = null;
+        ModelAndView modelAndView;
         if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.MANAGER)) {
             modelAndView = new ModelAndView("manager/users");
         } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
@@ -112,8 +115,8 @@ public class ManagerController {
                                             @PathVariable Long userId,
                                             @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto,
                                             BindingResult bindingResult) {
-
         if (bindingResult.hasFieldErrors()) {
+            log.warn("validation problems were occurring at the update client account. userId:{}", userId);
             return new ModelAndView("manager/client_info_edit")
                     .addObject("manager", userService.getHeaderClientData(managerId))
                     .addObject("user", userService.getUserById(userId))
@@ -121,6 +124,7 @@ public class ManagerController {
                     .addObject("statuses", ActiveStatus.values());
 
         } else {
+            log.info("Start Updating client info. User email: {}", userUpdateDto.getEmail());
             userService.updateUserInfo(userId, userUpdateDto);
             return new ModelAndView("redirect:/managers/" + managerId + "/users/" + userId);
         }
@@ -128,12 +132,14 @@ public class ManagerController {
 
     @GetMapping(path = "/{managerId}/users/{userId}/block")
     RedirectView blockUser(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
+        log.info("Start blocking user. User id: {}", userId);
         userService.blockUser(userId);
         return new RedirectView("/managers/" + managerId + "/users/" + userId);
     }
 
     @GetMapping(path = "/{managerId}/users/{userId}/unblock")
     RedirectView unblockUser(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
+        log.info("Start unblocking user. User id: {}", userId);
         userService.unblockUser(userId);
         return new RedirectView("/managers/" + managerId + "/users");
     }
@@ -156,12 +162,14 @@ public class ManagerController {
     @PostMapping(path = "/{managerId}/users/{clientId}/profile")
     ModelAndView changeClientProfile(@PathVariable("managerId") Long managerId, @PathVariable("clientId") Long clientId, @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
         if (bindingResult.hasFieldErrors()) {
+            log.warn("validation problems were occurring at the update client account by manager. userId:{}", clientId);
             return new ModelAndView("manager/client_profile")
                     .addObject("manager", userService.getHeaderClientData(clientId))
                     .addObject("clientId", clientId)
                     .addObject("managerId", managerId);
 
         } else {
+            log.info("Start changing user account. User id: {}", clientId);
             if (!avatar.isEmpty()) {
                 try {
                     userUpdateDto.setAvatar(imageConvertor.convertByteImageToString(avatar.getBytes()));
@@ -230,6 +238,7 @@ public class ManagerController {
 
     @GetMapping(path = "/{managerId}/users/{userId}/plan/update")
     ModelAndView updatePlanStatus(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId, @RequestParam("status") String status) {
+        log.info("Update user plan. User id: {}", userId);
         userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
         return new ModelAndView("redirect:/managers/" + managerId + "/users/" + userId);
     }
@@ -246,6 +255,7 @@ public class ManagerController {
     @PostMapping(path = "/{managerId}/emails/send")
     ModelAndView sendEmail(@PathVariable("managerId") Long managerId,
                            @Valid @ModelAttribute("email") EmailContext email) {
+        log.info("Start sending email. send for user with email: {}", email.getEmail());
         emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
@@ -253,6 +263,7 @@ public class ManagerController {
     @PostMapping(path = "/{managerId}/emails/send/clients/all")
     ModelAndView sendEmailsForAllClients(@PathVariable("managerId") Long managerId,
                                          @Valid @ModelAttribute("email") EmailContext email) {
+        log.info("Start sending email. send for all clients with email");
         userService.sendEmailForAllClients(email);
         return new ModelAndView("redirect:/managers/" + managerId + "/emails");
     }
@@ -408,7 +419,7 @@ public class ManagerController {
                                     @PathVariable("categoryId") Long categoryId) {
         ModelAndView modelAndView = new ModelAndView("manager/create_category");
         modelAndView.addObject("manager", userService.getUserDto(managerId));
-        modelAndView.addObject("category",categoryService.findById(categoryId));
+        modelAndView.addObject("category", categoryService.findById(categoryId));
         return modelAndView;
     }
 }

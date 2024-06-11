@@ -9,6 +9,7 @@ import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -18,6 +19,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BankCardServiceImpl implements BankCardService {
 
     private final BankCardRepository bankCardRepository;
@@ -26,7 +28,7 @@ public class BankCardServiceImpl implements BankCardService {
 
     @Override
     public BankCard save(BankCard bankCard) {
-       return bankCardRepository.save(bankCard);
+        return bankCardRepository.save(bankCard);
     }
 
     @Override
@@ -84,6 +86,7 @@ public class BankCardServiceImpl implements BankCardService {
             saving.getBankCards()
                     .removeIf(bc -> Objects.equals(bc.getId(), bankCardId));
             userRepository.save(client);
+            log.info("remove bank card with id: {}", bankCardId);
         } else {
             throw new ResourceNotFoundException("User has not exist");
         }

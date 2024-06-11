@@ -26,6 +26,7 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -43,6 +44,7 @@ import static java.util.Objects.isNull;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private static final TransactionType INCOME_TRANSACTION_TYPE = TransactionType.INCOME;
@@ -64,10 +66,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
         if (Optional.ofNullable(createUserDto).isEmpty()) {
-            throw new IllegalStateException("Client is empty");
+            throw new ResourceNotFoundException("Client is empty");
         }
         if (existByEmail(createUserDto.getEmail())) {
-            throw new IllegalStateException("Email taken");
+            log.warn("user with email already exist email:{}", createUserDto.getEmail());
+            throw new ResourceAlreadyExistException("Email taken");
         }
         User user = User.builder()
                 .firstName(createUserDto.getFirstName())
@@ -76,6 +79,7 @@ public class UserServiceImpl implements UserService {
                 .password((createUserDto.getPassword()))
                 .status(ActiveStatus.ACTIVE)
                 .build();
+        log.info("save user card with email:{}", createUserDto.getEmail());
         return userRepository.save(user);
     }
 
@@ -95,6 +99,7 @@ public class UserServiceImpl implements UserService {
         user.setStatus(ActiveStatus.ACTIVE);
         userRepository.save(user);
         confirmationRepository.delete(confirmation);
+        log.info("successfully verifying user with email: {}", user.getEmail());
         return Boolean.TRUE;
     }
 
@@ -156,6 +161,7 @@ public class UserServiceImpl implements UserService {
         String updatedEmail = userUpdateDto.getEmail();
         String currentEmail = currentUser.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
+            log.warn("user with email already taken. email:{}", userUpdateDto.getEmail());
             throw new ResourceAlreadyExistException("Client with email: " + updatedEmail + " has already exist");
         }
         currentUser = currentUser.toBuilder()
@@ -174,6 +180,7 @@ public class UserServiceImpl implements UserService {
         String updatedEmail = userDto.getEmail();
         String currentEmail = currentClient.getEmail();
         if (isEmailTaken(currentEmail, updatedEmail)) {
+            log.warn("user with email already taken. email:{}", userDto.getEmail());
             throw new ResourceAlreadyExistException("Client with email: " + updatedEmail + " has already exist");
         }
         User user = currentClient.toBuilder()
@@ -248,9 +255,11 @@ public class UserServiceImpl implements UserService {
                 transactionRepository.save(transaction);
                 return dtoMapper.transactionToDto(transaction);
             } else {
+                log.warn("Category with name:{} does not found)", createTransactionDto.getCategoryName());
                 throw new ResourceNotFoundException("Category with name:" + userId + " does not found");
             }
         } else {
+            log.warn("User with id:{} does not found)", userId);
             throw new ResourceNotFoundException("User with id: " + userId + " does not found");
         }
     }
@@ -355,8 +364,10 @@ public class UserServiceImpl implements UserService {
     public Role updateUserRole(Long userId, Role role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
+        String startUserRole = user.getRole().toString();
         user.setRole(role);
         userRepository.save(user);
+        log.info("update user role from:{} , to:{}", startUserRole, role.toString());
         return user.getRole();
     }
 
