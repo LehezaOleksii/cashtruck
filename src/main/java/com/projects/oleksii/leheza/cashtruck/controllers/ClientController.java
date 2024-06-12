@@ -183,6 +183,7 @@ public class ClientController {
         }
     }
 
+
     @GetMapping("/{userId}/premium")
     public ModelAndView getPlansList(@PathVariable Long userId) {
         ModelAndView modelAndView = new ModelAndView("client/plans");
@@ -190,7 +191,6 @@ public class ClientController {
         modelAndView.addObject("userId", userId);
         modelAndView.addObject("client_plan", userService.getUserById(userId).getSubscription());
         modelAndView.addObject("payment_request", new PaymentCreateRequest());
-        modelAndView.addObject("stripePublicKey", stripePublicKey);
         return modelAndView;
     }
 

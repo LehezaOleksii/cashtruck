@@ -4,6 +4,8 @@ import com.projects.oleksii.leheza.cashtruck.config.MainEntitiesGenerator;
 import com.projects.oleksii.leheza.cashtruck.config.RandomUsersGenerator;
 import com.projects.oleksii.leheza.cashtruck.service.implemintation.UserServiceImpl;
 import com.projects.oleksii.leheza.cashtruck.service.subscription.SubscriptionChecker;
+import com.stripe.Stripe;
+import io.github.cdimascio.dotenv.Dotenv;
 import net.datafaker.Faker;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
 import org.springframework.boot.CommandLineRunner;
@@ -32,17 +34,19 @@ public class CashtruckApplication {
             randomUsersGenerator.generateRandomClientFields(10, 5, 1, 30, 200);
             SubscriptionChecker subscriptionChecker = new SubscriptionChecker(userService);
             subscriptionChecker.checkAndUpdateSubscriptionStatus();
+            Dotenv dotenv = Dotenv.load();
+            Stripe.apiKey = dotenv.get("STRIPE_SECRET_KEY");
         };
     }
 
     @Bean
     @Scope("prototype")
-    Random getRandom() {
+    public Random getRandom() {
         return new Random();
     }
 
     @Bean
-    Faker dataFaker() {
+    public Faker dataFaker() {
         return new Faker();
     }
 
