@@ -11,6 +11,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -226,5 +227,11 @@ public class ClientController {
     ModelAndView saveTransaction(@PathVariable("userId") Long userId, @ModelAttribute CreateTransactionDto transaction) {
         userService.addTransaction(userId, transaction);
         return new ModelAndView("redirect:/clients/" + userId);
+    }
+
+    @GetMapping(path = "/{userId}/premium/plan/{subscriptionStatus}")
+    ModelAndView updateSubscriptionPlan(@PathVariable("userId") Long userId, @PathVariable("subscriptionStatus") String subscriptionStatus) {
+        userService.updateUserPlan(userId, SubscriptionStatus.valueOf(subscriptionStatus));
+        return new ModelAndView("redirect:/clients/" + userId+"/premium");
     }
 }

@@ -422,4 +422,10 @@ public class ManagerController {
         modelAndView.addObject("category", categoryService.findById(categoryId));
         return modelAndView;
     }
+
+    @GetMapping(path = "/{userId}/premium/plan/{subscriptionStatus}")
+    ModelAndView updateSubscriptionPlan(@PathVariable("userId") Long userId, @PathVariable("subscriptionStatus") String subscriptionStatus) {
+        userService.updateUserPlan(userId, SubscriptionStatus.valueOf(subscriptionStatus));
+        return new ModelAndView("redirect:/managers/" + userId+"/premium");
+    }
 }

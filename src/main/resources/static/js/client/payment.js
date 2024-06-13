@@ -34,28 +34,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        const {error} = await stripe.confirmPayment({
+        await stripe.confirmPayment({
             elements,
             confirmParams: {
-                return_url: window.location.origin + "/clients/" + updateUserData.userId + "/premium",
+                return_url: window.location.origin + "/clients/" + updateUserData.userId + "/premium/plan/" + updateUserData.subscriptionPlan,
             }
         });
-
-        if (!error) {
-            updateUserStatus();
-            window.location.href = "/clients/" + updateUserData.userId;
-        } else {
-            console.error(error.message);
-        }
     });
-
-    function updateUserStatus() {
-        fetch('/api/payment/update-user-status', {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(updateUserData),
-        });
-    }
 });
+
