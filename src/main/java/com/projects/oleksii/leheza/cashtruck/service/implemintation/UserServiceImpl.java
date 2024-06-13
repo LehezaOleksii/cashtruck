@@ -350,7 +350,9 @@ public class UserServiceImpl implements UserService {
     public SubscriptionStatus updateUserPlan(Long userId, SubscriptionStatus status) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
-        user.setSubscription(subscriptionRepository.findBySubscriptionStatus(status));
+        Subscription subscription = subscriptionRepository.findBySubscriptionStatus(status)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + status.name() + " does not exist"));
+        user.setSubscription(subscription);
         userRepository.save(user);
         return user.getSubscription().getSubscriptionStatus();
     }

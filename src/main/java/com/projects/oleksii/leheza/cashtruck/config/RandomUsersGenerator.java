@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.SubscriptionRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
@@ -61,7 +62,9 @@ public class RandomUsersGenerator {
         user.setEmail("oleksii.leheza@gmail.com");
         user.setRole(Role.CLIENT);
         user.setStatus(ActiveStatus.ACTIVE);
-        user.setSubscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE));
+        Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
+        user.setSubscription(subscription);
         user.setSubscriptionFinishDate(new Date());
         userService.saveUser(user);
     }
@@ -90,6 +93,8 @@ public class RandomUsersGenerator {
             LocalDate currentDate = LocalDate.now();
             LocalDate subscriptionFinishDate = currentDate.plusDays(randomDays);
             Date subscriptionFinishDateLegacy = Date.from(subscriptionFinishDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+            Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
+                    .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
             user = user.toBuilder()
                     .firstName(firstName)
                     .lastName(lastName)
@@ -99,7 +104,7 @@ public class RandomUsersGenerator {
                     .transactions(allTransactions)
                     .role(Role.CLIENT)
                     .status(ActiveStatus.INACTIVE)
-                    .subscription(subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE))
+                    .subscription(subscription)
                     .subscriptionFinishDate(subscriptionFinishDateLegacy)
                     .build();
             userService.saveUser(user);

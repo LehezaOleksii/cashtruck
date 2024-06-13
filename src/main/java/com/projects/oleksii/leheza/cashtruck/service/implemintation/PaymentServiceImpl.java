@@ -6,19 +6,17 @@ import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentResponseDto;
 import com.projects.oleksii.leheza.cashtruck.repository.PaymentRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.PaymentService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class PaymentServiceImpl implements PaymentService {
 
     private final PaymentRepository paymentRepository;
-
-    @Autowired
-    public PaymentServiceImpl(PaymentRepository paymentRepository) {
-        this.paymentRepository = paymentRepository;
-    }
 
     @Override
     public PaymentResponseDto createPayment(PaymentCreateRequest paymentRequestDTO) {

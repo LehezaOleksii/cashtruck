@@ -36,8 +36,6 @@ public class ClientController {
     private final TransactionService transactionService;
     private final CategoryService categoryService;
     private final EmailService emailService;
-    private String stripePublicKey = "pk_test_51PDMQi2N1Bginh2bUyYqHhWzip5F9uR8B2BFcGtBorVSDcThERpj5eNYK4gOqrGyUaoQ79aZdb8e0Lt7RfnLsFaM00Qhes8t5J";
-
 
     @PostMapping(path = "/login")
     public ModelAndView registerNewClient(@RequestBody CreateUserDto createUserDto) {

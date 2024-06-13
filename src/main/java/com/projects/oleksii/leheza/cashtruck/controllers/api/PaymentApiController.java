@@ -1,9 +1,12 @@
 package com.projects.oleksii.leheza.cashtruck.controllers.api;
 
 import com.google.gson.Gson;
+import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.StringReposne;
+import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.exception.PaymentException;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.PaymentService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.SubscriptionService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -13,10 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 
@@ -26,7 +26,8 @@ import java.util.HashMap;
 @Slf4j
 public class PaymentApiController {
 
-    private final UserService userService;
+    private final PaymentService paymentService;
+    private final SubscriptionService subscriptionService;
     private final Dotenv dotenv = Dotenv.load();
     private final String stripePublishableKey = dotenv.get("STRIPE_PUBLISHABLE_KEY");
 
@@ -41,9 +42,9 @@ public class PaymentApiController {
     }
 
     @PostMapping(path = "/create-payment-intent")
-    public ResponseEntity<String> createPaymentIntent() {
+    public ResponseEntity<String> createPaymentIntent(@RequestBody PaymentCreateRequest paymentCreateRequest) {
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
-                .setAmount(11111L)
+                .setAmount(paymentCreateRequest.getPrice() * 100)
                 .setCurrency("usd")
                 .setAutomaticPaymentMethods(
                         PaymentIntentCreateParams.AutomaticPaymentMethods.builder()
@@ -62,4 +63,16 @@ public class PaymentApiController {
         clientSecretResp.put("clientSecret", intent.getClientSecret());
         return new ResponseEntity<>(gson.toJson(clientSecretResp), HttpStatus.OK);
     }
+
+    @GetMapping(path = "payment-request/is-valid")
+    public ResponseEntity<Boolean> isSubscriptionStatusExistBySubscriptionStatus(@RequestBody SubscriptionStatus status) {
+        Boolean isSubscriptionExist = subscriptionService.isSubscriptionStatusExistByStatus(status);
+        return new ResponseEntity<>(isSubscriptionExist, isSubscriptionExist ? HttpStatus.OK : HttpStatus.NOT_FOUND);
+    }
+
+//    @PutMapping(path = "/update-user-status")
+//    public ResponseEntity<?> updateUserStatus(@RequestBody PaymentCreateRequest paymentCreateRequest) {
+////        paymentService.pay(paymentCreateRequest);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//    }
 }

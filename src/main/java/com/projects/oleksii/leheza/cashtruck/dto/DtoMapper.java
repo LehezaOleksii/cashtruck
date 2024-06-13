@@ -4,6 +4,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
+import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
@@ -210,6 +211,13 @@ public class DtoMapper {
                 .id(categoryDto.getId())
                 .name(categoryDto.getCategoryName())
                 .transactionType(categoryDto.getTransactionType())
+                .build();
+    }
+
+    public PaymentCreateRequest subscriptionToPaymentRequest(Subscription subscription) {
+        return PaymentCreateRequest.builder()
+                .price(subscription.getPrice().longValue())
+                .subscriptionPlan(subscription.getSubscriptionStatus().name())
                 .build();
     }
 }
