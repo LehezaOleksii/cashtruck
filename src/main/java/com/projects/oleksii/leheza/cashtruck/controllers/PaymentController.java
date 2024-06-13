@@ -34,22 +34,4 @@ public class PaymentController {
             return new ModelAndView("redirect:/clients/" + clientId + "/premium");
         }
     }
-
-//    @PostMapping(path = "/update-user-status")
-//    ModelAndView updateUserStatus(@RequestBody PaymentCreateRequest paymentCreateRequest) {
-//        try {
-//            PaymentIntent paymentIntent = paymentCreateRequest.getPaymentIntent();
-//            paymentIntent.confirm();
-//            if (paymentIntent.getStatus().equals(SUCCESS_STRIPE_PAYMENT_STATUS)) {
-//                userService.updateUserPlan(paymentCreateRequest.getUserId(), SubscriptionStatus.valueOf(paymentCreateRequest.getSubscriptionPlan()));
-//                log.info("update user plan. userId:{}, user plan:{}", paymentCreateRequest.getUserId(), paymentCreateRequest.getPrice());
-//            } else {
-//                log.warn("payment failed with status:{}", paymentIntent.getStatus());
-//                throw new PaymentException("Payment failed");
-//            }
-//        } catch (StripeException e) {
-//            throw new PaymentException(e.getMessage());
-//        }
-//        return new ModelAndView("redirect:/clients/" + paymentCreateRequest.getUserId() + "/premium");
-//    }
 }
