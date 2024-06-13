@@ -5,8 +5,8 @@ import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.StringReposne;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import com.projects.oleksii.leheza.cashtruck.exception.PaymentException;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.PaymentService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.SubscriptionService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import com.stripe.exception.StripeException;
 import com.stripe.model.PaymentIntent;
 import com.stripe.param.PaymentIntentCreateParams;
@@ -26,7 +26,7 @@ import java.util.HashMap;
 @Slf4j
 public class PaymentApiController {
 
-    private final PaymentService paymentService;
+    private final UserService userService;
     private final SubscriptionService subscriptionService;
     private final Dotenv dotenv = Dotenv.load();
     private final String stripePublishableKey = dotenv.get("STRIPE_PUBLISHABLE_KEY");
@@ -70,9 +70,10 @@ public class PaymentApiController {
         return new ResponseEntity<>(isSubscriptionExist, isSubscriptionExist ? HttpStatus.OK : HttpStatus.NOT_FOUND);
     }
 
-//    @PutMapping(path = "/update-user-status")
-//    public ResponseEntity<?> updateUserStatus(@RequestBody PaymentCreateRequest paymentCreateRequest) {
-////        paymentService.pay(paymentCreateRequest);
-//        return new ResponseEntity<>(HttpStatus.OK);
-//    }
+    @PutMapping(path = "/update-user-status")
+    public ResponseEntity<Void> updateUserStatus(@RequestBody PaymentCreateRequest paymentCreateRequest) {
+        userService.updateUserPlan(paymentCreateRequest.getUserId(), SubscriptionStatus.valueOf(paymentCreateRequest.getSubscriptionPlan()));
+        log.info("update user plan. userId:{}, user plan:{}", paymentCreateRequest.getUserId(), paymentCreateRequest.getPrice());
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }
