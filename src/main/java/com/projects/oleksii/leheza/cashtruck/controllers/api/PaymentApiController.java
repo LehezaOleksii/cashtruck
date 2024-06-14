@@ -8,8 +8,11 @@ import com.projects.oleksii.leheza.cashtruck.exception.ErrorResponse;
 import com.projects.oleksii.leheza.cashtruck.exception.PaymentException;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.SubscriptionService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
+import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
+import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
+import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
 import io.github.cdimascio.dotenv.Dotenv;
 import io.swagger.v3.oas.annotations.Operation;
@@ -36,6 +39,7 @@ public class PaymentApiController {
     private final SubscriptionService subscriptionService;
     private final Dotenv dotenv = Dotenv.load();
     private final String stripePublishableKey = dotenv.get("STRIPE_PUBLISHABLE_KEY");
+    private final String endpointSecret = dotenv.get("STRIPE_WEBHOOK_SECRET");
 
     private final Gson gson = new Gson();
 
@@ -124,5 +128,38 @@ public class PaymentApiController {
     public ResponseEntity<SubscriptionStatus> updateUserStatus(@RequestBody PaymentCreateRequest paymentCreateRequest) {
         log.info("update user plan. userId:{}, user plan:{}", paymentCreateRequest.getUserId(), paymentCreateRequest.getPrice());
         return new ResponseEntity<>(userService.updateUserPlan(paymentCreateRequest.getUserId(), SubscriptionStatus.valueOf(paymentCreateRequest.getSubscriptionPlan())), HttpStatus.OK);
+    }
+
+    @Operation(summary = "Handle Stripe payment", description = "Update user status in stripe webhook")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "User status Update successfully",
+                    content = @Content(schema = @Schema(implementation = String.class))),
+            @ApiResponse(responseCode = "400", description = "Bad request",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "404", description = "Resource is not found",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+            @ApiResponse(responseCode = "500", description = "Internal server error",
+                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
+    })
+    @PostMapping(path = "/stripe-payment-webhook")
+    public ResponseEntity<String> handleStripePaymentWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
+        Event event;
+        try {
+            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+        } catch (SignatureVerificationException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
+        }
+        switch (event.getType()) {
+            case "payment_intent.succeeded":
+                System.out.println("💰 Payment received!");
+                break;
+            case "payment_intent.payment_failed":
+                System.out.println("❌ Payment failed.");
+                break;
+            default:
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected event type");
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body("");
     }
 }
