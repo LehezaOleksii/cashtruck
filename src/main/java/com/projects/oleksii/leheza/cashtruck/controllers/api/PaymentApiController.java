@@ -156,12 +156,16 @@ public class PaymentApiController {
         try {
             event = Webhook.constructEvent(payload, sigHeader, END_POINT_SECRET);
         } catch (SignatureVerificationException e) {
-            log.warn("Bad request in stripe webhook. payload:{}, sigHeader:{}", payload.toString(), sigHeader);
+            log.warn("Bad request in stripe webhook. payload:{}, sigHeader:{}", payload, sigHeader);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         }
         switch (event.getType()) {
             case "payment_intent.succeeded":
                 PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
+                if (paymentIntent == null) {
+                    log.warn("paymentIntent is null");
+                    break;
+                }
                 Long userId = Long.valueOf(paymentIntent.getMetadata().get("userId"));
                 String status = paymentIntent.getMetadata().get("subscriptionPlan");
                 userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
