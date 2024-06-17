@@ -6,9 +6,12 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const priceElement = document.getElementById('payment_data-price');
     const subscriptionPlanElement = document.getElementById('payment_data-plan');
+    const userIdElement = document.getElementById('user_data-id');
+
     const paymentData = {
-        price: parseFloat(priceElement.textContent.trim()),
+        userId: userIdElement.textContent.trim(),
         subscriptionPlan: subscriptionPlanElement.textContent.trim(),
+        price: priceElement.textContent.trim()
     };
 
     const {clientSecret} = await fetch("/api/payment/create-payment-intent", {
@@ -23,12 +26,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const paymentElement = elements.create('payment');
     paymentElement.mount('#payment-element');
 
-    const userIdElement = document.getElementById('user_data-id');
-    const updateUserData = {
-        userId: userIdElement.textContent.trim(),
-        subscriptionPlan: subscriptionPlanElement.textContent.trim(),
-        price: priceElement.textContent.trim()
-    };
 
     const form = document.getElementById('payment-form');
     form.addEventListener('submit', async (e) => {
@@ -37,7 +34,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         await stripe.confirmPayment({
             elements,
             confirmParams: {
-                return_url: window.location.origin + "/clients/" + updateUserData.userId + "/premium/plan/" + updateUserData.subscriptionPlan,
+                return_url: window.location.origin + "/clients/" + paymentData.userId + "/premium/plan/" + paymentData.subscriptionPlan,
             }
         });
     });

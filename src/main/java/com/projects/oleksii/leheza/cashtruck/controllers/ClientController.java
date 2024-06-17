@@ -232,6 +232,7 @@ public class ClientController {
     @GetMapping(path = "/{userId}/premium/plan/{subscriptionStatus}")
     ModelAndView updateSubscriptionPlan(@PathVariable("userId") Long userId, @PathVariable("subscriptionStatus") String subscriptionStatus) {
         userService.updateUserPlan(userId, SubscriptionStatus.valueOf(subscriptionStatus));
+        log.info("User status was updated by client controller. user id:{}, user status:{}", userId, subscriptionStatus);
         return new ModelAndView("redirect:/clients/" + userId+"/premium");
     }
 }

@@ -28,6 +28,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/payment")
@@ -39,7 +40,7 @@ public class PaymentApiController {
     private final SubscriptionService subscriptionService;
     private final Dotenv dotenv = Dotenv.load();
     private final String stripePublishableKey = dotenv.get("STRIPE_PUBLISHABLE_KEY");
-    private final String endpointSecret = dotenv.get("STRIPE_WEBHOOK_SECRET");
+    private final String END_POINT_SECRET = dotenv.get("STRIPE_WEBHOOK_SECRET");
 
     private final Gson gson = new Gson();
 
@@ -75,6 +76,10 @@ public class PaymentApiController {
     })
     @PostMapping(path = "/create-payment-intent")
     public ResponseEntity<String> createPaymentIntent(@RequestBody PaymentCreateRequest paymentCreateRequest) {
+        Map<String, String> metadata = new HashMap<>();
+        metadata.put("userId", paymentCreateRequest.getUserId().toString());
+        metadata.put("subscriptionPlan", paymentCreateRequest.getSubscriptionPlan());
+
         PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                 .setAmount(paymentCreateRequest.getPrice() * 100)
                 .setCurrency("usd")
@@ -83,7 +88,9 @@ public class PaymentApiController {
                                 .setEnabled(true)
                                 .build()
                 )
+                .putAllMetadata(metadata)
                 .build();
+
         PaymentIntent intent;
         try {
             intent = PaymentIntent.create(params);
@@ -91,10 +98,12 @@ public class PaymentApiController {
             log.warn("Exception occurred while creating payment intent: {}", ex.getMessage());
             throw new PaymentException("Exception occurred while creating payment");
         }
+
         HashMap<String, String> clientSecretResp = new HashMap<>();
         clientSecretResp.put("clientSecret", intent.getClientSecret());
         return new ResponseEntity<>(gson.toJson(clientSecretResp), HttpStatus.OK);
     }
+
 
     @Operation(summary = "Check is subscription exist", description = "Check is subscription exist by provided subscription status")
     @ApiResponses(value = {
@@ -130,9 +139,9 @@ public class PaymentApiController {
         return new ResponseEntity<>(userService.updateUserPlan(paymentCreateRequest.getUserId(), SubscriptionStatus.valueOf(paymentCreateRequest.getSubscriptionPlan())), HttpStatus.OK);
     }
 
-    @Operation(summary = "Handle Stripe payment", description = "Update user status in stripe webhook")
+    @Operation(summary = "Handle Stripe payment", description = "Update user status in Stripe webhook")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "User status Update successfully",
+            @ApiResponse(responseCode = "200", description = "User status updated successfully",
                     content = @Content(schema = @Schema(implementation = String.class))),
             @ApiResponse(responseCode = "400", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
@@ -145,16 +154,20 @@ public class PaymentApiController {
     public ResponseEntity<String> handleStripePaymentWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
         Event event;
         try {
-            event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+            event = Webhook.constructEvent(payload, sigHeader, END_POINT_SECRET);
         } catch (SignatureVerificationException e) {
+            log.warn("Bad request in stripe webhook. payload:{}, sigHeader:{}", payload.toString(), sigHeader);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid signature");
         }
         switch (event.getType()) {
             case "payment_intent.succeeded":
-                System.out.println("💰 Payment received!");
+                PaymentIntent paymentIntent = (PaymentIntent) event.getDataObjectDeserializer().getObject().orElse(null);
+                Long userId = Long.valueOf(paymentIntent.getMetadata().get("userId"));
+                String status = paymentIntent.getMetadata().get("subscriptionPlan");
+                userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
+                log.info("User status was updated by webhook. user id:{}, user status:{}", userId, status);
                 break;
             case "payment_intent.payment_failed":
-                System.out.println("❌ Payment failed.");
                 break;
             default:
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected event type");
