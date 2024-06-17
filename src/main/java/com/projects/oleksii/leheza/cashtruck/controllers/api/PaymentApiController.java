@@ -168,11 +168,12 @@ public class PaymentApiController {
                 log.info("User status was updated by webhook. user id:{}, user status:{}", userId, status);
                 break;
             case "payment_intent.payment_failed":
+                log.error("Payment failed. {}", event.toString());
                 break;
             default:
+                log.warn("Payment failed. {}", event.toString());
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Unexpected event type");
         }
-
         return ResponseEntity.status(HttpStatus.OK).body("");
     }
 }
