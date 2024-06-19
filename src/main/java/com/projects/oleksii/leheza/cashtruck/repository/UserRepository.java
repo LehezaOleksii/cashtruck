@@ -13,11 +13,15 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserRepository extends
         JpaRepository<User, Long>, JpaSpecificationExecutor<User>,
         PagingAndSortingRepository<User, Long> {
+
+//    @EntityGraph(attributePaths = "authorities")
+    Optional<User> findByEmail(String email);
 
     User findByEmailIgnoreCase(String email); // TODO Optional<User>
 

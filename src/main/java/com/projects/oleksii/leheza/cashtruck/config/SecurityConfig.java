@@ -1,47 +1,88 @@
-//package com.projects.oleksii.leheza.cashtruck.config;
+package com.projects.oleksii.leheza.cashtruck.config;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final UserDetailsService userDetailsService;
+    private final PasswordEncoder passwordEncoder;
 //
-//import com.projects.oleksii.leheza.cashtruck.enums.Role;
-//import com.projects.oleksii.leheza.cashtruck.security.CustomUserDetailsService;
-//import lombok.RequiredArgsConstructor;
-//import org.springframework.context.annotation.Bean;
-//import org.springframework.context.annotation.Configuration;
-//import org.springframework.security.config.Customizer;
-//import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-//import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-//import org.springframework.security.core.userdetails.UserDetailsService;
-//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-//import org.springframework.security.crypto.password.PasswordEncoder;
-//import org.springframework.security.web.SecurityFilterChain;
-//
-//@Configuration
-//@EnableWebSecurity
-//@RequiredArgsConstructor
-//public class SecurityConfig {
-//
-//    private final CustomUserDetailsService userService;
-//
+//    @Value("${security.signing-key}")
+//    private String signingKey;
+//    @Value("${security.clientSecret}")
+//    private String clientSecret;
+//    @Value("${security.clientId}")
+//    private String clientId;
+//    @Value("${security.tokenValidity}")
+//    private Integer tokenValidity;
+//    @Value("${security.refreshTokenValidity}")
+//    private Integer refreshTokenValidity;
+
 //    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .authorizeHttpRequests(authorizeRequests ->
-//                        authorizeRequests
-//                                .requestMatchers("/managers").hasAnyRole(Role.MANAGER.toString(), Role.ADMIN.toString())
-//                                .requestMatchers("/admins").hasAnyRole(Role.ADMIN.toString(), Role.CLIENT.toString(), Role.MANAGER.toString())
-//                                .anyRequest().authenticated()
-//                )
-//                .userDetailsService(userService)
-//                .formLogin(Customizer.withDefaults())
-//                .httpBasic(Customizer.withDefaults());
-//        return http.build();
+//    public ClientRegistrationRepository clientRegistrationRepository() {
+//        return new InMemoryClientRegistrationRepository(this.googleClientRegistration());
 //    }
-//
-//    @Bean(name = "securityCustomUserDetailsService")
-//    public UserDetailsService customUserDetailsService() {
-//        return new CustomUserDetailsService();
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .requestMatchers("/login/**").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .userDetailsService(userDetailsService);
+//                .userDetailsService(userDetailsService)
+//                .password(NoOpPasswordEncoder.getInstance())
+//                .authorizeHttpRequests(authorize -> authorize
+//                        .anyRequest().authenticated()
+//                ).oauth2Login(Customizer.withDefaults())
+        ;
+        return http.build();
+    }
+
+
+//    private ClientRegistration googleClientRegistration() {
+//        return ClientRegistration.withRegistrationId("google")
+//                .clientId("126136830888-9968uqfmrl5bhcvugsru5v8u46thfvh1.apps.googleusercontent.com")
+//                .clientSecret("AIzaSyCdLHZ6ZYe1E0_Mru81FBhYzr6TIxvIOR0")
+//                .clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+//                .authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+//                .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
+//                .scope("openid", "profile", "email", "address", "phone")
+//                .authorizationUri("https://accounts.google.com/o/oauth2/v2/auth")
+//                .tokenUri("https://www.googleapis.com/oauth2/v4/token")
+//                .userInfoUri("https://www.googleapis.com/oauth2/v3/userinfo")
+//                .userNameAttributeName(IdTokenClaimNames.SUB)
+//                .jwkSetUri("https://www.googleapis.com/oauth2/v3/certs")
+//                .clientName("Google")
+//                .build();
 //    }
-//
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
+
+//    @Override
+//    protected void configure(HttpSecurity http) throws Exception {
+//        http.cors().and().csrf().disable().authorizeRequests()
+//                .antMatchers("/oauth/token").permitAll()
+//                .antMatchers("/token/token/find-all/**").denyAll()
+//                .antMatchers("/token/revoke/refresh-token").authenticated()
+//                .anyRequest().authenticated();
 //    }
-//}
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web
+//                .ignoring()
+//                .antMatchers("/v2/api-docs",
+//                "/configuration/ui",
+//                "/swagger-resources/**",
+//                "/configuration/security",
+//                "/swagger-ui.html",
+//                "/webjars/**");
+//    }
+}
