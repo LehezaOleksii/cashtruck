@@ -31,9 +31,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -48,7 +45,7 @@ import static java.util.Objects.isNull;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserServiceImpl implements UserService, UserDetailsService {
+public class UserServiceImpl implements UserService {
 
     private static final TransactionType INCOME_TRANSACTION_TYPE = TransactionType.INCOME;
     private static final TransactionType EXPENSE_TRANSACTION_TYPE = TransactionType.EXPENSE;
@@ -503,11 +500,6 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {
         return !Objects.equals(currentEmail, updatedEmail) && existByEmail(updatedEmail);
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmailIgnoreCase(username);
     }
 }
 

@@ -55,6 +55,7 @@ public interface UserService {
     ClientStatisticDto getClientStatisticByUserId(Long userId);
 
     Transaction addTransaction(Long userId, Transaction transaction);
+
     //TODO use only one method (update) use tranisction
     TransactionDto addTransaction(Long userId, CreateTransactionDto transaction);
 

@@ -305,4 +305,16 @@ height: 50px;
   border-right: none;
 }
 
+/* Login */
+.login-card {
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
+.login-form-control {
+    border-radius: 10px;
+}
+
+.login-btn-primary {
+    border-radius: 10px;
+}

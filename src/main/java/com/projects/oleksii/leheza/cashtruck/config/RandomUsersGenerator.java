@@ -11,6 +11,7 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import lombok.RequiredArgsConstructor;
 import net.datafaker.Faker;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,7 +39,7 @@ public class RandomUsersGenerator {
     private final Random random;
     private final Faker faker;
 
-    public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber) {
+    public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber, PasswordEncoder passwordEncoder) {
 //    prepare for client generation
         int allUsers = clientsNumber + managersNumber + adminsNumber;
         generateBankCards(bankCardsNumber);
@@ -49,16 +50,17 @@ public class RandomUsersGenerator {
         List<BankTransaction> lastBankTransactions = allBankTransactions.subList(allBankTransactions.size() / 2, allBankTransactions.size());
         generateRandomTransactionIncomes(firstBankTransactions);
         generateRandomTransactionExpenses(lastBankTransactions);
-        generateRandomUsers(allUsers);
+        generateRandomUsers(allUsers,passwordEncoder);
         generateRandomClients(clientsNumber);
         generateRandomManagers(managersNumber, clientsNumber);
         generateRandomAdmins(adminsNumber, managersNumber, clientsNumber);
-        generateTestAccount();
+        generateTestAccount(passwordEncoder);
     }
 
-    private void generateTestAccount() {
+    private void generateTestAccount(PasswordEncoder passwordEncoder) {
         User user = new User();
-        user.setPassword("password");
+        user.setPassword(
+                passwordEncoder.encode("password"));
         user.setEmail("oleksii.leheza@gmail.com");
         user.setRole(Role.CLIENT);
         user.setStatus(ActiveStatus.ACTIVE);
@@ -69,7 +71,7 @@ public class RandomUsersGenerator {
         userService.saveUser(user);
     }
 
-    private void generateRandomUsers(int allUsers) {
+    private void generateRandomUsers(int allUsers, PasswordEncoder passwordEncoder) {
         List<Saving> savings = savingService.findAll();
         List<Transaction> allIncomes = transactionService.findAllIncomeTransactions();
         List<Transaction> allExpenses = transactionService.findAllExpenseTransactions();
@@ -95,11 +97,12 @@ public class RandomUsersGenerator {
             Date subscriptionFinishDateLegacy = Date.from(subscriptionFinishDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
             Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
                     .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
+            String password = passwordEncoder.encode(faker.lorem().sentence(2));
             user = user.toBuilder()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(faker.internet().emailAddress())
-                    .password(faker.lorem().sentence(2))
+                    .password(password)
                     .saving(saving)
                     .transactions(allTransactions)
                     .role(Role.CLIENT)
