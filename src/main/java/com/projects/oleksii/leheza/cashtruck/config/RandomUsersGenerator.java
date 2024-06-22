@@ -62,7 +62,7 @@ public class RandomUsersGenerator {
         user.setPassword(
                 passwordEncoder.encode("password"));
         user.setEmail("oleksii.leheza@gmail.com");
-        user.setRole(Role.CLIENT);
+        user.setRole(Role.ROLE_CLIENT);
         user.setStatus(ActiveStatus.ACTIVE);
         Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
                 .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
@@ -105,7 +105,7 @@ public class RandomUsersGenerator {
                     .password(password)
                     .saving(saving)
                     .transactions(allTransactions)
-                    .role(Role.CLIENT)
+                    .role(Role.ROLE_CLIENT)
                     .status(ActiveStatus.INACTIVE)
                     .subscription(subscription)
                     .subscriptionFinishDate(subscriptionFinishDateLegacy)
@@ -118,7 +118,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(1, clientsNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRole(Role.CLIENT);
+            user.setRole(Role.ROLE_CLIENT);
             userService.saveUser(user);
         });
     }
@@ -127,7 +127,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRole(Role.MANAGER);
+            user.setRole(Role.ROLE_MANAGER);
             userService.saveUser(user);
         });
     }
@@ -136,7 +136,7 @@ public class RandomUsersGenerator {
         List<User> users = userRepository.findAll();
         IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
             User user = users.get(clientsNumber);
-            user.setRole(Role.ADMIN);
+            user.setRole(Role.ROLE_ADMIN);
             userService.saveUser(user);
         });
     }

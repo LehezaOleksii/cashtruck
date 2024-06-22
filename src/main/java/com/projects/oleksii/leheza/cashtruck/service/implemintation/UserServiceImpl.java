@@ -92,10 +92,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public Boolean verifyEmailToken(String token) {
         Confirmation confirmation = confirmationRepository.findByToken(token);
-        User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail());
-        if (user == null) {
-            throw new ResourceNotFoundException("User with email:" + confirmation.getUser().getEmail() + " not exist");
-        }
+        User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + token));
         user.setStatus(ActiveStatus.ACTIVE);
         userRepository.save(user);
         confirmationRepository.delete(confirmation);
@@ -142,7 +140,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User findByEmail(String email) {
-        return userRepository.findByEmailIgnoreCase(email);
+        return userRepository.findByEmailIgnoreCase(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
     }
 
     @Override
@@ -326,7 +325,7 @@ public class UserServiceImpl implements UserService {
     public void blockUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
-        if (user.getRole() == Role.CLIENT) {
+        if (user.getRole() == Role.ROLE_CLIENT) {
             user.setStatus(ActiveStatus.BANNED);
             userRepository.save(user);
         } else {
@@ -338,7 +337,7 @@ public class UserServiceImpl implements UserService {
     public void unblockUser(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
-        if (user.getRole() == Role.CLIENT) {
+        if (user.getRole() == Role.ROLE_CLIENT) {
             user.setStatus(ActiveStatus.ACTIVE);
             userRepository.save(user);
         } else {
@@ -414,7 +413,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void sendEmailForAllClients(EmailContext email) {
-        String[] emails = userRepository.findAllEmailsByRole(Role.CLIENT)
+        String[] emails = userRepository.findAllEmailsByRole(Role.ROLE_CLIENT)
                 .toArray(String[]::new);
         email.setTo(Arrays.toString(emails));
         emailService.sendEmailWithAttachment(email);
@@ -489,13 +488,12 @@ public class UserServiceImpl implements UserService {
     }
 
     private boolean existByEmail(String email) {
-        if (userRepository.findByEmailIgnoreCase(email) != null) {
-            String emailInRepository = userRepository.findByEmailIgnoreCase(email).getEmail();
+        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
+            String emailInRepository = userRepository.findByEmailIgnoreCase(email).get().getEmail();
             return email.equals(emailInRepository);
         } else {
             return false;
         }
-//        return adminRepository.findAdminByUser_Email(email).isPresent();
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {

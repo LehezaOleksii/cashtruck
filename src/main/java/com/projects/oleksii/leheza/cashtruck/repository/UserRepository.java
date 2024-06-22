@@ -23,7 +23,7 @@ public interface UserRepository extends
 //    @EntityGraph(attributePaths = "authorities")
     Optional<User> findByEmail(String email);
 
-    User findByEmailIgnoreCase(String email); // TODO Optional<User>
+    Optional<User>  findByEmailIgnoreCase(String email);
 
     Boolean existsByEmailIgnoreCase(String email);
 

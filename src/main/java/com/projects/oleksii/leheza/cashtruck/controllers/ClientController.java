@@ -198,7 +198,7 @@ public class ClientController {
         ModelAndView modelAndView = new ModelAndView("client/emails");
         modelAndView.addObject("client", userService.getUserDto(userId));
         modelAndView.addObject("email", new EmailContext());
-        modelAndView.addObject("managers", userService.getUsersByRole(Role.MANAGER));
+        modelAndView.addObject("managers", userService.getUsersByRole(Role.ROLE_MANAGER));
         return modelAndView;
     }
 

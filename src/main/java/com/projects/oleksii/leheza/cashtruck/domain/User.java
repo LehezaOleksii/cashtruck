@@ -12,10 +12,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
@@ -45,8 +42,8 @@ public class User implements UserDetails {
     @NotEmpty
     @NotBlank
     private String password;
-    @OneToMany
-    private Set<Authority> authorities;
+//    @OneToMany
+//    private Set<Authority> authorities;
     @NotNull
     @Enumerated(EnumType.STRING)//TODO???????
     private Role role;
@@ -74,7 +71,7 @@ public class User implements UserDetails {
 //    }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return authorities;
+        return Collections.singleton(role);
     }
 
     @Override

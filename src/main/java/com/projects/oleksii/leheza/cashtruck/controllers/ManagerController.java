@@ -67,9 +67,9 @@ public class ManagerController {
                                 @RequestParam(value = "page", defaultValue = "0") int page,
                                 @RequestParam(value = "size", defaultValue = "10") int size) {
         ModelAndView modelAndView;
-        if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.MANAGER)) {
+        if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ROLE_MANAGER)) {
             modelAndView = new ModelAndView("manager/users");
-        } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
+        } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ROLE_ADMIN)) {
             modelAndView = new ModelAndView("admin/users");
         } else {
             throw new SecurityException("User does not have enough permission for this action");
@@ -87,7 +87,7 @@ public class ManagerController {
     @GetMapping(path = "/{managerId}/users/{userId}")
     ModelAndView getClientById(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         ModelAndView modelAndView;
-        if (userService.getUserById(userId).getRole().equals((Role.CLIENT.toString()))) {
+        if (userService.getUserById(userId).getRole().equals((Role.ROLE_CLIENT.toString()))) {
             modelAndView = new ModelAndView("manager/client_info");
         } else {
             modelAndView = new ModelAndView("manager/manager_info");
@@ -147,7 +147,7 @@ public class ManagerController {
     @GetMapping(path = "/{managerId}/users/{userId}/profile")
     ModelAndView getClientProfileForm(@PathVariable("managerId") Long managerId, @PathVariable("userId") Long userId) {
         ModelAndView modelAndView;
-        if (userService.getUserById(userId).getRole().equals((Role.CLIENT.toString()))) {
+        if (userService.getUserById(userId).getRole().equals((Role.ROLE_CLIENT.toString()))) {
             modelAndView = new ModelAndView("manager/client_profile");
             modelAndView.addObject("client", userService.getClientUpdateDto(userId));
         } else {
@@ -195,9 +195,9 @@ public class ManagerController {
                                   @RequestParam(value = "page", defaultValue = "0") int page,
                                   @RequestParam(value = "size", defaultValue = "10") int size) {
         ModelAndView modelAndView = null;
-        if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.MANAGER)) {
+        if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ROLE_MANAGER)) {
             modelAndView = new ModelAndView("manager/users");
-        } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ADMIN)) {
+        } else if (Role.valueOf(userService.getUserById(managerId).getRole()) == (Role.ROLE_ADMIN)) {
             modelAndView = new ModelAndView("admin/users");
         } else {
             throw new SecurityException("User does not have enough permission for this action");
