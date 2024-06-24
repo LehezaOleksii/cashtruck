@@ -48,29 +48,25 @@
         
        <div class="additional-info mt-4">       
         <div type="hidden" class="cardId" id="cardId" th:text="${card != null ? card.id : '-'}" style="display: none;"></div>
-        <div type="hidden" class="userId" id="userId" th:text="${userId}" style="display: none;"></div>
-              <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div> 
+              <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div>
               <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
               <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
                          
                 <button type="button" class="btn btn-primary custom-back-violet col-12 mt-2" id="changeBankCard">                  
                   Change bank card information
-                </button> 
+                </button>
 
               <script>
                 document.getElementById('changeBankCard').addEventListener('click', function() {
                 var cardId = document.getElementById('cardId').innerText;
-                var userId = document.getElementById('userId').innerText;  
-                var updateUrl = '/clients/' + userId + '/bank_cards/' + cardId + '/save'; 
+                var updateUrl = '/clients/bank_cards?bankCardId='+cardId;
                 window.location.href = updateUrl;});
               </script>
 
               <button id="deleteCardBtn" class="btn custom-back-red col-12 mt-2">
                  Delete current bank card
-               </button> 
-
-              
+               </button>
 <script>
   // Show the modal when the button is clicked
   document.getElementById('deleteCardBtn').addEventListener('click', function() {
@@ -94,8 +90,7 @@
         <script>
           document.getElementById('confirmDelete').addEventListener('click', function() {
           var cardId = document.getElementById('cardId').innerText;
-          var userId = document.getElementById('userId').innerText;  
-          var deleteUrl = '/clients/' + userId + '/bank_cards/' + cardId + '/remove'; 
+          var deleteUrl = '/clients/bank_cards/remove?bankCardId='+cardId;
           window.location.href = deleteUrl;});
             // Handle cancel button to close the modal
 document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
@@ -160,18 +155,12 @@ $('#confirmationModal').modal('hide');
  function selectBank(button) {
         var selectedBankName = button.innerText;
         var cards = /*[[${bank_cards}]]*/ [];
-
-        // Find the selected bank card from the list using a unique identifier (card ID)
-        var selectedCard = cards.find(function (card) {
+      var selectedCard = cards.find(function (card) {
             return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
         });
+      document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
 
-        // Update the text on the top button to the selected bank name
-        document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
-
-
-        // Update card details
-        var elementsWithBalanceClass = document.getElementsByClassName('balance');
+     var elementsWithBalanceClass = document.getElementsByClassName('balance');
         for (var i = 0; i < elementsWithBalanceClass.length; i++) {
             elementsWithBalanceClass[i].innerText = selectedCard.balance;
         }
@@ -180,7 +169,6 @@ $('#confirmationModal').modal('hide');
         for (var i = 0; i < elementsWithCvvClass.length; i++) {
             elementsWithCvvClass[i].innerText = selectedCard.cvv;
         }
-
          var elementsWithIdClass = document.getElementsByClassName('card-id');
         for (var i = 0; i < elementsWithIdClass.length; i++) {
             elementsWithIdClass[i].innerText = selectedCard.id;
@@ -215,10 +203,10 @@ $('#confirmationModal').modal('hide');
          var elementsWithCardIdClass = document.getElementsByClassName('cardId');
         for (var i = 0; i < elementsWithCardIdClass.length; i++) {
             elementsWithCardIdClass[i].innerText = selectedCard.id;
-        } 
-        
+        }
 
-        $('cardId').text(button.getAttribute('card-id')); 
+
+        $('cardId').text(button.getAttribute('card-id'));
         $('cardId').val(button.getAttribute('card-id'));
         $('cardId').val(button.getAttribute('card-id')); 
     }

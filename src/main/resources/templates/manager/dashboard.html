@@ -39,7 +39,7 @@
                         </ul>
                     </div>   
                   <div class="col-4">
-                    <a style="width:100%;" th:href="@{'/managers/' + ${manager.id} + '/bank_cards/save'}">
+                    <a style="width:100%;" th:href="@{'/managers/bank_cards'}">
                       <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card</button>
                     </a>
                   </div>
@@ -93,7 +93,7 @@
                 
                 <div class="col-sm-5">
                     <div> 
-                        <a th:href="@{'/manager/' + ${manager.id} + '/bank_cards/save'}">
+                        <a th:href="@{'/manager/bank_cards'}">
                             <button class="btn btn-primary custom-back-violet col-12 mt-2" >
                                 Add Card
                             </button> 
@@ -602,14 +602,14 @@
                 </div>
             <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions" >
            <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/managers/' + ${manager.id} + '/categories'}"  >
+            <a th:href="@{'/managers/categories'}"  >
                 <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
             </a> 
            </div>
            </div>
            <div th:if="${client_statistic.expenses.size() > 0} "  class = "expense_transactions" style="display: none;">
            <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/managers/' + ${manager.id} + '/categories'}"  >
+            <a th:href="@{'/managers/categories'}"  >
                 <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
             </a>
            </div>

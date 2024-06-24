@@ -28,7 +28,7 @@
                 <h5 class="mb-0">Card details</h5>
               </div>
               <div class="card-body">
-<form method="post" th:object="${bank_card}" th:action="@{'/clients/' + ${client.id} + '/bank_cards'}" onsubmit="return validateForm();">
+<form method="post" th:object="${bank_card}" th:action="@{'/clients/bank_cards/save'}" onsubmit="return validateForm();">
  <!-- choose bank -->
 <div class="dropdown mb-3">
     <select id="bankNameButton" required class="btn btn-primary dropdown-toggle custom-back-violet" type="button" data-bs-toggle="dropdown" aria-expanded="false" th:field="*{bankName}" text="Select a bank">
@@ -45,9 +45,8 @@
         var hiddenExpiringDateInput = document.getElementById('hiddenExpiringDate');
 
         expiringDateInput.addEventListener('input', function () {
-            // Parse the input value and set it in ISO format in the hidden input field
             var parts = expiringDateInput.value.split('/');
-            var isoDate = parts[1] + '-' + parts[0] + '-01'; // Assuming day is always 01
+            var isoDate = parts[1] + '-' + parts[0] + '-01';
             hiddenExpiringDateInput.value = isoDate;
         });
     });

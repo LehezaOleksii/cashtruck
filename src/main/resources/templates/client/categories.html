@@ -22,7 +22,7 @@
                         <div><span  class="card-title bold" th:text="${#numbers.formatDecimal(category.fullCategoryTransactionSum, 1, 2, 'POINT')}"></span>$</div>
                       </div>
                     <div>
-                      <a th:href="@{'/clients/' + ${client.id} + '/categories/' + ${category.name}}">
+                      <a th:href="@{'/clients/categories/' + ${category.name}}">
                         <button class="btn btn-primary custom-back-violet mr-2">
                           details
                         </button> 
@@ -44,7 +44,7 @@
                         <span class="card-title" th:text="${#numbers.formatDecimal(category.categoryPercentage, 1, 2, 'POINT')}">0.00</span>%
                         <div><span  class="card-title bold" th:text="${#numbers.formatDecimal(category.fullCategoryTransactionSum, 1, 2, 'POINT')}"></span>$</div>
                       </div>
-                      <a th:href="@{'/clients/' + ${client.id} + '/categories/' + ${category.name}}">
+                      <a th:href="@{'/clients/categories/' + ${category.name}}">
                         <button class="btn btn-primary custom-back-violet mr-2">
                           details
                         </button> 

@@ -56,15 +56,14 @@
                          
                 <button type="button" class="btn btn-primary custom-back-violet col-12 mt-2" id="changeBankCard">                  
                   Change bank card information
-                </button> 
+                </button>
 
-              <script>
-                document.getElementById('changeBankCard').addEventListener('click', function() {
-                var cardId = document.getElementById('cardId').innerText;
-                var userId = document.getElementById('userId').innerText;  
-                var updateUrl = '/managers/' + userId + '/bank_cards/' + cardId + '/save';
-                window.location.href = updateUrl;});
-              </script>
+           <script>
+               document.getElementById('changeBankCard').addEventListener('click', function() {
+                   var cardId = document.getElementById('cardId').innerText;
+                   var updateUrl = '/managers/bank_cards?bankCardId='+cardId;
+                   window.location.href = updateUrl;});
+           </script>
 
               <button id="deleteCardBtn" class="btn custom-back-red col-12 mt-2">
                  Delete current bank card
@@ -72,7 +71,6 @@
 
               
 <script>
-  // Show the modal when the button is clicked
   document.getElementById('deleteCardBtn').addEventListener('click', function() {
     $('#confirmationModal').modal('show');
   }); 
@@ -91,17 +89,15 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
         <button type="button" class="btn custom-back-red" id="confirmDelete">Delete</button>
-        <script>
-          document.getElementById('confirmDelete').addEventListener('click', function() {
-          var cardId = document.getElementById('cardId').innerText;
-          var userId = document.getElementById('userId').innerText;  
-          var deleteUrl = '/managers/' + userId + '/bank_cards/' + cardId + '/remove';
-          window.location.href = deleteUrl;});
-            // Handle cancel button to close the modal
-document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
-$('#confirmationModal').modal('hide');
-});
-        </script>
+          <script>
+              document.getElementById('confirmDelete').addEventListener('click', function() {
+                  var cardId = document.getElementById('cardId').innerText;
+                  var deleteUrl = '/clients/bank_cards/remove?bankCardId='+cardId;
+                  window.location.href = deleteUrl;});
+              document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
+                  $('#confirmationModal').modal('hide');
+              });
+          </script>
       </div>
     </div>
   </div>

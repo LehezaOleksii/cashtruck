@@ -14,9 +14,8 @@ import java.util.Date;
 @Builder(toBuilder = true)
 public class CreateBankCardDto {
 
-    @NotNull
     @Min(0)
-    Long id;
+    private Long id;
     @NotNull
     @NotBlank
     @Size(max = 100, message = "Must be exactly 16 characters")

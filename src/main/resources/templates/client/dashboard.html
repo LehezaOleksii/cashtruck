@@ -39,7 +39,7 @@
                         </ul>
                     </div>   
                   <div class="col-4">
-                    <a style="width:100%;" th:href="@{'/clients/' + ${client.id} + '/bank_cards/save'}">
+                    <a style="width:100%;" th:href="@{'/clients/bank_cards'}">
                       <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card</button>
                     </a>
                   </div>
@@ -93,7 +93,7 @@
                 
                 <div class="col-sm-5">
                     <div> 
-                        <a th:href="@{'/clients/' + ${client.id} + '/bank_cards/save'}">
+                        <a th:href="@{'/clients/bank_cards'}">
                             <button class="btn btn-primary custom-back-violet col-12 mt-2" >
                                 Add Card
                             </button> 
@@ -138,8 +138,6 @@
     function selectBank(button) {
         var selectedBankName = button.innerText;
         var cards = /*[[${bank_cards}]]*/ [];
-
-        // Find the selected bank card from the list using a unique identifier (card ID)
         var selectedCard = cards.find(function (card) {
             return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
         });
@@ -602,14 +600,14 @@
                 </div>
             <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions" >
            <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/clients/' + ${client.id} + '/categories'}"  >
+            <a th:href="@{'/clients/categories'}"  >
                 <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
             </a> 
            </div>
            </div>
            <div th:if="${client_statistic.expenses.size() > 0} "  class = "expense_transactions" style="display: none;">
            <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/clients/' + ${client.id} + '/categories'}"  >
+            <a th:href="@{'/clients/categories'}"  >
                 <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
             </a>
            </div>

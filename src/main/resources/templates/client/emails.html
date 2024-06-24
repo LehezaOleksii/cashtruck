@@ -10,7 +10,7 @@
 </head>
 <body th:object="${client}">
 <main layout:fragment="content" >
-    <form method="post" th:object="${email}" th:action="@{'/clients/' + ${client.id} + '/emails/send'}" enctype="multipart/form-data">
+    <form method="post" th:object="${email}" th:action="@{'/clients/emails/send'}" enctype="multipart/form-data">
         <div id="userId" style="display: none;" data-th-text="${client.id}"></div>
         <div class="my-container col-6 mx-auto">
             <div class="card-body d-flex justify-content-center align-items-center">

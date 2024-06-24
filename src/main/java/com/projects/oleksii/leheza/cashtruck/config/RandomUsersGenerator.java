@@ -38,8 +38,9 @@ public class RandomUsersGenerator {
 
     private final Random random;
     private final Faker faker;
+    private final PasswordEncoder passwordEncoder;
 
-    public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber, PasswordEncoder passwordEncoder) {
+    public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber) {
 //    prepare for client generation
         int allUsers = clientsNumber + managersNumber + adminsNumber;
         generateBankCards(bankCardsNumber);
@@ -50,7 +51,7 @@ public class RandomUsersGenerator {
         List<BankTransaction> lastBankTransactions = allBankTransactions.subList(allBankTransactions.size() / 2, allBankTransactions.size());
         generateRandomTransactionIncomes(firstBankTransactions);
         generateRandomTransactionExpenses(lastBankTransactions);
-        generateRandomUsers(allUsers,passwordEncoder);
+        generateRandomUsers(allUsers, passwordEncoder);
         generateRandomClients(clientsNumber);
         generateRandomManagers(managersNumber, clientsNumber);
         generateRandomAdmins(adminsNumber, managersNumber, clientsNumber);
@@ -97,7 +98,8 @@ public class RandomUsersGenerator {
             Date subscriptionFinishDateLegacy = Date.from(subscriptionFinishDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
             Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
                     .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
-            String password = passwordEncoder.encode(faker.lorem().sentence(2));
+//            String password = passwordEncoder.encode(faker.lorem().sentence(2));
+            String password = passwordEncoder.encode("password");
             user = user.toBuilder()
                     .firstName(firstName)
                     .lastName(lastName)
@@ -106,7 +108,7 @@ public class RandomUsersGenerator {
                     .saving(saving)
                     .transactions(allTransactions)
                     .role(Role.ROLE_CLIENT)
-                    .status(ActiveStatus.INACTIVE)
+                    .status(ActiveStatus.ACTIVE)
                     .subscription(subscription)
                     .subscriptionFinishDate(subscriptionFinishDateLegacy)
                     .build();

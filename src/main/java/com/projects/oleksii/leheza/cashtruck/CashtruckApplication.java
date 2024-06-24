@@ -30,10 +30,10 @@ public class CashtruckApplication {
     }
 
     @Bean
-    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator, UserServiceImpl userService, PasswordEncoder passwordEncoder) {
+    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator, UserServiceImpl userService) {
         return args -> {
             mainEntitiesGenerator.generateMainEntities();
-            randomUsersGenerator.generateRandomClientFields(10, 5, 1, 30, 200,passwordEncoder);
+            randomUsersGenerator.generateRandomClientFields(10, 5, 1, 30, 200);
             SubscriptionChecker subscriptionChecker = new SubscriptionChecker(userService);
             subscriptionChecker.checkAndUpdateSubscriptionStatus();
             Dotenv dotenv = Dotenv.load();

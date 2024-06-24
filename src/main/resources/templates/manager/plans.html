@@ -32,7 +32,7 @@
                         <li>Help center access</li>
                     </ul>
                     <div th:if="${client_plan == 'FREE'}" class="btn btn-lg btn-block btn-primary">Current plan</div>
-                    <a th:if="${client_plan != 'FREE'}" th:href="@{'/clients/' + ${client.id} + '/premium/payment_form?plan=FREE'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
+                    <a th:if="${client_plan != 'FREE'}" th:href="@{'/maangers/premium/payment_form?plan=FREE'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
                 </div>
             </div>
             <!-- Plus Plan -->
@@ -48,7 +48,7 @@
                         <li>Help center access</li>
                     </ul>
                     <div th:if="${client_plan == 'PLUS'}" class="btn btn-lg btn-block btn-primary">Current</div>
-                    <a th:if="${client_plan != 'PLUS'}" th:href="@{'/clients/' + ${client.id} + '/premium/payment_form?plan=PLUS'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
+                    <a th:if="${client_plan != 'PLUS'}" th:href="@{'/managers/premium/payment_form?plan=PLUS'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
                 </div>
             </div>
             <!-- Pro Plan -->
@@ -64,7 +64,7 @@
                         <li>Help center access</li>
                     </ul>
                     <div th:if="${client_plan == 'PRO'}" class="btn btn-lg btn-block btn-primary">Current</div>
-                    <a th:if="${client_plan != 'PRO'}" th:href="@{'/clients/' + ${client.id} + '/premium/payment_form?plan=PRO'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
+                    <a th:if="${client_plan != 'PRO'}" th:href="@{'/managers/premium/payment_form?plan=PRO'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
                 </div>
             </div>
         </div>

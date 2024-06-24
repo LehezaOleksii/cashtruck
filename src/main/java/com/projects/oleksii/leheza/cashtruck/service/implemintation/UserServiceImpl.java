@@ -246,12 +246,17 @@ public class UserServiceImpl implements UserService {
         Optional<User> userOptional = userRepository.findById(userId);
         if (userOptional.isPresent()) {
             if (categoryOptional.isPresent()) {
+                User user = userOptional.get();
                 Transaction transaction = Transaction.builder()
-                        .user(userOptional.get())
+                        .user(user)
                         .bankTransaction(bankTransaction)
                         .category(categoryOptional.get())
                         .build();
                 transactionRepository.save(transaction);
+                List<Transaction> transactions = user.getTransactions();
+                transactions.add(transaction);
+                user.setTransactions(transactions);
+                userRepository.save(user);
                 return dtoMapper.transactionToDto(transaction);
             } else {
                 log.warn("Category with name:{} does not found)", createTransactionDto.getCategoryName());

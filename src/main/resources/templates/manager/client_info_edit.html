@@ -10,7 +10,7 @@
 </head>
 <body th:object="${user}">
 <main layout:fragment="content">
-    <form method="post" th:object="${clientDto}" th:action="@{'/managers/' + ${manager.id}+'/users/'+ ${user.id}+'/update'}">
+    <form method="post" th:object="${clientDto}" th:action="@{'/managers/users/'+ ${user.id}+'/update'}">
         <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
             <span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -84,7 +84,7 @@
                             <button class= "btn custom-back-violet mt-2" type="submit" style="width: 160px;">Update</button>
                         </div>
                         <div class="col">
-                            <a th:href="@{'/managers/' + ${user.id}+'/users/'+${clientDto.id}}" class="btn mt-2 custom-back-grey" style="width: 160px;">Cancel</a>
+                            <a th:href="@{'/managers/users/'+${clientDto.id}}" class="btn mt-2 custom-back-grey" style="width: 160px;">Cancel</a>
                         </div>
                     </div>
                 </div>

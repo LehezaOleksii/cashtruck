@@ -16,7 +16,7 @@
                 </div>
                 <span class="modal-body">
                     <form method="post" th:object="${category}"
-                          th:action="@{'/managers/' + ${manager.id} + '/categories/create'}">
+                          th:action="@{'/managers/categories/create'}">
                         <!-- Category -->
                         <input type="hidden" th:field="*{id}" style="display: none;"/>
                         <div class="mb-3">

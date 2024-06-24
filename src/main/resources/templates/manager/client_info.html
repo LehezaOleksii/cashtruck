@@ -78,7 +78,7 @@
                                                 document.getElementById('confirmDelete').addEventListener('click', function() {
                                                     var userId = document.getElementById('userId').innerText;
                                                     var managerId = document.getElementById('managerId').innerText;
-                                                    var blockUrl = '/managers/' + managerId + '/users/' + userId + '/block';
+                                                    var blockUrl = '/managers/users/' + userId + '/block';
                                                     window.location.href = blockUrl;});
                                                 // Handle cancel button to close the modal
                                                 document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {

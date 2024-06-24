@@ -65,13 +65,42 @@ public class BankCardServiceImpl implements BankCardService {
     }
 
     @Override
-    public boolean isClientHasCard(Long userId, CreateBankCardDto bankCardDto) {
+    public boolean isClientHasCard(Long userId, BankCard bankCard) {
         if (userRepository.findById(userId).isPresent()) {
             return bankCardRepository.getBankCardsByUserId(userId)
                     .stream()
                     .filter(Optional::isPresent)
                     .map(Optional::get)
-                    .anyMatch(card -> card.getCardNumber().equals(bankCardDto.getCardNumber()));
+                    .anyMatch(card -> card.getCardNumber().equals(bankCard.getCardNumber()));
+        } else {
+            throw new ResourceNotFoundException("User was not found when checking the existence of the card");
+        }
+    }
+
+    @Override
+    public boolean isClientHasCard(Long userId, CreateBankCardDto createBankCardDto) {
+        if (userRepository.findById(userId).isPresent()) {
+            return bankCardRepository.getBankCardsByUserId(userId)
+                    .stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .anyMatch(card -> card.getCardNumber().equals(createBankCardDto.getCardNumber()));
+        } else {
+            throw new ResourceNotFoundException("User was not found when checking the existence of the card");
+        }
+    }
+
+    @Override
+    public boolean isClientHasCard(Long userId, Long cardId) {
+        if (userRepository.findById(userId).isPresent()) {
+            return bankCardRepository.getBankCardsByUserId(userId)
+                    .stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .anyMatch(card -> card.getCardNumber().equals(bankCardRepository
+                            .findById(cardId)
+                            .orElseThrow(() -> new ResourceNotFoundException("Card with id:" + cardId + " does not found"))
+                            .getCardNumber()));
         } else {
             throw new ResourceNotFoundException("User was not found when checking the existence of the card");
         }

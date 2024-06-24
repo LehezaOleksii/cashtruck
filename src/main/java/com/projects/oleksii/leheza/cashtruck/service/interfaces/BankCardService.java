@@ -17,7 +17,11 @@ public interface BankCardService {
 
     List<BankCard> findAll();
 
-    boolean isClientHasCard(Long clientId, CreateBankCardDto bankCardDto);
+    boolean isClientHasCard(Long userId, BankCard bankCard);
+
+    boolean isClientHasCard(Long userId, CreateBankCardDto createBankCardDto);
+
+    boolean isClientHasCard(Long userId, Long cardId);
 
     void removeBankCardForClient(Long bankCardId, Long clientId);
 }

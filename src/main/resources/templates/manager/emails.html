@@ -37,7 +37,7 @@
             function searchEmails() {
               var managerId = document.getElementById('userId').innerText;
               var email = document.getElementById('searchQuery').value;
-              var searchUrl = '/managers/' + managerId + '/emails/search?pattern=' + encodeURIComponent(email);
+              var searchUrl = '/managers/emails/search?pattern=' + encodeURIComponent(email);
               window.location.href = searchUrl;
             }
           </script>

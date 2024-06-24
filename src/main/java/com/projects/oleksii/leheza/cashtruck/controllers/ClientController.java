@@ -12,11 +12,13 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
+import com.projects.oleksii.leheza.cashtruck.exception.UserPlanException;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -54,8 +56,9 @@ public class ClientController {
         }
     }
 
-    @GetMapping(path = "/{userId}")
-    public ModelAndView showClientDashboard(@PathVariable(value = "userId") Long userId) {
+    @GetMapping(path = "/dashboard")
+    public ModelAndView showClientDashboard(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         UserHeaderDto client = userService.getHeaderClientData(userId);
         if (client == null) {
             return new ModelAndView("login");
@@ -67,8 +70,13 @@ public class ClientController {
         return modelAndView;
     }
 
-    @GetMapping({"/{userId}/bank_cards/save", "/{userId}/bank_cards/{bankCardId}/save"})
-    public ModelAndView clientBankCardsForm(@PathVariable Long userId, @PathVariable(required = false) Long bankCardId) {
+    @GetMapping({"/bank_cards"})
+    public ModelAndView clientBankCardsForm(@RequestParam(required = false) Long bankCardId,
+                                            @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
+        if (bankCardId!=null && !bankCardService.isClientHasCard(userId, bankCardId)) {
+            throw new SecurityException("user has not card with id:" + bankCardId);
+        }
         ModelAndView modelAndView = new ModelAndView("client/add_bank_card");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));//TODO use DTO
         modelAndView.addObject("userId", userService.getUserById(userId).getId());//TODO use DTO
@@ -87,8 +95,11 @@ public class ClientController {
         return modelAndView;
     }
 
-    @PostMapping("/{userId}/bank_cards")
-    public ModelAndView saveBankCardToClient(@PathVariable Long userId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto, BindingResult bindingResult) {
+    @PostMapping("/bank_cards/save")
+    public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto,
+                                             @AuthenticationPrincipal User user,
+                                             BindingResult bindingResult) {
+        Long userId = user.getId();
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the save bank card process. userId:{} ,bank card number{}", userId, bankCardDto.getCardNumber());
             return new ModelAndView("client/add_bank_card")
@@ -98,16 +109,17 @@ public class ClientController {
             try {
                 BankCard bankCard = bankCardService.save(bankCardDto);
                 savingService.assignBankCardToClient(userId, bankCard);
-            } catch (IllegalArgumentException e) {
+            } catch (UserPlanException ex) {
                 log.warn("user with id: {} has bank card with number:{}", userId, bankCardDto.getCardNumber());
-                return new ModelAndView("redirect:/clients/" + userId + "/premium");
+                return new ModelAndView("redirect:/clients/premium");
             }
         }
-        return new ModelAndView("redirect:/clients/" + userId);
+        return new ModelAndView("redirect:/clients/dashboard");
     }
 
-    @GetMapping("/{userId}/bank_cards/update")
-    public ModelAndView updateBankCardForm(@PathVariable Long userId) {
+    @GetMapping("/bank_cards/update")
+    public ModelAndView updateBankCardForm(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/update_delete_bank_card");
         UserHeaderDto userHeaderDto = userService.getHeaderClientData(userId);
         modelAndView.addObject("client", userHeaderDto);
@@ -115,21 +127,29 @@ public class ClientController {
         return modelAndView;
     }
 
-    @PutMapping("/{userId}/bank_cards")
-    public ModelAndView updateBankCardData(@PathVariable Long userId, @Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto) {
+    @PutMapping("/bank_cards")
+    public ModelAndView updateBankCardData(@Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto,
+                                           @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         bankCardService.save(bankCardDto);
 //        savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
-        return new ModelAndView("redirect:/clients/" + userId);
+        return new ModelAndView("redirect:/clients/dashboard");
     }
 
-    @GetMapping("/{userId}/bank_cards/{bankCardId}/remove")
-    public ModelAndView removeBankCard(@PathVariable Long userId, @PathVariable Long bankCardId) {
+    @GetMapping("/bank_cards/remove")
+    public ModelAndView removeBankCard(@RequestParam Long bankCardId,
+                                       @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
+        if (!bankCardService.isClientHasCard(userId, bankCardId)) {
+            throw new SecurityException("user has not card with id:" + bankCardId);
+        }
         bankCardService.removeBankCardForClient(bankCardId, userId);
-        return new ModelAndView("redirect:/clients/" + userId);
+        return new ModelAndView("redirect:/clients/dashboard");
     }
 
-    @GetMapping("/{userId}/categories")
-    public ModelAndView viewIncomeAndExpensesDashboard(@PathVariable Long userId) {
+    @GetMapping("/categories")
+    public ModelAndView viewIncomeAndExpensesDashboard(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/categories");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));//TODO Optimise maybe (it will be a lot of dto)
         modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(userId));
@@ -137,11 +157,12 @@ public class ClientController {
         return modelAndView;
     }
 
-    @GetMapping("/{userId}/categories/{categoryName}")
-    public ModelAndView viewTransactionsByCategoryName(@PathVariable Long userId,
-                                                       @PathVariable String categoryName,
+    @GetMapping("/categories/{categoryName}")
+    public ModelAndView viewTransactionsByCategoryName(@PathVariable String categoryName,
                                                        @RequestParam(value = "page", defaultValue = "0") int page,
-                                                       @RequestParam(value = "size", defaultValue = "10") int size) {
+                                                       @RequestParam(value = "size", defaultValue = "10") int size,
+                                                       @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/transactions_details");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("category", categoryService.findByName(categoryName));
@@ -153,8 +174,9 @@ public class ClientController {
         return modelAndView;
     }
 
-    @GetMapping("/{userId}/profile")
-    public ModelAndView updateClientAccountForm(@PathVariable Long userId) {
+    @GetMapping("/profile")
+    public ModelAndView updateClientAccountForm(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/profile");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
@@ -163,8 +185,12 @@ public class ClientController {
         return modelAndView;
     }
 
-    @PostMapping("/{userId}/update")
-    public ModelAndView updateClientAccount(@PathVariable Long userId, @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto, BindingResult bindingResult, @RequestParam("image") MultipartFile avatar) {
+    @PostMapping("/update")
+    public ModelAndView updateClientAccount(@Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto,
+                                            BindingResult bindingResult,
+                                            @RequestParam("image") MultipartFile avatar,
+                                            @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the update client account. userId:{}", userId);
             return new ModelAndView("client/profile")
@@ -176,15 +202,16 @@ public class ClientController {
             }
             userService.updateUserInfo(userId, userUpdateDto);
             log.info("update client information. client id:{}", userId);
-            ModelAndView modelAndView = new ModelAndView("redirect:/clients/" + userId + "/profile");
+            ModelAndView modelAndView = new ModelAndView("redirect:/clients/profile");
             modelAndView.addObject("client", userService.getHeaderClientData(userId));
-            return new ModelAndView("redirect:/clients/" + userId);
+            return new ModelAndView("redirect:/clients/dashboard");
         }
     }
 
 
-    @GetMapping("/{userId}/premium")
-    public ModelAndView getPlansList(@PathVariable Long userId) {
+    @GetMapping("/premium")
+    public ModelAndView getPlansList(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/plans");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
@@ -193,8 +220,9 @@ public class ClientController {
         return modelAndView;
     }
 
-    @GetMapping(path = "/{userId}/emails")
-    ModelAndView getEmailsMenu(@PathVariable("userId") Long userId) {
+    @GetMapping(path = "/emails")
+    ModelAndView getEmailsMenu(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/emails");
         modelAndView.addObject("client", userService.getUserDto(userId));
         modelAndView.addObject("email", new EmailContext());
@@ -203,17 +231,18 @@ public class ClientController {
     }
 
 
-    @PostMapping(path = "/{userId}/emails/send")
-    ModelAndView sendEmail(@PathVariable("userId") Long userId,
-                           @Valid @ModelAttribute("email") EmailContext email) {
+    @PostMapping(path = "/emails/send")
+    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email, @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         log.info("start sending email to user with email: {}", email.getTo());
         emailService.sendEmailWithAttachment(email);
         log.info("finish sending email to user with email: {}", email.getTo());
-        return new ModelAndView("redirect:/clients/" + userId + "/emails");
+        return new ModelAndView("redirect:/clients/emails");
     }
 
-    @GetMapping(path = "/{userId}/transactions")
-    ModelAndView createTransactionForm(@PathVariable("userId") Long userId) {
+    @GetMapping(path = "/transactions")
+    ModelAndView createTransactionForm(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/create_transaction");
         modelAndView.addObject("client", userService.getUserDto(userId));
         modelAndView.addObject("incomes", categoryService.findAllIncomeCategories());
@@ -223,16 +252,19 @@ public class ClientController {
         return modelAndView;
     }
 
-    @PostMapping(path = "/{userId}/transactions/save")
-    ModelAndView saveTransaction(@PathVariable("userId") Long userId, @ModelAttribute CreateTransactionDto transaction) {
+    @PostMapping(path = "/transactions/save")
+    ModelAndView saveTransaction(@ModelAttribute CreateTransactionDto transaction, @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         userService.addTransaction(userId, transaction);
-        return new ModelAndView("redirect:/clients/" + userId);
+        return new ModelAndView("redirect:/clients/dashboard");
     }
 
-    @GetMapping(path = "/{userId}/premium/plan/{subscriptionStatus}")
-    ModelAndView updateSubscriptionPlan(@PathVariable("userId") Long userId, @PathVariable("subscriptionStatus") String subscriptionStatus) {
+    @GetMapping(path = "/premium/plan/{subscriptionStatus}")
+    ModelAndView updateSubscriptionPlan(@PathVariable("subscriptionStatus") String subscriptionStatus,
+                                        @AuthenticationPrincipal User user) {
+        Long userId = user.getId();
         userService.updateUserPlan(userId, SubscriptionStatus.valueOf(subscriptionStatus));
         log.info("User status was updated by client controller. user id:{}, user status:{}", userId, subscriptionStatus);
-        return new ModelAndView("redirect:/clients/" + userId+"/premium");
+        return new ModelAndView("redirect:/clients/premium");
     }
 }
