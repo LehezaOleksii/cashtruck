@@ -1,8 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.dto.update;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 @AllArgsConstructor
@@ -17,6 +15,8 @@ public class UserUpdateDto {
     private String firstName;
     @Size(max = 50, message = "Last name must be at most 50 characters")
     private String lastName;
+    @NotEmpty
+    @NotBlank
     @Email(message = "Invalid email format")
     private String email;
     @Size(min = 8, message = "Password must be at least 8 characters long")

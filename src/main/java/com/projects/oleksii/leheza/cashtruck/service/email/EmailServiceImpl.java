@@ -49,20 +49,19 @@ public class EmailServiceImpl implements EmailService {
     public void sendConformationEmailRequest(String to, String token) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(USER_EMAIL);
-        simpleMailMessage.setTo("oleksii.leheza@gmail.com");
+        simpleMailMessage.setTo(to);
         simpleMailMessage.setSubject(NEW_USER_ACCOUNT_VERIFICATION);
-        simpleMailMessage.setText("12345");
+        simpleMailMessage.setText(getEmailMessage("localhost:8080",token));
         mailSender.send(simpleMailMessage);
     }
-
     @Async
-    public String getEmailMessage(String name, String host, String token) {
-        return "Hello " + name + ", \n\nYour new account has been created. Please click the link below to verify your account. \n\n" +
+    public String getEmailMessage(String host, String token) {
+        return "Your new account has been created. Please click the link below to verify your account. \n\n" +
                 getVerificationUrl(host, token) + "\n\nThe support Team";
     }
 
     public String getVerificationUrl(String host, String token) {
-        return host + "/api/users?token=" + token;
+        return host + "http://localhost:8080/auth/users?token=" + token;
     }
 
 

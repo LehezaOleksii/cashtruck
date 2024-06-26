@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cash Track - Sign Up</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+            rel="stylesheet"
+            integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+            crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .card {
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-control {
+            border-radius: 10px;
+        }
+
+        .btn-primary {
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-4">
+            <div class="card mt-5">
+                <div class="card-header text-center">
+                    <h3>Sign Up</h3>
+                </div>
+                <div class="card-body">
+                    <form id="signupForm" th:action="@{/auth/register}" method="post">
+                        <div class="mb-2">
+                            <label for="login" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="login" name="login"
+                                   placeholder="Enter your email" required
+                                   pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}"
+                                   title="Please enter a valid email address">
+                        </div>
+                        <div class="mb-2">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password"
+                                   placeholder="Enter your password"
+                                   required
+                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$"
+                                   title="Password must contain at least one lowercase letter, one uppercase letter, and one digit"
+                                   minlength="8">
+                        </div>
+                        <div class="mb-3">
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            <input type="password" class="form-control mb-3" id="confirmPassword" name="confirmPassword"
+                                   placeholder="Confirm your password"
+                                   required
+                                   pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$"
+                                   title="Password must contain at least one lowercase letter, one uppercase letter, and one digit"
+                                   minlength="8">
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Sign Up</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-center">
+                    <small class="text-muted">Already have an account? <a th:href="@{'/auth/login'}">Login</a></small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.getElementById('signupForm').addEventListener('submit', function(event) {
+        var password = document.getElementById('password').value;
+        var confirmPassword = document.getElementById('confirmPassword').value;
+
+        if (password !== confirmPassword) {
+            alert('Passwords do not match!');
+            event.preventDefault();
+        }
+    });
+</script>
+
+</body>
+</html>

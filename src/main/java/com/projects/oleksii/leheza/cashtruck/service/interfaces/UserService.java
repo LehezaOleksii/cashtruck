@@ -2,6 +2,7 @@ package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
+import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
@@ -10,6 +11,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import org.springframework.data.domain.Page;
@@ -19,9 +21,11 @@ import java.util.List;
 
 public interface UserService {
 
-    User saveClient(CreateUserDto createUserDto);
+//    User save(CreateUserDto createUserDto);
 
-    User saveUser(User user); //TODO paramiters(DTO,id)
+    User save(User user); //TODO paramiters(DTO,id)
+
+    User saveNewUser(LoginDto loginDto);
 
     Boolean verifyEmailToken(String token);
 
@@ -87,4 +91,6 @@ public interface UserService {
     PageDto<UserDto> getUserPageByEmailPattern(String email, Integer pageNumber, Integer pageSize);
 
     void sendEmailForAllClients(EmailContext email);
+
+    void setStatus(Long userId, ActiveStatus status);
 }

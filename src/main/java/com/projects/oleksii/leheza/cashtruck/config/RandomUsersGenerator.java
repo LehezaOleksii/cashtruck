@@ -69,7 +69,7 @@ public class RandomUsersGenerator {
                 .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
         user.setSubscription(subscription);
         user.setSubscriptionFinishDate(new Date());
-        userService.saveUser(user);
+        userService.save(user);
     }
 
     private void generateRandomUsers(int allUsers, PasswordEncoder passwordEncoder) {
@@ -112,7 +112,7 @@ public class RandomUsersGenerator {
                     .subscription(subscription)
                     .subscriptionFinishDate(subscriptionFinishDateLegacy)
                     .build();
-            userService.saveUser(user);
+            userService.save(user);
         });
     }
 
@@ -121,7 +121,7 @@ public class RandomUsersGenerator {
         IntStream.range(1, clientsNumber).forEach(index -> {
             User user = users.get(clientsNumber);
             user.setRole(Role.ROLE_CLIENT);
-            userService.saveUser(user);
+            userService.save(user);
         });
     }
 
@@ -130,7 +130,7 @@ public class RandomUsersGenerator {
         IntStream.range(clientsNumber, clientsNumber + managersNumber).forEach(index -> {
             User user = users.get(clientsNumber);
             user.setRole(Role.ROLE_MANAGER);
-            userService.saveUser(user);
+            userService.save(user);
         });
     }
 
@@ -139,7 +139,7 @@ public class RandomUsersGenerator {
         IntStream.range(clientsNumber + managersNumber, clientsNumber + managersNumber + adminNumber).forEach(index -> {
             User user = users.get(clientsNumber);
             user.setRole(Role.ROLE_ADMIN);
-            userService.saveUser(user);
+            userService.save(user);
         });
     }
 

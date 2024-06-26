@@ -8,7 +8,7 @@ public interface EmailService {
 
     void sendConformationEmailRequest(String to, String token);
 
-    String getEmailMessage(String name, String host, String token);
+    String getEmailMessage(String host, String token);
 
     String getVerificationUrl(String host, String token);
 }

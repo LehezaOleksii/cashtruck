@@ -3,16 +3,16 @@ package com.projects.oleksii.leheza.cashtruck.domain;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -36,13 +36,16 @@ public class User implements UserDetails {
     private String phoneNumber;
     private String language; //TODO
     private String country; //TODO
-    @NotEmpty
-    @NotBlank
+    @NotEmpty(message = "Login cannot be empty")
+    @NotBlank(message = "Login cannot be blank")
+    @Email(message = "Invalid email format")
     private String email;
     @NotEmpty
     @NotBlank
+    @Size(min = 8, message = "Password must be at least 8 characters long")
+    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "Password must contain at least one lowercase letter, one uppercase letter, and one digit")
     private String password;
-//    @OneToMany
+    //    @OneToMany
 //    private Set<Authority> authorities;
     @NotNull
     @Enumerated(EnumType.STRING)//TODO???????
@@ -61,10 +64,11 @@ public class User implements UserDetails {
     @NotNull
     @ManyToOne
     private Subscription subscription;
+//    @NotNull
     private Date subscriptionFinishDate;
     private BigDecimal balance = new BigDecimal(0);
 
-//            public Role getLeadAuthority() {
+    //            public Role getLeadAuthority() {
 //        return roles.stream()
 //                .min(comparingInt(Role::getOrder))
 //                .orElse(null);

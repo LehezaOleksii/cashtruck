@@ -5,7 +5,6 @@ import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
@@ -40,29 +39,10 @@ public class ClientController {
     private final CategoryService categoryService;
     private final EmailService emailService;
 
-    @PostMapping(path = "/login")
-    public ModelAndView registerNewClient(@RequestBody CreateUserDto createUserDto) {
-        ModelAndView modelAndView;
-        if (userService.findByEmail(createUserDto.getEmail()) == null) {
-            log.info("start saving user card with email:{}", createUserDto.getEmail());
-            User user = userService.saveClient(createUserDto);
-            modelAndView = new ModelAndView("redirect:/client/login");
-            modelAndView.addObject("client", userService.getHeaderClientData(user.getId()));
-            return modelAndView;
-        } else {
-            log.warn("user with email already exist:{}", createUserDto.getEmail());
-            return null;
-//            throw new ResourceAlreadyExistException(""); //TODO
-        }
-    }
-
     @GetMapping(path = "/dashboard")
     public ModelAndView showClientDashboard(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         UserHeaderDto client = userService.getHeaderClientData(userId);
-        if (client == null) {
-            return new ModelAndView("login");
-        }
         ModelAndView modelAndView = new ModelAndView("client/dashboard");
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         modelAndView.addObject("client", client);

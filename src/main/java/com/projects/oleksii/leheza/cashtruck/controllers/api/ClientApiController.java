@@ -6,7 +6,6 @@ import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
@@ -43,25 +42,6 @@ public class ClientApiController {
     private final SavingService savingService;
     private final TransactionService transactionService;
     private final EmailService emailService;
-
-    @Operation(summary = "Create a new user", description = "Create a new user.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "User created successfully",
-                    content = @Content(schema = @Schema(implementation = User.class))),
-            @ApiResponse(responseCode = "400", description = "Bad request",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "409", description = "User email duplicate",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-            @ApiResponse(responseCode = "500", description = "Internal server error",
-                    content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
-    })
-    @PostMapping()
-    public ResponseEntity<User> registerNewClient(@RequestBody CreateUserDto createUserDto) {
-        log.info("start register new user with email:{}", createUserDto.getEmail());
-        User user = userService.saveClient(createUserDto);
-        return new ResponseEntity<>(user, HttpStatus.CREATED);
-    }
-
 
     @Operation(summary = "Find user by id", description = "Find a user by its id.")
     @ApiResponses(value = {

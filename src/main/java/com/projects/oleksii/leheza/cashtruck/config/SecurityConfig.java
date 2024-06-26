@@ -13,6 +13,7 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+//    private final AuthenticationManager authenticationManager;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -23,18 +24,21 @@ public class SecurityConfig {
                         .successHandler(customAuthenticationSuccessHandler)
                         .permitAll()
                 )
+//                .authenticationManager(authenticationManager)
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers("/clients/**").hasAnyRole("CLIENT", "MANAGER", "ADMIN")
+                        .requestMatchers("/managers/**").hasAnyRole("MANAGER", "ADMIN")
+                        .requestMatchers("/admins/**").hasAnyRole("ADMIN")
+                        .requestMatchers("/auth/**", "/js/client/**", "/css/**").permitAll()
+                        .anyRequest().authenticated()
+                )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
                         .logoutSuccessUrl("/auth/login")
                         .permitAll()
                 )
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/clients/**").hasAnyRole("CLIENT", "MANAGER", "ADMIN")
-                        .requestMatchers("/managers/**").hasAnyRole("MANAGER", "ADMIN")
-                        .requestMatchers("/admins/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/auth/login", "/auth/register", "/js/client/**", "/css/**").permitAll()
-                        .anyRequest().authenticated()
-                );
+//                .rememberMe()
+                ;
         return http.build();
     }
 }

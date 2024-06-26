@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
+import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
@@ -31,6 +32,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -62,30 +64,65 @@ public class UserServiceImpl implements UserService {
     private final UserSpecification userSpecification;
     private final SubscriptionRepository subscriptionRepository;
     private final EmailService emailService;
+    private final SavingRepository savingRepository;
+    private final PasswordEncoder encoder;
+
+//    @Override
+//    public User save(CreateUserDto createUserDto) throws IllegalArgumentException {
+//        if (Optional.ofNullable(createUserDto).isEmpty()) {
+//            throw new ResourceNotFoundException("User is empty");
+//        }
+//        if (existByEmail(createUserDto.getEmail())) {
+//            log.warn("User with email already exist email:{}", createUserDto.getEmail());
+//            throw new ResourceAlreadyExistException("Email taken");
+//        }
+//        User user = User.builder()
+//                .firstName(createUserDto.getFirstName())
+//                .lastName(createUserDto.getLastName())
+//                .email(createUserDto.getEmail())
+//                .password((createUserDto.getPassword()))
+//                .status(ActiveStatus.ACTIVE)
+//                .build();
+//        log.info("save user with email:{}", createUserDto.getEmail());
+//        return userRepository.save(user);
+//    }
 
     @Override
-    public User saveClient(CreateUserDto createUserDto) throws IllegalArgumentException {
-        if (Optional.ofNullable(createUserDto).isEmpty()) {
-            throw new ResourceNotFoundException("Client is empty");
-        }
-        if (existByEmail(createUserDto.getEmail())) {
-            log.warn("user with email already exist email:{}", createUserDto.getEmail());
-            throw new ResourceAlreadyExistException("Email taken");
-        }
-        User user = User.builder()
-                .firstName(createUserDto.getFirstName())
-                .lastName(createUserDto.getLastName())
-                .email(createUserDto.getEmail())
-                .password((createUserDto.getPassword()))
-                .status(ActiveStatus.ACTIVE)
-                .build();
-        log.info("save user card with email:{}", createUserDto.getEmail());
+    public User save(User user) {
         return userRepository.save(user);
     }
 
     @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public User saveNewUser(LoginDto loginDto) {
+        if (Optional.ofNullable(loginDto).isEmpty()) {
+            throw new ResourceNotFoundException("User is empty");
+        }
+        if (existByEmail(loginDto.getLogin())) {
+            log.warn("user with email already exist email:{}", loginDto.getLogin());
+            throw new ResourceAlreadyExistException("Email taken");
+        }
+        Saving saving = new Saving();
+//        Set<BankCard> bankCards = new HashSet<>();
+//        saving.setBankCards(bankCards);
+        savingRepository.save(saving);
+        Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription status does not found in the database"));
+
+        User user = User.builder()
+                .email(loginDto.getLogin())
+                .password(encoder.encode(loginDto.getPassword()))
+                .status(ActiveStatus.ACTIVE)
+                .saving(saving)
+                .role(Role.ROLE_CLIENT)
+                .subscription(subscription)
+                .status(ActiveStatus.INACTIVE)
+                .build();
+        userRepository.save(user);
+        log.info("save user with email:{}", loginDto.getLogin());
+        Confirmation confirmation = new Confirmation(user);
+        confirmationRepository.save(confirmation);
+        emailService.sendConformationEmailRequest(loginDto.getLogin(), confirmation.getToken());
+        return user;
     }
 
     @Override
@@ -422,6 +459,14 @@ public class UserServiceImpl implements UserService {
                 .toArray(String[]::new);
         email.setTo(Arrays.toString(emails));
         emailService.sendEmailWithAttachment(email);
+    }
+
+    @Override
+    public void setStatus(Long userId, ActiveStatus status) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id " + userId + " does not exist"));
+        user.setStatus(status);
+        userRepository.save(user);
     }
 
     private ClientStatisticDto createStatisticDto(User client) {
