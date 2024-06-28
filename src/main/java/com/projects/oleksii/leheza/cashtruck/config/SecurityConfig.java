@@ -37,7 +37,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
-                        .logoutSuccessUrl("/auth/login")
+                        .logoutSuccessUrl("/auth/login?logout")
                         .permitAll()
                 )
                 .rememberMe((remember) -> remember
