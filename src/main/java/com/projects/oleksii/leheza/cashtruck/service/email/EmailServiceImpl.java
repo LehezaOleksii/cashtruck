@@ -2,6 +2,9 @@ package com.projects.oleksii.leheza.cashtruck.service.email;
 
 
 import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.domain.OtpToken;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
+import com.projects.oleksii.leheza.cashtruck.repository.OtpRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import jakarta.mail.MessagingException;
@@ -22,8 +25,10 @@ public class EmailServiceImpl implements EmailService {
     private static final String USER_EMAIL = "leheza.oleksii@gmail.com";
     private static final String UTF_8 = "UTF-8";
     private static final String NEW_USER_ACCOUNT_VERIFICATION = "New User Account Verification";
+    public static final String EMAIL = "leheza.oleksii@gmail.com";
     private final JavaMailSender mailSender;
     private final UserRepository userRepository;
+    private final OtpRepository otpRepository;
 
     @Async
     public void sendEmailWithAttachment(EmailContext emailContext) {
@@ -49,21 +54,35 @@ public class EmailServiceImpl implements EmailService {
     public void sendConformationEmailRequest(String to, String token) {
         SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
         simpleMailMessage.setFrom(USER_EMAIL);
-        simpleMailMessage.setTo(to);
+        simpleMailMessage.setTo(EMAIL);//TODO prod input to variable
         simpleMailMessage.setSubject(NEW_USER_ACCOUNT_VERIFICATION);
-        simpleMailMessage.setText(getEmailMessage("localhost:8080",token));
+        simpleMailMessage.setText(getEmailMessage("localhost:8080", token));
         mailSender.send(simpleMailMessage);
     }
+
     @Async
     public String getEmailMessage(String host, String token) {
         return "Your new account has been created. Please click the link below to verify your account. \n\n" +
                 getVerificationUrl(host, token) + "\n\nThe support Team";
     }
 
+    @Override
+    @Async
+    public void sendOTP(String email) {
+        SimpleMailMessage simpleMailMessage = new SimpleMailMessage();
+        simpleMailMessage.setFrom(USER_EMAIL);
+        simpleMailMessage.setTo(EMAIL);//TODO prod input to variable
+        simpleMailMessage.setSubject(NEW_USER_ACCOUNT_VERIFICATION);
+        OtpToken otp = new OtpToken(userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("user with email " + email + " does not found")));
+        otpRepository.save(otp);
+        simpleMailMessage.setText(Integer.toString(otp.getPassword()));
+        mailSender.send(simpleMailMessage);
+    }
+
     public String getVerificationUrl(String host, String token) {
         return host + "http://localhost:8080/auth/users?token=" + token;
     }
-
 
     private MimeMessage getMimeMessage() {
         return mailSender.createMimeMessage();

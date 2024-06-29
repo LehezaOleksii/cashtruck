@@ -469,6 +469,24 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
+    @Override
+    public Boolean existByEmail(String email) {
+        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
+            String emailInRepository = userRepository.findByEmailIgnoreCase(email).get().getEmail();
+            return email.equals(emailInRepository);
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public void setNewPassword(String email, String newPassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
+        user.setPassword(encoder.encode(newPassword));
+        userRepository.save(user);
+    }
+
     private ClientStatisticDto createStatisticDto(User client) {
         ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
         Long clientId = client.getId();
@@ -535,15 +553,6 @@ public class UserServiceImpl implements UserService {
                 .map(Transaction::getBankTransaction)
                 .map(BankTransaction::getSum)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
-
-    private boolean existByEmail(String email) {
-        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
-            String emailInRepository = userRepository.findByEmailIgnoreCase(email).get().getEmail();
-            return email.equals(emailInRepository);
-        } else {
-            return false;
-        }
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {
@@ -953,10 +962,6 @@ public class UserServiceImpl implements UserService {
 //        managerService.updateManagerInfo(managerId, managerUpdateDto);
 //    }
 //
-//    private boolean existByEmail(String email) {
-//        return email.equals(adminRepository.findAdminByUser_Email(email).getUser().getEmail());
-////        return adminRepository.findAdminByUser_Email(email).isPresent();
-//    }
 //
 //    private boolean isEmailTaken(String currentEmail, String updatedEmail) {
 //        return !Objects.equals(currentEmail, updatedEmail) && existByEmail(updatedEmail);

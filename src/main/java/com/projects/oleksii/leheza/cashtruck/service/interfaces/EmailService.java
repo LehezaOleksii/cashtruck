@@ -11,4 +11,6 @@ public interface EmailService {
     String getEmailMessage(String host, String token);
 
     String getVerificationUrl(String host, String token);
+
+    void sendOTP(String email);
 }

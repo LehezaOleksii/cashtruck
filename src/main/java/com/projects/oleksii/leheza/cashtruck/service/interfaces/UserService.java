@@ -93,4 +93,8 @@ public interface UserService {
     void sendEmailForAllClients(EmailContext email);
 
     void setStatus(Long userId, ActiveStatus status);
+
+    Boolean existByEmail(String email);
+
+    void setNewPassword(String email, String newPassword);
 }
