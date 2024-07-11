@@ -99,4 +99,6 @@ public interface UserService {
     Boolean existByEmail(String email);
 
     void setNewPassword(String email, String newPassword);
+
+    void authenticateUser(String email);
 }

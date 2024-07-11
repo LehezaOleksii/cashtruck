@@ -33,7 +33,7 @@ public class SecurityConfig {
     private String clientSecret;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http, CustomUserDetailsService customUserDetailsService) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .userDetailsService(userDetailsService)
                 .formLogin(form -> form
@@ -48,8 +48,8 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oAuth2 -> oAuth2
-                                .loginPage("/auth/login")
-                .successHandler(customAuthenticationSuccessHandler)
+                        .loginPage("/auth/login")
+                        .successHandler(customAuthenticationSuccessHandler)
                 )
                 .logout(logout -> logout
                         .logoutUrl("/auth/logout")
@@ -57,7 +57,7 @@ public class SecurityConfig {
                         .permitAll()
                 )
                 .rememberMe((remember) -> remember
-                        .rememberMeServices(rememberMeServices(customUserDetailsService))
+                        .rememberMeServices(rememberMeServices(userDetailsService))
                 );
         return http.build();
 //        http

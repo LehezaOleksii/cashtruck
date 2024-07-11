@@ -32,6 +32,7 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
             if (!userService.existByEmail(email)) {
                 oAuth2UserService.saveNewUser(email);
             }
+            userService.authenticateUser(email);
             redirectUrl = "/clients/dashboard";
         } else {
             if (authorities.stream().anyMatch(authority -> authority.getAuthority().equals(Role.ROLE_CLIENT.getAuthority()))) {

@@ -32,6 +32,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -66,6 +70,7 @@ public class UserServiceImpl implements UserService {
     private final EmailService emailService;
     private final SavingRepository savingRepository;
     private final PasswordEncoder encoder;
+    private final UserDetailsService userDetailsService;
 
 //    @Override
 //    public User save(CreateUserDto createUserDto) throws IllegalArgumentException {
@@ -511,6 +516,14 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
+    }
+
+    @Override
+    public void authenticateUser(String email) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        UsernamePasswordAuthenticationToken authenticationToken =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authenticationToken);
     }
 
     private ClientStatisticDto createStatisticDto(User client) {
