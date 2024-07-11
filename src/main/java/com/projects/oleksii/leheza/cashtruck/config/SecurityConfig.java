@@ -1,7 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.security.CustomUserDetailsService;
-import com.projects.oleksii.leheza.cashtruck.service.implemintation.OAuth2UserService;
 import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,7 +25,6 @@ public class SecurityConfig {
     private final String REMEMBER_ME_KEY = dotenv.get("REMEMBER_ME_KEY");
     private final CustomUserDetailsService userDetailsService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
-    private final OAuth2UserService oAuth2UserService;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
