@@ -27,6 +27,8 @@ public interface UserService {
 
     User saveNewUser(LoginDto loginDto);
 
+    User saveNewUserWithActiveStatus(LoginDto loginDto);
+
     Boolean verifyEmailToken(String token);
 
     Page<UserDto> findAll(int page, int size);

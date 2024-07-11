@@ -5,6 +5,7 @@ import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -20,7 +21,7 @@ public interface UserRepository extends
         JpaRepository<User, Long>, JpaSpecificationExecutor<User>,
         PagingAndSortingRepository<User, Long> {
 
-//    @EntityGraph(attributePaths = "authorities")
+    @EntityGraph(attributePaths = "authorities")
     Optional<User> findByEmail(String email);
 
     Optional<User>  findByEmailIgnoreCase(String email);

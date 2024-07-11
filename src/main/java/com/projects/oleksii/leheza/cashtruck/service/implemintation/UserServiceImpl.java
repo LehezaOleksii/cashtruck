@@ -111,7 +111,6 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .email(loginDto.getLogin())
                 .password(encoder.encode(loginDto.getPassword()))
-                .status(ActiveStatus.ACTIVE)
                 .saving(saving)
                 .role(Role.ROLE_CLIENT)
                 .subscription(subscription)
@@ -122,6 +121,33 @@ public class UserServiceImpl implements UserService {
         Confirmation confirmation = new Confirmation(user);
         confirmationRepository.save(confirmation);
         emailService.sendConformationEmailRequest(loginDto.getLogin(), confirmation.getToken());
+        return user;
+    }
+
+    @Override
+    public User saveNewUserWithActiveStatus(LoginDto loginDto) {
+        if (Optional.ofNullable(loginDto).isEmpty()) {
+            throw new ResourceNotFoundException("User is empty");
+        }
+        if (existByEmail(loginDto.getLogin())) {
+            log.warn("user with email already exist email:{}", loginDto.getLogin());
+            throw new ResourceAlreadyExistException("Email taken");
+        }
+        Saving saving = new Saving();
+        savingRepository.save(saving);
+        Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
+                .orElseThrow(() -> new ResourceNotFoundException("Subscription status does not found in the database"));
+
+        User user = User.builder()
+                .email(loginDto.getLogin())
+                .password(encoder.encode(loginDto.getPassword()))
+                .status(ActiveStatus.ACTIVE)
+                .saving(saving)
+                .role(Role.ROLE_CLIENT)
+                .subscription(subscription)
+                .build();
+        userRepository.save(user);
+        log.info("save user with email:{}", loginDto.getLogin());
         return user;
     }
 
