@@ -4,9 +4,6 @@ import com.projects.oleksii.leheza.cashtruck.domain.Confirmation;
 import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.repository.ConfirmationRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.OtpRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.OtpService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +19,6 @@ public class AuthController {
     private final UserService userService;
     private final ConfirmationRepository confirmationRepository;
     private final OtpService otpService;
-    private final EmailService emailService;
-    private final OtpRepository otpRepository;
-    private final UserRepository userRepository;
-
 
     @GetMapping("/login")
     public String login() {

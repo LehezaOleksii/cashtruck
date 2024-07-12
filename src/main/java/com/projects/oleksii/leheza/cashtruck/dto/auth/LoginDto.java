@@ -1,11 +1,15 @@
 package com.projects.oleksii.leheza.cashtruck.dto.auth;
 
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class LoginDto {
 
     @NotEmpty(message = "Login cannot be empty")
