@@ -1,21 +1,18 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @RequiredArgsConstructor
 @Builder(toBuilder = true)
 @Entity
 @Table(name = "transactions")
 public class Transaction {
-
     @Id
-    @SequenceGenerator(name = "transaction_sequence", sequenceName = "transaction_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "transaction_sequence", sequenceName = "transaction_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transaction_sequence")
     private Long id;
     @ManyToOne
@@ -25,6 +22,6 @@ public class Transaction {
     @JoinColumn(foreignKey = @ForeignKey(name = "fk_transaction_bank_transaction"))
     private BankTransaction bankTransaction;
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
-    private User user;
+    @JoinColumn(name = "bank_card_id", referencedColumnName = "id")
+    private BankCard bankCard;
 }

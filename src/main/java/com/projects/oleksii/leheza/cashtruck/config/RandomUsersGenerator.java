@@ -28,7 +28,6 @@ import java.util.stream.Stream;
 public class RandomUsersGenerator {
 
     private final UserService userService;
-    private final SavingService savingService;
     private final BankCardService bankCardService;
     private final TransactionService transactionService;
     private final BankTransactionService bankTransactionService;
@@ -43,8 +42,7 @@ public class RandomUsersGenerator {
     public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber) {
 //    prepare for client generation
         int allUsers = clientsNumber + managersNumber + adminsNumber;
-        generateBankCards(bankCardsNumber);
-        generateRandomSavings(allUsers);
+        generateBankCards(bankCardsNumber, allUsers);
         generateRandomBankTransactions(transactionNumber);
         List<BankTransaction> allBankTransactions = bankTransactionService.findAll();
         List<BankTransaction> firstBankTransactions = allBankTransactions.subList(1, allBankTransactions.size() / 2);
@@ -73,44 +71,32 @@ public class RandomUsersGenerator {
     }
 
     private void generateRandomUsers(int allUsers, PasswordEncoder passwordEncoder) {
-        List<Saving> savings = savingService.findAll();
-        List<Transaction> allIncomes = transactionService.findAllIncomeTransactions();
-        List<Transaction> allExpenses = transactionService.findAllExpenseTransactions();
         List<String> firstNames = Stream.generate(() -> faker.name().firstName()).limit(allUsers).toList();
         List<String> lastNames = Stream.generate(() -> faker.name().lastName()).limit(allUsers).toList();
-        int incomesPerClient = allIncomes.size() / allUsers;
-        int expensesPerClient = allExpenses.size() / allUsers;
+        List<BankCard> allBankCards = bankCardService.findAll();
         IntStream.range(1, allUsers).forEach(index -> {
-            List<Transaction> incomes = allIncomes.subList(index * (incomesPerClient) - incomesPerClient + 1, index * incomesPerClient);
-            List<Transaction> expenses = allExpenses.subList(index * (expensesPerClient) - expensesPerClient + 1, index * expensesPerClient);
-            List<Transaction> allTransactions = new ArrayList<>();
-            allTransactions.addAll(incomes);
-            allTransactions.addAll(expenses);
             String firstName = firstNames.get(index - 1);
             String lastName = lastNames.get(index - 1);
             String fullName = firstName + lastName;
-            Saving saving = savings.get(index - 1);
-            saveBankCardHolderName(fullName, saving);
+            List<BankCard> bankCards = allBankCards.subList(index, index + 1);
+            saveBankCardHolderName(fullName, bankCards);
             User user = new User();
-            int randomDays = ThreadLocalRandom.current().nextInt(7, 31);
             LocalDate currentDate = LocalDate.now();
-            LocalDate subscriptionFinishDate = currentDate.plusDays(randomDays);
+            LocalDate subscriptionFinishDate = currentDate.plusYears(100);
             Date subscriptionFinishDateLegacy = Date.from(subscriptionFinishDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
             Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
                     .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
-//            String password = passwordEncoder.encode(faker.lorem().sentence(2));
             String password = passwordEncoder.encode("password");
             user = user.toBuilder()
                     .firstName(firstName)
                     .lastName(lastName)
                     .email(faker.internet().emailAddress())
                     .password(password)
-                    .saving(saving)
-                    .transactions(allTransactions)
                     .role(Role.ROLE_CLIENT)
                     .status(ActiveStatus.ACTIVE)
                     .subscription(subscription)
                     .subscriptionFinishDate(subscriptionFinishDateLegacy)
+                    .bankCards(new HashSet<>(bankCards))
                     .build();
             userService.save(user);
         });
@@ -143,50 +129,43 @@ public class RandomUsersGenerator {
         });
     }
 
-    private void generateRandomSavings(int savingNumber) {
-        List<BankCard> bankCards = bankCardService.findAll();
-        List<Saving> savings = IntStream.range(1, savingNumber)
-                .mapToObj(index -> {
-                    Set<BankCard> selectedBankCards = getRandomCards(bankCards, 1, 3);
-                    return Saving.builder()
-                            .bankCards(selectedBankCards)
-                            .build();
-                })
-                .toList();
-        savingService.saveAll(savings);
-    }
-
-    private Set<BankCard> getRandomCards(List<BankCard> bankCards, int minSize, int maxSize) {
-        int clientBankCards = random.nextInt(maxSize - minSize + 1) + minSize;
-        int randomCardNumber = random.nextInt(bankCards.size() - maxSize);
-        return new HashSet<>(bankCards.subList(randomCardNumber, randomCardNumber + Math.min(clientBankCards, bankCards.size())));
-    }
-
-    private void generateBankCards(Integer bankCardsNumber) {
+    private void generateBankCards(Integer bankCardsNumber, int allUsers) {
+        List<Transaction> allIncomes = transactionService.findAllIncomeTransactions();
+        List<Transaction> allExpenses = transactionService.findAllExpenseTransactions();
+        int incomesPerClient = allIncomes.size() / allUsers;
+        int expensesPerClient = allExpenses.size() / allUsers;
         LocalDate startDate = LocalDate.of(2025, 1, 1);
         LocalDate endDate = LocalDate.of(2032, 1, 1);
-        IntStream.range(1, bankCardsNumber + 1).mapToObj(index -> BankCard.builder()
-                .balance(new BigDecimal(random.nextDouble(5000) + 5000))
-                .bankName(faker.company().name())
-                .cardNumber(faker.number().digits(16))
-                .expiringDate(faker.date().between(
-                        Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                        Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant())))
-                .cvv(Integer.toString(random.nextInt(900) + 100))
-                .build()).forEach(bankCardService::save);
+        IntStream.range(0, bankCardsNumber).forEach(index -> {
+            List<Transaction> incomes = allIncomes.subList(index * incomesPerClient, Math.min((index + 1) * incomesPerClient, allIncomes.size()));
+            List<Transaction> expenses = allExpenses.subList(index * expensesPerClient, Math.min((index + 1) * expensesPerClient, allExpenses.size()));
+            List<Transaction> allTransactions = new ArrayList<>();
+            allTransactions.addAll(incomes);
+            allTransactions.addAll(expenses);
+            BankCard bankCard = BankCard.builder()
+                    .balance(BigDecimal.valueOf(random.nextDouble() * 5000 + 5000))
+                    .bankName(faker.company().name())
+                    .cardNumber(faker.number().digits(16))
+                    .expiringDate(faker.date().between(
+                            Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
+                            Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant())))
+                    .cvv(Integer.toString(random.nextInt(900) + 100))
+                    .transactions(new HashSet<>(allTransactions))
+                    .build();
+            bankCardService.save(bankCard);
+            for (Transaction transaction : allTransactions) {
+                transaction.setBankCard(bankCard);
+                transactionService.save(transaction);
+            }
+        });
     }
 
     private void generateRandomBankTransactions(int transactionsNumber) {
-        List<BankCard> allBankCards = bankCardService.findAll();
-        List<BankCard> bankCardsFrom = allBankCards.subList(0, allBankCards.size() / 2);
-        List<BankCard> bankCardsTo = allBankCards.subList(allBankCards.size() / 2, allBankCards.size());
         LocalDateTime now = LocalDateTime.now();
         List<BankTransaction> bankTransactions = IntStream.range(1, transactionsNumber)
                 .mapToObj(index ->
                         BankTransaction.builder()
                                 .sum(new BigDecimal(random.nextDouble() * 1000 + 50))
-                                .from(bankCardsFrom.get(random.nextInt(bankCardsFrom.size())))
-                                .to(bankCardsTo.get(random.nextInt(bankCardsTo.size())))
                                 .name(faker.commerce().productName())
                                 .time(now.minus(random.nextInt(60), ChronoUnit.DAYS))
                                 .build()).toList();
@@ -225,9 +204,9 @@ public class RandomUsersGenerator {
         return start.plusSeconds(randomSeconds);
     }
 
-    private void saveBankCardHolderName(String fullName, Saving saving) {
-        saving.getBankCards().forEach(bankCard -> {
-            bankCard.setNameOnCard(fullName);
+    private void saveBankCardHolderName(String fullName, List<BankCard> bankCards) {
+        bankCards.forEach(bankCard -> {
+            bankCard.setCardHolder(fullName);
             bankCardService.save(bankCard);
         });
     }

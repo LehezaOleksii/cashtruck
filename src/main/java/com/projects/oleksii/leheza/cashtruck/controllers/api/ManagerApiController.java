@@ -2,9 +2,9 @@ package com.projects.oleksii.leheza.cashtruck.controllers.api;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Category;
-import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -48,7 +48,6 @@ public class ManagerApiController {
     private final ImageConvertor imageConvertor;
     private final EmailServiceImpl emailService;
     private final BankCardService bankCardService;
-    private final SavingService savingService;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
 
@@ -110,15 +109,15 @@ public class ManagerApiController {
     @Operation(summary = "Find user`s bank cards by user id", description = "Find a list of user`s bank cards posts by user id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Bank cards retrieved successfully",
-                    content = @Content(schema = @Schema(implementation = BankCard.class))),
+                    content = @Content(schema = @Schema(implementation = BankCardDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping(path = "/users/{userId}/bank_cards")
-    public ResponseEntity<List<BankCard>> getClientBankCardsByClientId(@PathVariable("userId") Long userId) {
-        List<BankCard> bankCards = userService.getBankCardsByUserId(userId);
+    public ResponseEntity<List<BankCardDto>> getClientBankCardsByClientId(@PathVariable("userId") Long userId) {
+        List<BankCardDto> bankCards = userService.getBankCardsByUserId(userId);
         return new ResponseEntity<>(bankCards, bankCards != null ? HttpStatus.OK : HttpStatus.NO_CONTENT);
     }
 
@@ -274,9 +273,9 @@ public class ManagerApiController {
     })
     @PostMapping("/users/{userId}/bank_cards")
     public ResponseEntity<Void> saveBankCardToClient(@PathVariable Long userId,
-                                                     @Valid @RequestBody CreateBankCardDto bankCardDto) {
+                                                     @Valid @RequestBody BankCardDto bankCardDto) {
         BankCard bankCard = bankCardService.save(bankCardDto);
-        savingService.assignBankCardToClient(userId, bankCard);
+//        savingService.assignBankCardToClient(userId, bankCard); //TODO
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
@@ -292,7 +291,7 @@ public class ManagerApiController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PutMapping("/bank_cards")
-    public ResponseEntity<BankCard> updateBankCardData(@Valid @RequestBody CreateBankCardDto bankCardDto) {
+    public ResponseEntity<BankCard> updateBankCardData(@Valid @RequestBody BankCardDto bankCardDto) {
         BankCard bankCard = bankCardService.save(bankCardDto);
         return new ResponseEntity<>(bankCard, HttpStatus.OK);
     }

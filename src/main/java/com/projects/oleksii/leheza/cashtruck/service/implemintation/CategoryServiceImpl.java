@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static java.util.Objects.isNull;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -30,16 +28,15 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final DtoMapper dtoMapper;
 
-
-    @Override
-    public List<Category> findAll() {
-        return categoryRepository.findAll();
-    }
-
-    @Override
-    public Category save(Category category) {
-        return categoryRepository.save(category);
-    }
+//    @Override TODO
+//    public List<Category> findAll() {
+//        return categoryRepository.findAll();
+//    }
+//
+//    @Override
+//    public Category save(Category category) {
+//        return categoryRepository.save(category);
+//    }
 
     @Override
     public Category save(CreateCategoryDto category) {
@@ -64,7 +61,7 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<CategoryDto> findAllDtos() {
+    public List<CategoryDto> findAllCategories() {
         return categoryRepository.findAll().stream()
                 .map(dtoMapper::categoryToDto)
                 .toList();
@@ -81,11 +78,9 @@ public class CategoryServiceImpl implements CategoryService {
                 .size(pageSize)
                 .totalSize(categories.size())
                 .build();
-        if (!isNull(pageNumber) && !isNull(pageSize)) {
-            categoriesPageDto = categoriesPageDto.toBuilder()
-                    .totalPage((int) Math.ceil((double) categories.size() / pageSize))
-                    .build();
-        }
+        categoriesPageDto = categoriesPageDto.toBuilder()
+                .totalPage((int) Math.ceil((double) categories.size() / pageSize))
+                .build();
         return categoriesPageDto;
     }
 

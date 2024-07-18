@@ -1,10 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.controllers.api;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
@@ -39,7 +39,6 @@ public class ClientApiController {
 
     private final UserService userService;
     private final BankCardService bankCardService;
-    private final SavingService savingService;
     private final TransactionService transactionService;
     private final EmailService emailService;
 
@@ -62,21 +61,21 @@ public class ClientApiController {
     @Operation(summary = "Find user`s bank cards by user id", description = "Find a list of user`s bank cards posts by user id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Bank cards retrieved successfully",
-                    content = @Content(schema = @Schema(implementation = BankCard.class))),
+                    content = @Content(schema = @Schema(implementation = BankCardDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "500", description = "Internal server error",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping(path = "/{userId}/bank_cards")
-    public ResponseEntity<List<BankCard>> getUserBankCards(@PathVariable(value = "userId") Long clientId) {
+    public ResponseEntity<List<BankCardDto>> getUserBankCards(@PathVariable(value = "userId") Long clientId) {
         return new ResponseEntity<>(userService.getBankCardsByUserId(clientId), HttpStatus.OK);
     }
 
     @Operation(summary = "Find bank card by id", description = "Find bank card by its id.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Bank card found successfully",
-                    content = @Content(schema = @Schema(implementation = BankCard.class))),
+                    content = @Content(schema = @Schema(implementation = BankCardDto.class))),
             @ApiResponse(responseCode = "400", description = "Bad request",
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
             @ApiResponse(responseCode = "404", description = "Bank card is not found",
@@ -85,7 +84,7 @@ public class ClientApiController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @GetMapping(path = "/bank_cards/{bankCardId}")
-    public ResponseEntity<BankCard> getBankCardById(@PathVariable(value = "bankCardId") Long bankCardId) {
+    public ResponseEntity<BankCardDto> getBankCardById(@PathVariable(value = "bankCardId") Long bankCardId) {
         return new ResponseEntity<>(bankCardService.getById(bankCardId), HttpStatus.OK);
     }
 
@@ -102,9 +101,9 @@ public class ClientApiController {
     })
     @PostMapping(path = "/{userId}/bank_cards")
     public ResponseEntity<BankCard> saveBankCardToUser(@PathVariable Long userId,
-                                                       @Valid @RequestBody CreateBankCardDto bankCardDto) {
+                                                       @Valid @RequestBody BankCardDto bankCardDto) {
         BankCard bankCard = bankCardService.save(bankCardDto);
-        savingService.assignBankCardToClient(userId, bankCard);
+//        savingService.assignBankCardToClient(userId, bankCard); //TODO
         return new ResponseEntity<>(bankCard, HttpStatus.OK);
     }
 
@@ -122,7 +121,7 @@ public class ClientApiController {
                     content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     })
     @PutMapping(path = "/bank_cards")
-    public ResponseEntity<BankCard> updateBankCard(@Valid @RequestBody CreateBankCardDto bankCardDto) {
+    public ResponseEntity<BankCard> updateBankCard(@Valid @RequestBody BankCardDto bankCardDto) {
         BankCard bankCard = bankCardService.save(bankCardDto);
         return new ResponseEntity<>(bankCard, HttpStatus.OK);
     }

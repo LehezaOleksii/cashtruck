@@ -8,9 +8,9 @@
     <meta charset="utf-8" />
     <title>Cash truck</title>
 </head>
-<body th:object="${user}">
+<body th:object="${manager}">
 <main layout:fragment="content">
-    <form method="post" th:object="${clientDto}" th:action="@{'/managers/users/'+ ${user.id}+'/update'}">
+    <form method="post" th:object="${clientDto}" th:action="@{'/managers/users/'+ ${clientDto.id}+'/update'}">
         <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
             <span th:text="${errorMessage}"></span>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -55,27 +55,6 @@
                                        th:text="${#strings.listJoin(#fields.errors('email'), ', ')}" class="text-danger">
                                     Please provide a valid email.
                                 </small>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="profile-atribute">Password</div>
-                            <div class="form-outline">
-                                <input id="password" type="text" th:field="*{password}" placeholder="Password" class="form-control" required/>
-                                <small th:if="${#fields.hasErrors('password')}"
-                                       th:errors="*{password}"
-                                       th:text="${#strings.listJoin(#fields.errors('password'), ', ')}" class="text-danger">
-                                    Please provide a valid password.
-                                </small>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row mb-4">
-                        <div class="col">
-                            <div class="profile-atribute">Status</div>
-                            <div class="form-outline">
-                                <select id="status" name="status" class="form-control">
-                                    <option th:each="status : ${statuses}" th:value="${status}" th:text="${status.toString()}" th:selected="${clientDto.status == status}"></option>
-                                </select>
                             </div>
                         </div>
                     </div>

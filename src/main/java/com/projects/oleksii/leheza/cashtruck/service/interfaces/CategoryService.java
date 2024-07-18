@@ -9,13 +9,11 @@ import java.util.List;
 
 public interface CategoryService {
 
-
-    List<Category> findAll();
-
-    Category save(Category category);
+//    List<Category> findAll();TODO
+//
+//    Category save(Category category);
 
     Category save(CreateCategoryDto category);
-
 
     List<Category> findAllIncomeCategories();
 
@@ -23,8 +21,9 @@ public interface CategoryService {
 
     CategoryDto findByName(String categoryName);
 
-    List<CategoryDto> findAllDtos();
+    List<CategoryDto> findAllCategories();
 
     PageDto<CategoryDto> findAll(Integer pageNumber, Integer pageSize);
+
     CreateCategoryDto findById(Long categoryId);
 }

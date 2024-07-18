@@ -29,10 +29,11 @@
                                 <option value="EXPENSE">Expense</option>
                             </select>
                         </div>
-                        <div class="mb-3">
-                            <label for="category name" class="form-label">Category name</label>
-                            <input type="text" class="form-control" id="category name" placeholder="category name"
+                         <div class="mb-3">
+                            <label for="categoryName" class="form-label">Category name</label>
+                            <input type="text" class="form-control" id="categoryName" placeholder="category name"
                                    th:field="*{categoryName}" required>
+                            <div class="text-danger" th:if="${#fields.hasErrors('categoryName')}" th:errors="*{categoryName}">Category name error</div>
                         </div>
                         <button type="submit" class="btn btn-primary custom-back-violet">Submit</button>
                     </form>

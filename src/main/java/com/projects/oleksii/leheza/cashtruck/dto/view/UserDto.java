@@ -1,12 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.dto.view;
 
-import com.projects.oleksii.leheza.cashtruck.domain.Saving;
+import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,7 +24,7 @@ public class UserDto {
     private String phoneNumber;
     private String country;
     private String language;
-    private Saving saving;
+    private Set<BankCard> bankCards;
     private String avatar;
     private String role;
     private String status;

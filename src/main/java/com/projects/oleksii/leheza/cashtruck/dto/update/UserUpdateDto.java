@@ -1,6 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.dto.update;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @AllArgsConstructor
@@ -19,9 +22,5 @@ public class UserUpdateDto {
     @NotBlank
     @Email(message = "Invalid email format")
     private String email;
-    @Size(min = 8, message = "Password must be at least 8 characters long")
-    @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).*$", message = "Password must contain at least one lowercase letter, one uppercase letter, and one digit")
-    private String password;
-    private String status;
     private String avatar;
 }

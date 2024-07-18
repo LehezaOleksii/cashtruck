@@ -11,7 +11,7 @@
   <body th:object="${manager}">
     <main layout:fragment="content">
         <div id = "managerId" th:text="${manager.id}" style="display: none"></div>
-        <form th:action="@{/managers/{managerId}/users/filter(managerId=${managerId})}" method="get">
+        <form th:action="@{/managers/users/filter}" method="get">
 
         <div class="my-container mt-4">
             <div class="pt-4 pl-4">
@@ -32,9 +32,9 @@
                     <div class="col-md-4">
                         <select id="roleFilter"  name="role" class="form-select px-2" aria-label="Default select example">
                             <option value="" selected>Select role</option>
-                            <option value="ADMIN">Admin</option>
-                            <option value="MANAGER">Manager</option>
-                            <option value="CLIENT">Client</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                            <option value="ROLE_MANAGER">Manager</option>
+                            <option value="ROLE_CLIENT">Client</option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -64,7 +64,7 @@
                     <script>
                         document.getElementById("cancelButton").addEventListener("click", function() {
                             var managerId = document.getElementById("managerId").innerText;
-                            window.location.href = 'http://localhost:8080/managers/' + managerId + '/users';
+                            window.location.href = 'http://localhost:8080/managers/users';
                         });
                     </script>
                 </div>
@@ -135,8 +135,8 @@
                                                     Upgrade role
                                                 </button>
                                             </li>
-                                            <li th:if="${user.status =='Banned'}"><button class="dropdown-item" type="button" id="unblockUser"  th:data-user-id="${user.id}">Unblock</button></li>
-                                            <li th:if="${user.status !='Banned'}"><button class="dropdown-item" type="button" id="blockUser"  th:data-user-id="${user.id}">Block</button></li>
+                                            <li th:if="${user.status =='BANNED'}"><button class="dropdown-item" type="button" id="unblockUser"  th:data-user-id="${user.id}">Unblock</button></li>
+                                            <li th:if="${user.status !='BANNED'}"><button class="dropdown-item" type="button" id="blockUser"  th:data-user-id="${user.id}">Block</button></li>
                                         </ul>
                                 </span>
                             </td>
@@ -146,15 +146,15 @@
         <nav aria-label="Page navigation example" class="d-flex justify-content-center">
             <ul class="pagination">
                 <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
-                    <a class="page-link" th:if="${currentPage > 0}" th:href="@{'/managers/' + ${managerId} + '/users?page=' + ${currentPage - 1} + '&size=' + ${10}}" aria-label="Previous">
+                    <a class="page-link" th:if="${currentPage > 0}" th:href="@{'/managers/users?page=' + ${currentPage - 1} + '&size=' + ${10}}" aria-label="Previous">
                         <span aria-hidden="true">&laquo;</span>
                     </a>
                 </li>
                 <li class="page-item" th:each="pageNumber : ${#numbers.sequence(0, totalPages - 1)}">
-                    <a class="page-link" th:href="@{'/managers/' + ${managerId} + '/users?page=' + ${pageNumber} + '&size=' + ${10}}" th:text="${pageNumber + 1}"></a>
+                    <a class="page-link" th:href="@{'/managers/users?page=' + ${pageNumber} + '&size=' + ${10}}" th:text="${pageNumber + 1}"></a>
                 </li>
                 <li class="page-item" th:class="${currentPage == totalPages - 1 ? 'disabled' : ''}">
-                    <a class="page-link" th:if="${currentPage < totalPages - 1}" th:href="@{'/managers/' + ${managerId} + '/users?page=' + ${currentPage + 1} + '&size=' + ${10}}" aria-label="Next">
+                    <a class="page-link" th:if="${currentPage < totalPages - 1}" th:href="@{'/managers/users?page=' + ${currentPage + 1} + '&size=' + ${10}}" aria-label="Next">
                         <span aria-hidden="true">&raquo;</span>
                     </a>
                 </li>
@@ -180,7 +180,7 @@
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
                             var managerId = document.getElementById('managerId').innerText;
-                            var unblockUserUrl = '/managers/' + managerId + '/users/' + userId + '/unblock';
+                            var unblockUserUrl = '/managers/users/' + userId + '/unblock';
                             window.location.href = unblockUserUrl;});
                     });
                 </script>
@@ -189,7 +189,7 @@
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
                             var managerId = document.getElementById('managerId').innerText;
-                            var userProfileInfoUrl = '/managers/' + managerId + '/users/' + userId;
+                            var userProfileInfoUrl = '/managers/users/' + userId;
                             window.location.href = userProfileInfoUrl;});
                     });
                 </script>
@@ -210,7 +210,7 @@
                                     document.getElementById('confirmBlock').addEventListener('click', function() {
                                         var userId = this.getAttribute('data-user-id');
                                         var managerId = document.getElementById('managerId').innerText;
-                                        var blockUserUrl = '/managers/' + managerId + '/users/' + userId + '/block';
+                                        var blockUserUrl = '/managers/users/' + userId + '/block';
                                         window.location.href = blockUserUrl;});
                                     document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
                                         $('#confirmationModal').modal('hide');
@@ -238,9 +238,9 @@
                             <div class="mb-3">
                                 <label for="roleSelect" class="form-label">Select Role:</label>
                                 <select class="form-select" id="roleSelect" name="role">
-                                    <option value="CLIENT">Client</option>
-                                    <option value="MANAGER">Manager</option>
-                                    <option value="ADMIN">Admin</option>
+                                    <option value="ROLE_CLIENT">Client</option>
+                                    <option value="ROLE_MANAGER">Manager</option>
+                                    <option value="ROLE_ADMIN">Admin</option>
                                 </select>
                             </div>
                             <button type="button" class="btn btn-primary custom-back-violet" id="submitUpgradeRole">
@@ -264,11 +264,10 @@
                     var userId = document.getElementById('selectedUserId').value; // Get the user id from the hidden field
                     var managerId = document.getElementById('managerId').innerText;
                     var status = document.getElementById('roleSelect').value;
-                    var updateUrl = '/admins/' + managerId + '/users/' + userId + '/role/update?role=' + status;
+                    var updateUrl = '/admins/users/' + userId + '/role/update?role=' + status;
                     window.location.href = updateUrl;
                 });
             });
-
         </script>
     </main>
 </body>

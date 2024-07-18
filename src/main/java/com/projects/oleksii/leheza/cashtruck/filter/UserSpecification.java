@@ -52,7 +52,10 @@ public class UserSpecification {
 
     public Specification<User> planLike(UserSearchCriteria criteria) {
         return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("plan"), "%" + criteria.getPlan() + "%");
+                criteriaBuilder.like(
+                        root.join("subscription").get("subscriptionStatus"),
+                        "%" + criteria.getPlan() + "%"
+                );
     }
 
     public Specification<User> emailLike(UserSearchCriteria criteria) {

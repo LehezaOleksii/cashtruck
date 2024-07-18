@@ -1,6 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
-import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
+import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 
 public interface EmailService {
 

@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.service.implemintation;
+package com.projects.oleksii.leheza.cashtruck.security;
 
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;

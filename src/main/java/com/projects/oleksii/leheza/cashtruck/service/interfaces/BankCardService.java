@@ -1,27 +1,23 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 
 import java.util.List;
 
 public interface BankCardService {
 
-    BankCard save(BankCard bankCard);
+    BankCard save(BankCardDto bankCard);
 
-    BankCard save(CreateBankCardDto bankCard);
+    BankCardDto getById(Long id);
 
-    BankCard getBankCardByBankNumber(String bankNumber);
-
-    BankCard getById(Long id);
-
-    List<BankCard> findAll();
-
-    boolean isClientHasCard(Long userId, BankCard bankCard);
-
-    boolean isClientHasCard(Long userId, CreateBankCardDto createBankCardDto);
+    boolean isClientHasCard(Long userId, String cardNumber);
 
     boolean isClientHasCard(Long userId, Long cardId);
 
     void removeBankCardForClient(Long bankCardId, Long clientId);
+
+    BankCard save(BankCard bankCard);
+
+    List<BankCard> findAll();
 }

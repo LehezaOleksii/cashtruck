@@ -1,17 +1,17 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateBankCardDto;
+import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
+import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
-import com.projects.oleksii.leheza.cashtruck.exception.UserPlanException;
+import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,18 +34,17 @@ public class ClientController {
 
     private final UserService userService;
     private final BankCardService bankCardService;
-    private final SavingService savingService;
     private final TransactionService transactionService;
     private final CategoryService categoryService;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @GetMapping(path = "/dashboard")
     public ModelAndView showClientDashboard(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
-        UserHeaderDto client = userService.getHeaderClientData(userId);
         ModelAndView modelAndView = new ModelAndView("client/dashboard");
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
-        modelAndView.addObject("client", client);
+        modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(userId));
         return modelAndView;
     }
@@ -54,45 +53,32 @@ public class ClientController {
     public ModelAndView clientBankCardsForm(@RequestParam(required = false) Long bankCardId,
                                             @AuthenticationPrincipal User user) {
         Long userId = user.getId();
-        if (bankCardId!=null && !bankCardService.isClientHasCard(userId, bankCardId)) {
+        if (bankCardId != null && !bankCardService.isClientHasCard(userId, bankCardId)) {
             throw new SecurityException("user has not card with id:" + bankCardId);
         }
         ModelAndView modelAndView = new ModelAndView("client/add_bank_card");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));//TODO use DTO
-        modelAndView.addObject("userId", userService.getUserById(userId).getId());//TODO use DTO
+        modelAndView.addObject("client", userService.getHeaderClientData(userId));
         if (Optional.ofNullable(bankCardId).isPresent()) {
-            BankCard bankCard = bankCardService.getById(bankCardId);
-            modelAndView.addObject("bank_card", CreateBankCardDto.builder().bankName(bankCard.getBankName())
-                    .nameOnCard(bankCard.getNameOnCard())
-                    .id(bankCardId)
-                    .expiringDate(bankCard.getExpiringDate())
-                    .cardNumber(bankCard.getCardNumber())
-                    .balance(Double.parseDouble(bankCard.getBalance().toString()))
-                    .cvv(bankCard.getCvv()).build());
+            modelAndView.addObject("bank_card", bankCardService.getById(bankCardId));
         } else {
-            modelAndView.addObject("bank_card", new CreateBankCardDto());
+            modelAndView.addObject("bank_card", new BankCardDto());
         }
         return modelAndView;
     }
 
     @PostMapping("/bank_cards/save")
-    public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto,
+    public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") BankCardDto bankCardDto,
                                              @AuthenticationPrincipal User user,
                                              BindingResult bindingResult) {
+        //TODO bindingResult and valid checking
         Long userId = user.getId();
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the save bank card process. userId:{} ,bank card number{}", userId, bankCardDto.getCardNumber());
-            return new ModelAndView("client/add_bank_card")
-                    .addObject("client", userService.getHeaderClientData(userId));
+            return new ModelAndView("redirect:/clients/bank_cards");
         }
-        if (!bankCardService.isClientHasCard(userId, bankCardDto)) {
-            try {
-                BankCard bankCard = bankCardService.save(bankCardDto);
-                savingService.assignBankCardToClient(userId, bankCard);
-            } catch (UserPlanException ex) {
-                log.warn("user with id: {} has bank card with number:{}", userId, bankCardDto.getCardNumber());
-                return new ModelAndView("redirect:/clients/premium");
-            }
+        BankCard bankCard = bankCardService.save(bankCardDto);
+        if (!bankCardService.isClientHasCard(userId, bankCardDto.getCardNumber())) {
+            userService.assignBankCardToClient(userId, bankCard);
         }
         return new ModelAndView("redirect:/clients/dashboard");
     }
@@ -103,17 +89,8 @@ public class ClientController {
         ModelAndView modelAndView = new ModelAndView("client/update_delete_bank_card");
         UserHeaderDto userHeaderDto = userService.getHeaderClientData(userId);
         modelAndView.addObject("client", userHeaderDto);
-        modelAndView.addObject("bank_cards", userService.getUserById(userId).getSaving().getBankCards());
+        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         return modelAndView;
-    }
-
-    @PutMapping("/bank_cards")
-    public ModelAndView updateBankCardData(@Valid @ModelAttribute("bank_card") CreateBankCardDto bankCardDto,
-                                           @AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        bankCardService.save(bankCardDto);
-//        savingService.assignBankCardToClient(userId, bankCardService.getBankCardByBankNumber(bankCardDto.getCardNumber()));
-        return new ModelAndView("redirect:/clients/dashboard");
     }
 
     @GetMapping("/bank_cards/remove")
@@ -131,7 +108,7 @@ public class ClientController {
     public ModelAndView viewIncomeAndExpensesDashboard(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/categories");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));//TODO Optimise maybe (it will be a lot of dto)
+        modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(userId));
         modelAndView.addObject("expenses_categories", transactionService.findClientExpenseCategoriesByClientId(userId));
         return modelAndView;
@@ -160,8 +137,7 @@ public class ClientController {
         ModelAndView modelAndView = new ModelAndView("client/profile");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
-        UserUpdateDto userUpdateDto = userService.getClientUpdateDto(userId);
-        modelAndView.addObject("clientDto", userUpdateDto);
+        modelAndView.addObject("clientDto", userService.getClientUpdateDto(userId));
         return modelAndView;
     }
 
@@ -195,7 +171,7 @@ public class ClientController {
         ModelAndView modelAndView = new ModelAndView("client/plans");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
-        modelAndView.addObject("client_plan", userService.getUserById(userId).getSubscription());
+        modelAndView.addObject("client_plan", userService.getUserSubscriptionById(userId).getSubscriptionStatus().name());
         modelAndView.addObject("payment_request", new PaymentCreateRequest());
         return modelAndView;
     }
@@ -204,7 +180,7 @@ public class ClientController {
     ModelAndView getEmailsMenu(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/emails");
-        modelAndView.addObject("client", userService.getUserDto(userId));
+        modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("email", new EmailContext());
         modelAndView.addObject("managers", userService.getUsersByRole(Role.ROLE_MANAGER));
         return modelAndView;
@@ -212,11 +188,10 @@ public class ClientController {
 
 
     @PostMapping(path = "/emails/send")
-    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email, @AuthenticationPrincipal User user) {
-        Long userId = user.getId();
+    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email,
+                           @AuthenticationPrincipal User user) { //TODO
         log.info("start sending email to user with email: {}", email.getTo());
         emailService.sendEmailWithAttachment(email);
-        log.info("finish sending email to user with email: {}", email.getTo());
         return new ModelAndView("redirect:/clients/emails");
     }
 
@@ -224,7 +199,7 @@ public class ClientController {
     ModelAndView createTransactionForm(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/create_transaction");
-        modelAndView.addObject("client", userService.getUserDto(userId));
+        modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("incomes", categoryService.findAllIncomeCategories());
         modelAndView.addObject("expenses", categoryService.findAllExpensesCategories());
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
@@ -244,7 +219,7 @@ public class ClientController {
                                         @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         userService.updateUserPlan(userId, SubscriptionStatus.valueOf(subscriptionStatus));
-        log.info("User status was updated by client controller. user id:{}, user status:{}", userId, subscriptionStatus);
+        log.info("User status was updated. user id:{}, user status:{}", userId, subscriptionStatus);
         return new ModelAndView("redirect:/clients/premium");
     }
 }

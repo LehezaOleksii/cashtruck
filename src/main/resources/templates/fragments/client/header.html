@@ -11,12 +11,11 @@
          </a>
          <ul class="dropdown-menu text-small shadow dropdown-menu-end" aria-labelledby="dropdownUser2">
             <li>
-               <a class="dropdown-item" th:href="@{'/clients/' + ${client.id} + '/profile'}">
+               <a class="dropdown-item" th:href="@{'/clients/profile'}">
                   Profile
                </a>
             </li>
-            <li><a class="dropdown-item" href="#">Email</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" th:href="@{'/clients/emails'}">Email</a></li>
             <li><hr class="dropdown-divider"></li>
             <li>
                <form th:action="@{/auth/logout}" method="post">

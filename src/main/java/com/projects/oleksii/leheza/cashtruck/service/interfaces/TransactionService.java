@@ -10,16 +10,6 @@ import java.util.List;
 
 public interface TransactionService {
 
-//      void createCategory(Category expensesCategory);
-//
-//      void changeCategory(Long expensesCategoryId, Category expensesCategory);
-//
-//      void deleteCategory(Long expensesCategoryId);
-//
-//      List<Category> findAll();
-
-//    void saveIncome(Income income, Long clientId);
-
     List<Transaction> findAll();
 
     Transaction save(Transaction transaction); //TODO return Optional/entity
@@ -27,10 +17,6 @@ public interface TransactionService {
     List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId);
 
     List<CategoryInfoDto> findClientExpenseCategoriesByClientId(Long clientId);
-
-    List<TransactionDto> findIncomeTransactionsByClientId(Long clientId);
-
-    List<TransactionDto> findExpenseTransactionsByClientId(Long clientId);
 
     Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int page,int size);
 

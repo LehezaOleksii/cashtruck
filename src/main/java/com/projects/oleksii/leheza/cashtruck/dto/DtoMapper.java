@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.dto;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
@@ -10,11 +11,11 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
-import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -28,6 +29,7 @@ public class DtoMapper {
 
     private final ImageConvertor imageConvertor;
     private final ImageService imageService;
+    private final PasswordEncoder passwordEncoder;
 
     public TransactionDto transactionToDto(Transaction transaction) {
         return TransactionDto.builder()
@@ -90,17 +92,14 @@ public class DtoMapper {
                 .password(user.getPassword())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
-                .language(user.getLanguage())
-                .country(user.getCountry())
-                .phoneNumber(user.getPhoneNumber())
-                .saving(user.getSaving())
-                .expenses(user.getTransactions().stream()
-                        .filter(transaction -> transaction.getCategory().getTransactionType()
-                                .equals(TransactionType.EXPENSE))
+                .bankCards(user.getBankCards())
+                .expenses(user.getBankCards().stream()
+                        .flatMap(bankCard -> bankCard.getTransactions().stream())
+                        .filter(transaction -> transaction.getCategory().getTransactionType().equals(TransactionType.EXPENSE))
                         .collect(Collectors.toList()))
-                .incomes(user.getTransactions().stream()
-                        .filter(transaction -> transaction.getCategory().getTransactionType()
-                                .equals(TransactionType.EXPENSE))
+                .incomes(user.getBankCards().stream()
+                        .flatMap(bankCard -> bankCard.getTransactions().stream())
+                        .filter(transaction -> transaction.getCategory().getTransactionType().equals(TransactionType.INCOME))
                         .collect(Collectors.toList()))
                 .role(String.valueOf(user.getRole()))
                 .status(String.valueOf(user.getStatus()))
@@ -114,24 +113,21 @@ public class DtoMapper {
         return dto;
     }
 
-    public User dtoToClient(UserDto clientdto) {
-        List<Transaction> transactions = clientdto.getIncomes();
-        transactions.addAll(clientdto.getExpenses());
-        return User.builder()
-                .id(clientdto.getId())
-                .firstName(clientdto.getFirstName())
-                .lastName(clientdto.getLastName())
-                .avatar(new Image(clientdto.getAvatar().getBytes()))
-                .language(clientdto.getLanguage())
-                .email(clientdto.getEmail())
-                .password(clientdto.getPassword())
-                .phoneNumber(clientdto.getPhoneNumber())
-                .country(clientdto.getCountry())
-                .saving(clientdto.getSaving())
-                .transactions(transactions)
-                .status(ActiveStatus.valueOf(clientdto.getStatus()))
-                .build();
-    }
+//    public User dtoToClient(UserDto clientdto) { TODO
+//        List<Transaction> transactions = clientdto.getIncomes();
+//        transactions.addAll(clientdto.getExpenses());
+//        return User.builder()
+//                .id(clientdto.getId())
+//                .firstName(clientdto.getFirstName())
+//                .lastName(clientdto.getLastName())
+//                .avatar(new Image(clientdto.getAvatar().getBytes()))
+//                .email(clientdto.getEmail())
+//                .password(clientdto.getPassword())
+//                .bankCards(clientdto.getBankCards())
+//                .transactions(transactions)
+//                .status(ActiveStatus.valueOf(clientdto.getStatus()))
+//                .build();
+//    }
 
     public UserUpdateDto clientToClientUpdateDto(User user) {
         UserUpdateDto userUpdateDto = new UserUpdateDto();
@@ -146,8 +142,6 @@ public class DtoMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .password(user.getPassword())
-                .status(String.valueOf(user.getStatus()))
                 .build();
     }
 
@@ -158,7 +152,6 @@ public class DtoMapper {
                 .lastName(userUpdateDto.getLastName())
                 .avatar(new Image(imageConvertor.convertStringToByteImage(userUpdateDto.getAvatar())))
                 .email(userUpdateDto.getEmail())
-                .password(userUpdateDto.getPassword())
                 .build();
     }
 
@@ -175,10 +168,7 @@ public class DtoMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .password(user.getPassword())
-                .language(user.getLanguage())
-                .country(user.getCountry())
-                .phoneNumber(user.getPhoneNumber())
+                .password(passwordEncoder.encode(user.getPassword()))
                 .role(user.getRole().toString())
                 .status(String.valueOf(user.getStatus()))
                 .build();
@@ -190,11 +180,8 @@ public class DtoMapper {
                 .firstName(userDto.getFirstName())
                 .lastName(userDto.getLastName())
                 .avatar(new Image(imageConvertor.convertStringToByteImage(userDto.getAvatar())))
-                .language(userDto.getLanguage())
                 .email(userDto.getEmail())
                 .password(userDto.getPassword())
-                .phoneNumber(userDto.getPhoneNumber())
-                .country(userDto.getCountry())
                 .build();
     }
 
@@ -218,6 +205,30 @@ public class DtoMapper {
         return PaymentCreateRequest.builder()
                 .price(subscription.getPrice().longValue())
                 .subscriptionPlan(subscription.getSubscriptionStatus().name())
+                .build();
+    }
+
+    public BankCard bankCardDtoToBankCard(BankCardDto bankCardDto) {
+        return BankCard.builder()
+                .id(bankCardDto.getId())
+                .cvv(bankCardDto.getCvv())
+                .bankName(bankCardDto.getBankName())
+                .cardNumber(bankCardDto.getCardNumber())
+                .cardHolder(bankCardDto.getCardHolder())
+                .expiringDate(bankCardDto.getExpiringDate())
+                .balance(BigDecimal.valueOf(bankCardDto.getBalance()))
+                .build();
+    }
+
+    public BankCardDto bankCardToBankCardDto(BankCard bankCard) {
+        return BankCardDto.builder()
+                .id(bankCard.getId())
+                .cvv(bankCard.getCvv())
+                .bankName(bankCard.getBankName())
+                .cardNumber(bankCard.getCardNumber())
+                .cardHolder(bankCard.getCardHolder())
+                .expiringDate(bankCard.getExpiringDate())
+                .balance(bankCard.getBalance().doubleValue())
                 .build();
     }
 }

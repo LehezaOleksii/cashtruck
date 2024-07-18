@@ -42,9 +42,10 @@ public class SecurityConfig {
                         .requestMatchers("/clients/**").hasAnyRole("CLIENT", "MANAGER", "ADMIN")
                         .requestMatchers("/managers/**").hasAnyRole("MANAGER", "ADMIN")
                         .requestMatchers("/admins/**").hasAnyRole("ADMIN")
-                        .requestMatchers("/auth/**", "/js/client/**", "/css/**").permitAll()
+                        .requestMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
+
                 .oauth2Login(oAuth2 -> oAuth2
                         .loginPage("/auth/login")
                         .successHandler(customAuthenticationSuccessHandler)
@@ -58,11 +59,6 @@ public class SecurityConfig {
                         .rememberMeServices(rememberMeServices(userDetailsService))
                 );
         return http.build();
-//        http
-//                .authorizeHttpRequests(authorize -> authorize
-//                        .anyRequest().authenticated()
-//                ).oauth2Login(Customizer.withDefaults());
-//        return http.build();
     }
 
     @Bean

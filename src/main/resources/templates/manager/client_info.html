@@ -213,7 +213,7 @@
         <div th:each="card : ${bank_cards}" class="cardMaster border p-3 rounded mb-3">
             <div class="d-flex justify-content-between flex-sm-row flex-column">
                 <div class="card-information">
-                    <h6 class="mb-1" th:text="${card.nameOnCard}">Card Holder Name</h6>
+                    <h6 class="mb-1" th:text="${card.cardHolder}">Card Holder Name</h6>
                     <span class="card-number" th:text="${card.cardNumber}">Card Number</span>
                 </div>
                 <div class="d-flex flex-column text-start text-lg-end">
@@ -257,7 +257,7 @@
             var clientId = document.getElementById('userId').innerText;
             var managerId = document.getElementById('managerId').innerText;
             var status = document.getElementById('statusSelect').value;
-            var updateUrl = '/managers/' + managerId + '/users/' + clientId + '/plan/update?status=' + status;
+            var updateUrl = '/managers/users/' + clientId + '/plan/update?status=' + status;
             window.location.href = updateUrl;
         });
     </script>
@@ -266,7 +266,7 @@
             var clientId = document.getElementById('userId').innerText;
             var managerId = document.getElementById('managerId').innerText;
             var status = document.getElementById('statusSelect').value;
-            var updateUrl = '/managers/' + managerId + '/users/' + clientId + '/update/form';
+            var updateUrl = '/managers/users/' + clientId + '/update/form';
             window.location.href = updateUrl;
         });
     </script>

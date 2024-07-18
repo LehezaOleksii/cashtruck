@@ -17,10 +17,10 @@ public class AdminController {
 
     private final UserService userService;
 
-    @GetMapping(path = "/{adminId}/users/{userId}/role/update")
-    ModelAndView updatePlanStatus(@PathVariable("adminId") Long adminId, @PathVariable("userId") Long userId,
+    @GetMapping(path = "/users/{userId}/role/update")
+    ModelAndView updatePlanStatus(@PathVariable("userId") Long userId,
                                   @RequestParam("role") String status) {
         userService.updateUserRole(userId, Role.valueOf(status));
-        return new ModelAndView("redirect:/managers/" + adminId + "/users");
+        return new ModelAndView("redirect:/managers/users");
     }
 }

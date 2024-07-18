@@ -3,29 +3,26 @@ package com.projects.oleksii.leheza.cashtruck.domain;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
 @Entity
-@Table
+@Table(name = "categories")
 public final class Category {
-
     @Id
-    @SequenceGenerator(name = "category_sequence", sequenceName = "category_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "category_sequence", sequenceName = "category_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_sequence")
     private Long id;
+    @NotNull
     @Enumerated(EnumType.ORDINAL)
     private TransactionType transactionType;
-    @NotEmpty
     @NotBlank
-    @Column(name = "name", length = 50)
+    @Column(length = 50)
     private String name;
 
     public Category(TransactionType transactionType, String name) {

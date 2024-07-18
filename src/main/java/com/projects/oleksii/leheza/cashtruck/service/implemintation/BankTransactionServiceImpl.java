@@ -6,7 +6,6 @@ import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankTransactionS
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,12 +16,6 @@ public class BankTransactionServiceImpl implements BankTransactionService {
 
     @Override
     public BankTransaction save(BankTransaction bankTransaction) {
-        return bankTransactionRepository.save(bankTransaction);
-    }
-
-    @Override
-    public BankTransaction saveTransaction(BankTransaction bankTransaction, LocalDateTime time) {
-        bankTransaction.setTime(time);
         return bankTransactionRepository.save(bankTransaction);
     }
 

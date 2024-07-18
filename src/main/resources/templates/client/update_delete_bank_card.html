@@ -49,7 +49,7 @@
        <div class="additional-info mt-4">       
         <div type="hidden" class="cardId" id="cardId" th:text="${card != null ? card.id : '-'}" style="display: none;"></div>
               <div> Bank card number: <span class="cardNumber" th:text="${card != null ? card.cardNumber : '-'}"></span></div>
-              <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
+              <div> Holder: <span class="cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
               <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
                          
@@ -114,7 +114,7 @@ $('#confirmationModal').modal('hide');
                         </div>
                         <div class="card-number cardNumber"></div>
                         <div class="card-holder-and-expiry">
-                        <div class="card-holder nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></div>
+                        <div class="card-holder cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></div>
                         <div class="expiry expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></div>
                         </div>
                     </div> 
@@ -195,9 +195,9 @@ $('#confirmationModal').modal('hide');
             elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
         }
 
-        var elementsWithNameOnCardClass = document.getElementsByClassName('nameOnCard');
-        for (var i = 0; i < elementsWithNameOnCardClass.length; i++) {
-            elementsWithNameOnCardClass[i].innerText = selectedCard.nameOnCard;
+        var elementsWithcardHolderClass = document.getElementsByClassName('cardHolder');
+        for (var i = 0; i < elementsWithcardHolderClass.length; i++) {
+            elementsWithcardHolderClass[i].innerText = selectedCard.cardHolder;
         }
 
          var elementsWithCardIdClass = document.getElementsByClassName('cardId');

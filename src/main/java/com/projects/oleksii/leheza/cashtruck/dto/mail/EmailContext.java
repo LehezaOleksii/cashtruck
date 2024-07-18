@@ -1,4 +1,4 @@
-package com.projects.oleksii.leheza.cashtruck.domain;
+package com.projects.oleksii.leheza.cashtruck.dto.mail;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

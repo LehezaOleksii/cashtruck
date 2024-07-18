@@ -1,8 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
-import lombok.*;
-
 import jakarta.persistence.*;
+import lombok.*;
 
 @Getter
 @Setter
@@ -13,13 +12,12 @@ import jakarta.persistence.*;
 @Entity
 @Table(name = "images")
 public class Image {
-
     @Id
-    @SequenceGenerator(name = "image_sequence", sequenceName = "image_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "image_sequence", sequenceName = "image_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "image_sequence")
     private Long id;
-
     @Lob
+    @Column(name = "image_bytes")
     private byte[] imageBytes;
 
     public Image(byte[] imageBytes) {

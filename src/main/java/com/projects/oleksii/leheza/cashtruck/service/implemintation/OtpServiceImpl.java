@@ -1,7 +1,5 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
-import com.projects.oleksii.leheza.cashtruck.domain.User;
-import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.OtpRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.OtpService;
@@ -24,12 +22,6 @@ public class OtpServiceImpl implements OtpService {
     }
 
     @Override
-    public User getUserByOtp(int password) {
-        return otpRepository.findByPassword(password)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-    }
-
-    @Override
     @Transactional
     public void deleteOtp(int password) {
         otpRepository.deleteByPassword(password);
@@ -39,7 +31,7 @@ public class OtpServiceImpl implements OtpService {
     @Transactional
     public void sendOTP(String email) {
         if (otpRepository.existsByUserEmail(email)) {
-           otpRepository.deleteByUserEmail(email);
+            otpRepository.deleteByUserEmail(email);
         }
         emailService.sendOTP(email);
     }

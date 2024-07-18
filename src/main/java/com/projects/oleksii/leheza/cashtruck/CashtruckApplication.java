@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck;
 import com.projects.oleksii.leheza.cashtruck.config.MainEntitiesGenerator;
 import com.projects.oleksii.leheza.cashtruck.config.RandomUsersGenerator;
 import com.projects.oleksii.leheza.cashtruck.service.implemintation.UserServiceImpl;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import com.projects.oleksii.leheza.cashtruck.service.subscription.SubscriptionChecker;
 import com.stripe.Stripe;
 import io.github.cdimascio.dotenv.Dotenv;
@@ -30,11 +31,11 @@ public class CashtruckApplication {
     }
 
     @Bean
-    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator, UserServiceImpl userService) {
+    CommandLineRunner runner(RandomUsersGenerator randomUsersGenerator, MainEntitiesGenerator mainEntitiesGenerator, UserServiceImpl userService, EmailService emailService) {
         return args -> {
             mainEntitiesGenerator.generateMainEntities();
-            randomUsersGenerator.generateRandomClientFields(10, 5, 1, 30, 200);
-            SubscriptionChecker subscriptionChecker = new SubscriptionChecker(userService);
+            randomUsersGenerator.generateRandomClientFields(10, 5, 1, 32, 200);
+            SubscriptionChecker subscriptionChecker = new SubscriptionChecker(userService, emailService);
             subscriptionChecker.checkAndUpdateSubscriptionStatus();
             Dotenv dotenv = Dotenv.load();
             Stripe.apiKey = dotenv.get("STRIPE_SECRET_KEY");

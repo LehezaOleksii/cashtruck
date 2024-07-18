@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.controllers;
 import com.projects.oleksii.leheza.cashtruck.domain.Confirmation;
 import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
+import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.ConfirmationRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.OtpService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
@@ -35,17 +36,13 @@ public class AuthController {
     @PostMapping(path = "/register")
     public ModelAndView signUp(@ModelAttribute("login") LoginDto loginDto) {
         userService.saveNewUser(loginDto);
-        return new ModelAndView("redirect:/auth/authorization_complete");
-    }
-
-    @GetMapping(path = "/authorization_complete")
-    public ModelAndView authorizationCompleteMenu() {
-        return new ModelAndView("login/authorization_complete");
+        return new ModelAndView("redirect:/auth/login");
     }
 
     @GetMapping(path = "/users")
     public ModelAndView confirmEmail(@RequestParam String token) {
-        Confirmation confirmation = confirmationRepository.findByToken(token);
+        Confirmation confirmation = confirmationRepository.findByToken(token)
+                .orElseThrow(() -> new ResourceNotFoundException("Confirmation email does not exist"));
         userService.setStatus(confirmation.getUser().getId(), ActiveStatus.ACTIVE);
         confirmationRepository.delete(confirmation);
         return new ModelAndView("login/login");

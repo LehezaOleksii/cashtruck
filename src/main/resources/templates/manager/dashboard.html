@@ -56,7 +56,7 @@
                         <div class="card-number cardNumber"></div>
  
                         <div class="card-holder-and-expiry">
-                        <div class="card-holder nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></div>
+                        <div class="card-holder cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></div>
                         <div class="expiry expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></div>
                         </div>
                     </div>
@@ -66,7 +66,7 @@
                     <div class="additional-info mt-4">        
               <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div> 
               <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
-              <div> Holder: <span class="nameOnCard" th:text="${card != null ? card.nameOnCard : '-'}"></span></div> 
+              <div> Holder: <span class="cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
                     </div>
                 </div>
@@ -102,7 +102,7 @@
                     <div class="additional-info mt-5">
                        <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div>
                         <div> Exp date: <span th:text="${card != null ? card.expiringDate : '-'}"></span></div>
-                        <div> Holder: <span th:text="${card != null ? card.nameOnCard : '-'}"></span></div>
+                        <div> Holder: <span th:text="${card != null ? card.cardHolder : '-'}"></span></div>
                        <div>  CVV: <span th:text="${card != null ? card.cvv : '-'}"></span></div>
                     </div>
                 </div>
@@ -180,9 +180,9 @@
             elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
         }
 
-        var elementsWithNameOnCardClass = document.getElementsByClassName('nameOnCard');
-        for (var i = 0; i < elementsWithNameOnCardClass.length; i++) {
-            elementsWithNameOnCardClass[i].innerText = selectedCard.nameOnCard;
+        var elementsWithcardHolderClass = document.getElementsByClassName('cardHolder');
+        for (var i = 0; i < elementsWithcardHolderClass.length; i++) {
+            elementsWithcardHolderClass[i].innerText = selectedCard.cardHolder;
         }
     }
 </script>
@@ -391,7 +391,10 @@
 <!-- last month --> 
 <div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastMonthExpense >= 0 && client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome >= 0)) && client_statistic.lastMonthIncome > client_statistic.lastMonthExpense && ((client_statistic.totalBalance - client_statistic.lastMonthExpense)!=0)}">
     <div class="custom-green">
-        <!-- arrow up short --> 
+        <!-- arrow up short -->
+        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+        </svg>
         + <span th:if="${(client_statistic.totalBalance - client_statistic.lastMonthIncome) > 0}"> 
             <span th:text="${( client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) / (client_statistic.totalBalance - client_statistic.lastMonthIncome)*100 }"></span>
          </span>
@@ -419,7 +422,10 @@
 <!-- last year -->
 <div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastYearExpense >= 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense < client_statistic.lastYearIncome && ((client_statistic.totalBalance - client_statistic.lastYearExpense)!=0)}">
     <div class="custom-green">
-        <!-- arrow up short --> 
+        <!-- arrow up short -->
+        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+        </svg>
         + <span th:if="${(client_statistic.totalBalance - client_statistic.lastYearIncome) > 0}"> 
             <span th:text="${( client_statistic.lastYearIncome - client_statistic.lastYearExpense) / (client_statistic.totalBalance-client_statistic.lastYearIncome)*100 }"></span>
          </span>
@@ -602,14 +608,14 @@
                 </div>
             <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions" >
            <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/managers/categories'}"  >
+            <a th:href="@{'/managers/income_expense_categories'}"  >
                 <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
             </a> 
            </div>
            </div>
            <div th:if="${client_statistic.expenses.size() > 0} "  class = "expense_transactions" style="display: none;">
            <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/managers/categories'}"  >
+            <a th:href="@{'/managers/income_expense_categories'}"  >
                 <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
             </a>
            </div>

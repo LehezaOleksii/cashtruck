@@ -88,8 +88,7 @@
                             <!-- Sum -->
                             <div class="mb-3">
                                 <label for="sum" class="form-label">Sum</label>
-                                <input class="form-control" id="sum" th:field="*{sum}" placeholder="Sum" min="0"
-                                       required>
+                                <input type="number" step="0.01" class="form-control" id="sum" th:field="*{sum}" placeholder="Sum" min="0" required>
                                 <div>
                                     <small th:if="${#fields.hasErrors('sum')}"
                                            th:errors="*{sum}"

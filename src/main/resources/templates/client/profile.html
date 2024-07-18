@@ -111,65 +111,12 @@
                         </small>
                     </div>
             </div>
-            <div class="col">
-                <div class="profile-atribute">Password</div> 
-                    <div class="form-outline">
-                        <input id="password" type="text" th:field="*{password}" placeholder="Password" class="form-control" required/>
-                        <small th:if="${#fields.hasErrors('password')}"
-                        th:errors="*{password}"
-                        th:text="${#strings.listJoin(#fields.errors('password'), ', ')}" class="text-danger">
-                            Please provide a valid password.
-                        </small>
-                    </div>
-            </div>
-        </div>
-        <div class="row mb-4">
-            <div class="col">
-                <div class="profile-atribute">Language</div> 
-                    <div class="form-outline">
-                        <input id="language" type="text" th:field="*{language}" placeholder="Language" class="form-control"/>
-                        <small th:if="${#fields.hasErrors('language')}"
-                        th:errors="*{language}"
-                        th:text="${#strings.listJoin(#fields.errors('language'), ', ')}" class="text-danger">
-                            Please provide a valid language.
-                        </small>
-                    </div>
-            </div>
-            <div class="col">
-                <div class="profile-atribute">Country</div>
-                <div class="form-outline">
-                    <input id="country" type="text" class="form-control" th:field="*{country}" placeholder="Country">
-                    <small th:if="${#fields.hasErrors('country')}"
-                    th:errors="*{country}"
-                    th:text="${#strings.listJoin(#fields.errors('country'), ', ')}" class="text-danger">
-                        Please provide a valid country.
-                    </small>
-                </div>
-            </div>
-        </div>
-
-
-    <div class="row mb-4">
-        <div class="col-6">
-            <div class="profile-atribute">Phone Number</div>
-            <div class="form-outline">
-                <input id="phoneNumber" type="text" class="form-control" th:field="*{phoneNumber}" placeholder="Phone number">
-                <small th:if="${#fields.hasErrors('phoneNumber')}"
-                th:errors="*{phoneNumber}"
-                th:text="${#strings.listJoin(#fields.errors('phoneNumber'), ', ')}" class="text-danger">
-                    Please provide a valid phone number.
-                </small>
-            </div>
-        </div>
-    </div>
-
-
         <div class="row mb-4 ">
             <div class="col justify-content-end">
                     <button class= "btn custom-back-violet mt-2" type="submit" style="width: 160px;">Update</button>
             </div>
             <div class="col">  
-                <a th:href="@{'/clients/dasboard'}" class="btn mt-2 custom-back-grey" style="width: 160px;">Cancel</a>
+                <a th:href="@{'/clients/dashboard'}" class="btn mt-2 custom-back-grey" style="width: 160px;">Cancel</a>
             </div>
         </div>
         </div>

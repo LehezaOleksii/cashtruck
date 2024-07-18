@@ -6,7 +6,7 @@ import lombok.*;
 @Getter
 @Setter
 @AllArgsConstructor
-@RequiredArgsConstructor
+@NoArgsConstructor
 @ToString
 @Builder(toBuilder = true)
 @Entity
@@ -15,17 +15,17 @@ public class OtpToken {
 
     private static int currentPassword = 5487;
     @Id
-    @SequenceGenerator(name = "otp_sequence", sequenceName = "otp_sequence", allocationSize = 1)
+    @SequenceGenerator(name = "otp_sequence", sequenceName = "otp_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "otp_sequence")
     private Long id;
     private int password;
-    @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER)
+    @ManyToOne(targetEntity = User.class, fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
 
     public OtpToken(User user) {
         this.user = user;
-        currentPassword = (currentPassword == 9999) ? 1000 : currentPassword + 1;
+        currentPassword = (currentPassword >= 9999) ? 1000 : currentPassword + 1;
         password = currentPassword;
     }
 }

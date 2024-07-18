@@ -30,17 +30,19 @@
                 </div>
                 <div class="d-flex justify-content-between align-items-center row py-3 gap-3 gap-md-0 px-4">
                     <div class="col-md-4">
-                        <select id="roleFilter"  name="role" class="form-select px-2" aria-label="Default select example">
+                        <select id="roleFilter" name="role" class="form-select px-2" aria-label="Default select example">
                             <option value="" selected>Select role</option>
-                            <option value="ADMIN">Admin</option>
-                            <option value="MANAGER">Manager</option>
-                            <option value="CLIENT">Client</option>
+                            <option value="ROLE_ADMIN">Admin</option>
+                            <option value="ROLE_MANAGER">Manager</option>
+                            <option value="ROLE_CLIENT">Client</option>
                         </select>
                     </div>
                     <div class="col-md-4">
-                        <select  name="plan" class="form-select px-2" aria-label="Default select example">
+                        <select name="plan" class="form-select px-2" aria-label="Default select example">
                             <option value="" selected>Select plan</option>
-                            <option value="select plan"> plan</option>
+                            <option value="FREE">Free</option>
+                            <option value="PLUS">Plus</option>
+                            <option value="PRO">Pro</option>
                         </select>
                     </div>
                     <div class="col-md-4">
@@ -62,12 +64,11 @@
                     <script>
                         document.getElementById("cancelButton").addEventListener("click", function() {
                             var managerId = document.getElementById("managerId").innerText;
-                            window.location.href = 'http://localhost:8080/managers/' + managerId + '/users';
+                            window.location.href = 'http://localhost:8080/managers/users';
                         });
                     </script>
                 </div>
         </form>
-
                 <table class="table mt-3">
                     <thead>
                         <tr>
@@ -127,8 +128,8 @@
                                             <a class="user-profile cursor-pointer" th:data-user-id="${user.id}">
                                             <li><button id = "user-profile" class="dropdown-item" type="button"  th:data-user-id="${user.id}">Detailed information</button></li>
                                             </a>
-                                            <li th:if="${user.status =='Banned'}"><button class="dropdown-item" type="button" id="unblockUser"  th:data-user-id="${user.id}">Unblock</button></li>
-                                            <li th:if="${user.status !='Banned'}"><button class="dropdown-item" type="button" id="blockUser"  th:data-user-id="${user.id}">Block</button></li>
+                                            <li th:if="${user.status =='BANNED'}"><button class="dropdown-item" type="button" id="unblockUser"  th:data-user-id="${user.id}">Unblock</button></li>
+                                            <li th:if="${user.status !='BANNED'}"><button class="dropdown-item" type="button" id="blockUser"  th:data-user-id="${user.id}">Block</button></li>
                                         </ul>
                                 </span>
                             </td>

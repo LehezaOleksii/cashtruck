@@ -24,9 +24,9 @@ public interface UserRepository extends
     @EntityGraph(attributePaths = "authorities")
     Optional<User> findByEmail(String email);
 
-    Optional<User>  findByEmailIgnoreCase(String email);
+    Optional<User> findByEmailIgnoreCase(String email);
 
-    Boolean existsByEmailIgnoreCase(String email);
+//    Boolean existsByEmailIgnoreCase(String email); TODO
 
     @Query("SELECT u.avatar.imageBytes FROM User u WHERE u.id = :userId")
     byte[] findAvatarByUserId(@Param("userId") Long userId);
@@ -37,8 +37,11 @@ public interface UserRepository extends
 
     Page<User> findAll(Pageable pageable);
 
-    @Query("SELECT u.id FROM User u WHERE u.subscriptionFinishDate <= CURRENT_DATE")
+    @Query("SELECT u.id FROM User u WHERE u.subscriptionFinishDate = CURRENT_DATE")
     List<Long> findUserIdsWithExpiredSubscriptions();
+
+    @Query("SELECT u.email FROM User u WHERE u.subscriptionFinishDate = CURRENT_DATE AND u.subscription.subscriptionStatus != 'FREE'")
+    List<String> findUserEmailsWithExpiredSubscriptions();
 
     List<User> findByRole(Role role);
 
@@ -46,4 +49,7 @@ public interface UserRepository extends
 
     @Query("SELECT u.email FROM User u WHERE u.role = :role")
     List<String> findAllEmailsByRole(@Param("role") Role role);
+
+//    @Query("SELECT u.role FROM User u WHERE u.id = :id")
+//    Role findRoleById(String id); TODO
 }
