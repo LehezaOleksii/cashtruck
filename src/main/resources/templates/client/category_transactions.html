@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/client/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+  </head>  
+  <body th:object="${client}" layout:fragment="content">
+      <div class="income_transactions">
+                <div class="mb-2 "  style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
+                <div  th:each="income : ${client_statistic.incomes}">
+                    <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
+                    <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
+                    <span th:text="${income.bankTransaction.name}"></span><br>
+                    <span th:text="${income.bankTransaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br>
+                    <span th:text="${#temporals.format(income.bankTransaction.time, 'dd.MM.yy')}"></span>
+                    </div> 
+                </div>
+        </div>
+</div>
+  </main>
+  </body>
+</html>

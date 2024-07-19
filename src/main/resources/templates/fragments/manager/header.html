@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div class="py-2 border-bottom" th:object="${manager}">
+   <div class="d-flex justify-content-between">
+      <div class="flex-shrink-0 dropdown ml-auto">
+         <a id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="ms-1 d-none d-sm-inline">
+                        <img class="rounded-circle text-decoration-none" th:if="${manager.avatar != null}" th:src="'data:image/jpeg;base64,' + ${manager.avatar}" width="40" height="40" style="cursor: pointer;">
+                    </span>
+         </a>
+         <ul class="dropdown-menu text-small shadow dropdown-menu-end" aria-labelledby="dropdownUser2">
+            <li>
+               <a class="dropdown-item" th:href="@{'/managers/profile'}">
+                  Profile
+               </a>
+            </li>
+            <li><a class="dropdown-item" th:href="@{'/managers/emails'}">Email</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+               <form th:action="@{/auth/logout}" method="post">
+                  <button type="submit" class="dropdown-item">Sign out</button>
+               </form>
+            </li>
+         </ul>
+      </div>
+   </div>
+</div>
+</body>
+</html>

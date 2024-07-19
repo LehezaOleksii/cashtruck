@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorator="layout/client/layout"
+>
+<head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+</head>
+<body th:object="${client}">
+<main layout:fragment="content" >
+    <form method="post" th:object="${email}" th:action="@{'/clients/emails/send'}" enctype="multipart/form-data">
+        <div id="userId" style="display: none;" data-th-text="${client.id}"></div>
+        <div class="my-container col-6 mx-auto">
+            <div class="card-body d-flex justify-content-center align-items-center">
+                <div class="text-center">
+                    <a id="composeBtn" class="btn btn-primary custom-back-violet btn-lg mt-1" style="width: 200px;">
+                        Compose
+                    </a>
+                </div>
+            </div>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $("#composeBtn").click(function() {
+                    $("#composeForm").modal("show");
+                });
+            });
+        </script>
+        <div class="modal fade" tabindex="-1" role="dialog" id="composeForm">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="my-container">
+                        <div class="modal-header py-3 bg-body">
+                            <h5 class="modal-title fs-5">Compose Mail</h5>
+                            <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="d-flex justify-content-center border-bottom">
+                            <label for="formGroupExampleInput" class="pl-3 mb-2 mt-2">To:</label>
+                            <select th:field="*{to}" class="form-control border-0 mt-1">
+                                <option th:each="manager : ${managers}" th:value="${manager.email}" th:text="${manager.email}"></option>
+                            </select>
+                        </div>
+
+                        <div class="d-flex justify-content-center border-bottom">
+                            <label for="formGroupExampleInput" class="pl-3 mb-2 mt-2">Subject:</label>
+                            <input type="text" th:field="*{subject}"  class="form-control border-0 mb-2 mt-1" placeholder="Subject">
+                        </div>
+                        <div class="d-flex border-bottom" style="height: 200px;">
+                            <textarea class="form-control" th:field="*{email}"  id="exampleFormControlTextarea1" rows="3" placeholder="Enter your message here..."></textarea>
+                        </div>
+                        <div class="email-compose-actions d-flex justify-content-between align-items-center my-2 py-1 mt-2">
+                            <div class="d-flex align-items-center">
+                                <div class=" ml-4 mb-2">
+                                    <button  type="submit" class="btn btn-primary custom-back-violet mb-3" style="width: 100px;" id="sendBtn">Send</button>
+                                    <label for="attach-file">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="bi bi-paperclip ml-2"   style="cursor: pointer;"viewBox="0 0 16 16">
+                                            <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+                                        </svg>
+                                        <input type="file" name="attachment">
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                $("#composeBtn").click(function() {
+                    $("#composeForm").modal("show");
+                });
+                $(".btn-close").click(function() {
+                    $("#composeForm").modal("hide");
+                });
+            });
+        </script>
+    </form>
+</main>
+</body>
+</html>

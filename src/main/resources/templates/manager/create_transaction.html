@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/manager/layout">
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash truck</title>
+</head>
+<body th:object="${manager}">
+<content layout:fragment="content">
+    <!-- Check if bank_cards is empty -->
+    <div class="card card-body" th:if="${bank_cards.isEmpty()}">
+        <div class="alert alert-warning" role="alert">
+            You have no bank cards associated with your account. Please add bank cards.
+        </div>
+        <a style="width:100%;" th:href="@{/managers/bank_cards}">
+            <button class="custom-back-violet col-4 mx-auto">
+                <span>Add Bank Cards</span>
+            </button>
+        </a>
+    </div>
+    <!-- If bank_cards is not empty, display Transaction Modal -->
+    <div th:unless="${bank_cards.isEmpty()}">
+        <!-- Transaction Modal -->
+        <div id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title custom-dark-grey" id="transactionModalLabel">Create Transaction</h5>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" th:object="${transaction}"
+                              th:action="@{'/managers/transactions/save'}">
+                            <!-- Category -->
+                            <div class="mb-3">
+                                <label for="categoryName" class="form-label">Category</label>
+                                <select id="categoryName" class="form-select" th:field="*{categoryName}" required>
+                                    <option value="" disabled selected>Select Category</option>
+                                    <optgroup label="Incomes">
+                                    </optgroup>
+                                    <optgroup th:each="category : ${incomes}">
+                                        <option th:value="${category.name}" th:text="${category.name}"></option>
+                                    </optgroup>
+                                    <optgroup label="Expenses">
+                                    </optgroup>
+                                    <optgroup th:each="category : ${expenses}">
+                                        <option th:value="${category.name}" th:text="${category.name}"></option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                            <!-- Card Number -->
+                            <div class="mb-3">
+                                <label for="cardNumber" class="form-label">Credit Card Number</label>
+                                <select id="cardNumber" class="form-select" th:field="*{cardNumber}" required>
+                                    <option value="" disabled selected>Select Credit Card</option>
+                                    <option th:each="card : ${bank_cards}" th:value="${card.cardNumber}"
+                                            th:text="${card.cardNumber}"></option>
+                                </select>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('cardNumber')}"
+                                           th:errors="*{cardNumber}"
+                                           class="text-danger">Invalid card number.</small>
+                                </div>
+                            </div>
+
+                            <!-- Transaction Time -->
+                            <div class="mb-3">
+                                <label for="time" class="form-label">Transaction Time</label>
+                                <input type="datetime-local" class="form-control" id="time" th:field="*{time}" required>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('time')}"
+                                           th:errors="*{time}"
+                                           class="text-danger">Invalid time.</small>
+                                </div>
+                            </div>
+                            <!-- Transaction Name -->
+                            <div class="mb-3">
+                                <label for="transactionName" class="form-label">Transaction Name</label>
+                                <input type="text" class="form-control" id="transactionName"
+                                       th:field="*{transactionName}" placeholder="Transaction Name" required>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('transactionName')}"
+                                           th:errors="*{transactionName}"
+                                           class="text-danger">Invalid transaction name.</small>
+                                </div>
+                            </div>
+                            <!-- Sum -->
+                            <div class="mb-3">
+                                <label for="sum" class="form-label">Sum</label>
+                                <input type="number" step="0.01" class="form-control" id="sum" th:field="*{sum}" placeholder="Sum" min="0" required>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('sum')}"
+                                           th:errors="*{sum}"
+                                           class="text-danger">Invalid sum.</small>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary custom-back-violet">Submit</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</content>
+</body>
+</html>

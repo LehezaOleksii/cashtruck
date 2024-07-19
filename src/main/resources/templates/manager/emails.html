@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/manager/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </head>
+  <body th:object="${manager}">
+    <main layout:fragment="content" >
+      <form method="post" th:object="${email}" th:action="@{'/managers/' + ${manager.id} + '/emails/send'}" enctype="multipart/form-data">
+        <div id="userId" style="display: none;" data-th-text="${manager.id}"></div>
+      <div class="my-container ml-4 mr-4 row">
+        <div class="col-3 card-body border-right">
+          <div class="text-center">
+            <a id="composeBtn" class="btn btn-primary custom-back-violet mt-1 mx-auto d-block" style="width: 85%">
+              Compose
+            </a>
+          </div>
+        </div>
+        <div class="col-9 p-0">
+          <div class="border-bottom d-flex align-items-center pl-2 pt-1 pb-1">
+            <span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+              </svg>
+            </span>
+            <input type="text" id="searchQuery" class="form-control border-0 py-0" placeholder="Search email">
+            <button type="button" onclick="searchEmails()" class="btn btn-primary custom-back-violet">Search</button>
+          </div>
+          <div style="display:none;" th:text="${manager.id}"></div>
+          <script>
+            function searchEmails() {
+              var managerId = document.getElementById('userId').innerText;
+              var email = document.getElementById('searchQuery').value;
+              var searchUrl = '/managers/emails/search?pattern=' + encodeURIComponent(email);
+              window.location.href = searchUrl;
+            }
+          </script>
+          <div class="border-bottom pr-3 pt-2 pb-2">
+          <div class="d-flex">
+            <div class="ml-3">Users :</div>
+            <span class="d-sm-block d-none ml-1 text-muted" th:text="${users.size()}"></span>
+          </div>
+        </div>
+        <ul class="card-body pl-3">
+          <li class="mb-1 d-flex justify-content-between" th:each="user : ${users}">
+            <div class="mb-2">
+              <img class="rounded-circle text-decoration-none me-2" th:if="${user.avatar != null}" th:src="'data:image/jpeg;base64,' + ${user.avatar}" width="34" height="34">
+              <img class="rounded-circle text-decoration-none me-2" width="34" height="34">
+              <span th:text="${user.firstName}"></span>
+              <span th:text="${user.lastName}"></span>
+              <span class="mx-3 custom-dark-grey" th:text="${user.email}"></span>
+            </div>
+          </li>
+      </ul>
+        </div>
+      </div>
+<script>
+  $(document).ready(function() {
+    $("#composeBtn").click(function() {
+      $("#composeForm").modal("show");
+    });
+  });
+</script>
+<div class="modal fade" tabindex="-1" role="dialog" id="composeForm">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="my-container">
+              <div class="modal-header py-3 bg-body">
+                  <h5 class="modal-title fs-5">Compose Email</h5>
+                  <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+              </div>
+        <div class="d-flex justify-content-center border-bottom">
+          <label for="formGroupExampleInput" class="pl-3 mb-2 mt-2">To:</label>
+          <input type="text" th:field="*{to}" class="form-control border-0 mt-1" placeholder="Mail" required>
+        </div>
+
+        <div class="d-flex justify-content-center border-bottom">
+          <label for="formGroupExampleInput" class="pl-3 mb-2 mt-2">Subject:</label>
+          <input type="text" th:field="*{subject}" class="form-control border-0 mb-2 mt-1" placeholder="Subject" required>
+        </div>
+      <div class="d-flex border-bottom" style="height: 200px;">
+        <textarea class="form-control" th:field="*{email}" id="exampleFormControlTextarea1" rows="3" placeholder="Enter your message here..." required></textarea>
+      </div>
+    <div class="email-compose-actions d-flex justify-content-between align-items-center my-2 py-1 mt-2">
+      <div class="d-flex align-items-center">
+        <div class=" ml-4 mb-2">
+          <button  type="submit" class="btn btn-primary custom-back-violet" style="width: 100px;" id="sendBtn">Send</button>
+          <button  type="submit" onclick="sendEmailForAllClients()" class="btn btn-primary custom-back-violet" style="width: 170px;" id="sendForAllBtn"> Send for all clients</button>
+            <script>
+                function sendEmailForAllClients() {
+                    var managerId = document.getElementById('userId').innerText;
+                    var sendEmailForAllClientsUrl = '/managers/' + managerId + '/emails/send/clients/all';
+                    var formData = new FormData();
+                    formData.append('to', document.getElementById('to').value);
+                    formData.append('subject', document.getElementById('subject').value);
+                    formData.append('email', document.getElementById('email').value);
+                    $.ajax({
+                        url: sendEmailForAllClientsUrl,
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false
+                    });
+                }
+            </script>
+          <label for="attach-file">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" class="bi bi-paperclip ml-2"   style="cursor: pointer;"viewBox="0 0 16 16">
+              <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0z"/>
+            </svg>
+      </label>
+      <input type="file" name="attachment">
+    </div>
+      </div>
+    </div>
+      </div>
+    </div>
+  </div>
+  </div>
+  <script>
+    $(document).ready(function() {
+      $("#composeBtn").click(function() {
+        $("#composeForm").modal("show");
+      });
+      $(".btn-close").click(function() {
+        $("#composeForm").modal("hide");
+      });
+    });
+  </script>
+      </form>
+    </main>
+  </body>
+</html>

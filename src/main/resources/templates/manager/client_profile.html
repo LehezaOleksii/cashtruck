@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html
+  xmlns:th="http://www.thymeleaf.org"
+  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+  layout:decorator="layout/manager/layout"
+>
+  <head>
+    <meta charset="utf-8" />
+    <title>Cash truck</title> 
+  </head> 
+  <body>
+        <main layout:fragment="content">
+        <form method="post" th:object="${client}" th:action="@{'/clients/' + ${client.id} + '/update'}" enctype="multipart/form-data">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div class="overlay"> 
+            <div class="overlay-content">
+                <div class="profile-container">
+                <h5 class="text-center info-card-font bold mb-5">Edit profile information</h5>
+                <hr>
+                <h5 class="text-center info-card-font bold mb-3">Avatar</h5> 
+                <div class="container">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="image-preview d-flex justify-content-center align-items-center">
+                                <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${client.avatar == null}" height="110" width="110" >
+                                <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${client.avatar != null}" th:src="'data:image/jpeg;base64,' + ${client.avatar}" height="110" width="110">
+                            </div>
+                        </div>
+                        <div class="col-md-6 mt-2">
+                            <div class="d-flex flex-column row justify-content-center align-items-center">
+                                <label for="fileInput" class="btn custom-back-violet mb-2 small col-6">Choose photo</label>
+                                <input type="file" id="fileInput" name="image" accept="image/*" class="form-control-file" onchange="previewImage(this)" style="display: none;">
+                                <label type="button" class="btn btn-outline-secondary small col-6" onclick="clearImage()">Clear photo</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    <div class="d-flex justify-content-center">
+                        <div>
+                            <p th:text="${user.role}"></p>
+                        </div>
+                    </div>
+                <script>
+                    function previewImage(input) {
+                        var preview = document.getElementById('preview');
+                        var uploadedImage = document.getElementById('uploadedImage');
+                        var file = input.files[0];
+                        if (file) {
+                            var reader = new FileReader();
+                
+                            reader.onload = function (e) {
+                                preview.src = e.target.result;
+                            }
+                            reader.readAsDataURL(file);
+                            preview.style.display = 'block';
+                            uploadedImage.style.display = 'none';
+                        } 
+                    }
+                    function clearImage() {
+                        var preview = document.getElementById('preview');
+                        var fileInput = document.querySelector('.form-control-file');
+                        preview.src = "";
+                        fileInput.value = ""; 
+                    }
+                </script>
+                <hr>
+                <h5 class="text-center info-card-font bold mb-5">Profile information</h5>
+                <div class="row mb-4">
+            <div class="col">
+                <div class="profile-atribute">First name</div> 
+                    <div class="form-outline">
+                        <input id="firstName" type="text" placeholder="First Name" class="form-control" th:field="*{firstName}"  required/>
+                        <small th:if="${#fields.hasErrors('firstName')}"
+                        th:errors="*{firstName}"
+                        th:text="${#strings.listJoin(#fields.errors('firstName'), ', ')}" class="text-danger">
+                            Please provide a valid name.
+                        </small>
+                    </div>
+            </div>
+            <div class="col">
+                <div class="profile-atribute">Last Name</div>
+                <div class="form-outline">
+                    <input id="lastName" type="text" class="form-control" th:field="*{lastName}" placeholder="Last name" required>
+                    <small th:if="${#fields.hasErrors('lastName')}"
+                    th:errors="*{lastName}"
+                    th:text="${#strings.listJoin(#fields.errors('lastName'), ', ')}" class="text-danger">
+                        Please provide a valid card number.
+                    </small>
+                </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="profile-atribute">Email</div> 
+                    <div class="form-outline">
+                        <input id="email" type="text" th:field="*{email}" placeholder="Email" class="form-control"   required/>
+                        <small th:if="${#fields.hasErrors('email')}"
+                        th:errors="*{email}"
+                        th:text="${#strings.listJoin(#fields.errors('email'), ', ')}" class="text-danger">
+                            Please provide a valid email.
+                        </small>
+                    </div>
+            </div>
+            <div class="col">
+                <div class="profile-atribute">Password</div> 
+                    <div class="form-outline">
+                        <input id="password" type="text" th:field="*{password}" placeholder="Password" class="form-control" required/>
+                        <small th:if="${#fields.hasErrors('password')}"
+                        th:errors="*{password}"
+                        th:text="${#strings.listJoin(#fields.errors('password'), ', ')}" class="text-danger">
+                            Please provide a valid password.
+                        </small>
+                    </div>
+            </div>
+        </div>
+        <div class="row mb-4">
+            <div class="col">
+                <div class="profile-atribute">Language</div> 
+                    <div class="form-outline">
+                        <input id="language" type="text" th:field="*{language}" placeholder="Language" class="form-control"/>
+                        <small th:if="${#fields.hasErrors('language')}"
+                        th:errors="*{language}"
+                        th:text="${#strings.listJoin(#fields.errors('language'), ', ')}" class="text-danger">
+                            Please provide a valid language.
+                        </small>
+                    </div>
+            </div>
+            <div class="col">
+                <div class="profile-atribute">Country</div>
+                <div class="form-outline">
+                    <input id="country" type="text" class="form-control" th:field="*{country}" placeholder="Country">
+                    <small th:if="${#fields.hasErrors('country')}"
+                    th:errors="*{country}"
+                    th:text="${#strings.listJoin(#fields.errors('country'), ', ')}" class="text-danger">
+                        Please provide a valid country.
+                    </small>
+                </div>
+            </div>
+        </div>
+    <div class="row mb-4">
+        <div class="col-6">
+            <div class="profile-atribute">Phone Number</div>
+            <div class="form-outline">
+                <input id="phoneNumber" type="text" class="form-control" th:field="*{phoneNumber}" placeholder="Phone number">
+                <small th:if="${#fields.hasErrors('phoneNumber')}"
+                th:errors="*{phoneNumber}"
+                th:text="${#strings.listJoin(#fields.errors('phoneNumber'), ', ')}" class="text-danger">
+                    Please provide a valid phone number.
+                </small>
+            </div>
+        </div>
+    </div>
+        <div class="row mb-4 ">
+            <div class="col justify-content-end">
+                    <button class= "btn custom-back-violet mt-2" type="submit" style="width: 160px;">Update</button>
+            </div>
+            <div class="col">  
+                <a th:href="@{'/maangers/dashboard'}" class="btn mt-2 custom-back-grey" style="width: 160px;">Cancel</a>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+</form>
+</main>
+</body>
+</html>
