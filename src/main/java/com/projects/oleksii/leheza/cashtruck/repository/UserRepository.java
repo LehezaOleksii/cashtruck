@@ -26,7 +26,7 @@ public interface UserRepository extends
 
     Optional<User> findByEmailIgnoreCase(String email);
 
-//    Boolean existsByEmailIgnoreCase(String email); TODO
+    Boolean existsByEmailIgnoreCase(String email);
 
     @Query("SELECT u.avatar.imageBytes FROM User u WHERE u.id = :userId")
     byte[] findAvatarByUserId(@Param("userId") Long userId);

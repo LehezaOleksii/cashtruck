@@ -1,8 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.service.email;
 
 
-import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.OtpToken;
+import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.OtpRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
@@ -73,7 +73,7 @@ public class EmailServiceImpl implements EmailService {
         simpleMailMessage.setFrom(USER_EMAIL);//TODO prod input "from" variable
         simpleMailMessage.setTo(USER_EMAIL);//TODO prod input to variable
         simpleMailMessage.setSubject(NEW_USER_ACCOUNT_VERIFICATION);
-        OtpToken otp = new OtpToken(userRepository.findByEmail(email)
+        OtpToken otp = new OtpToken(userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("user with email " + email + " does not found")));
         otpRepository.save(otp);
         simpleMailMessage.setText(Integer.toString(otp.getPassword()));
@@ -81,7 +81,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     public String getVerificationUrl(String host, String token) {
-        return host + "http://localhost:8080/auth/users?token=" + token;//TODO change path
+        return host + "/auth/users?token=" + token;//TODO change path
     }
 
     private MimeMessage getMimeMessage() {

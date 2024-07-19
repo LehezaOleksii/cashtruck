@@ -435,17 +435,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Boolean existByEmail(String email) {
-        if (userRepository.findByEmailIgnoreCase(email).isPresent()) {
-            String emailInRepository = userRepository.findByEmailIgnoreCase(email).get().getEmail();
-            return email.equals(emailInRepository);
-        } else {
-            return false;
-        }
+        return userRepository.existsByEmailIgnoreCase(email);
     }
 
     @Override
     public void setNewPassword(String email, String newPassword) {
-        User user = userRepository.findByEmail(email)
+        User user = userRepository.findByEmailIgnoreCase(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User with email " + email + " does not exist"));
         user.setPassword(encoder.encode(newPassword));
         userRepository.save(user);
