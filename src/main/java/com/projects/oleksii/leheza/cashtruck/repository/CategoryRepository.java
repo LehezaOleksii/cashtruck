@@ -23,8 +23,5 @@ public interface CategoryRepository extends JpaRepository<Category, Long>,
     @Query("SELECT cat FROM User u JOIN u.bankCards bc JOIN bc.transactions t JOIN t.category cat WHERE cat.transactionType = ?1 AND u.id = ?2")
     List<Category> findCategoriesByTransactionTypeAndClientId(TransactionType transactionType, Long clientId);
 
-//    @Query("SELECT cat FROM User u JOIN u.transactions t JOIN t.category cat WHERE u.id=?1 AND cat.name = ?2")
-//    List<Category> findCategoriesByClientIdAndCategoryName(Long clientId, String categoryName); TODO
-
     Page<Category> findAll(Pageable pageable);
 }

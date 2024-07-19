@@ -28,16 +28,6 @@ public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final DtoMapper dtoMapper;
 
-//    @Override TODO
-//    public List<Category> findAll() {
-//        return categoryRepository.findAll();
-//    }
-//
-//    @Override
-//    public Category save(Category category) {
-//        return categoryRepository.save(category);
-//    }
-
     @Override
     public Category save(CreateCategoryDto category) {
         log.info("create new category with name: {}", category.getCategoryName());

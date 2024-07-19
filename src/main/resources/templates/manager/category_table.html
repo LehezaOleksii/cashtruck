@@ -57,7 +57,6 @@
                     document.querySelectorAll('.user-profile').forEach(function (userProfileLink) {
                         userProfileLink.addEventListener('click', function () {
                             var categoryId = this.getAttribute('data-category-id');
-                            var managerId = document.getElementById('managerId').innerText;
                             window.location.href = '/managers/categories/' + categoryId + '/update';
                         });
                     });

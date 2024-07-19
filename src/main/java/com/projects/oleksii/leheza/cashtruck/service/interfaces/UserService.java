@@ -31,8 +31,6 @@ public interface UserService {
 
     User saveNewUserWithActiveStatus(LoginDto loginDto);
 
-//    Boolean verifyEmailToken(String token); TODO
-
     Page<UserDto> findAll(int page, int size);
 
     PageDto<UserDto> findAll(Integer page, Integer size);
@@ -44,7 +42,6 @@ public interface UserService {
     UserUpdateDto getClientUpdateDto(Long clientId);
 
     UserDto getUserDto(Long userId);
-
     //For UI
     ClientStatisticDto getClientStatisticByUserId(Long userId);
 

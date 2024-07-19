@@ -48,7 +48,6 @@ public class ManagerApiController {
     private final ImageConvertor imageConvertor;
     private final EmailServiceImpl emailService;
     private final BankCardService bankCardService;
-    private final TransactionService transactionService;
     private final CategoryService categoryService;
 
     @Operation(summary = "Update user", description = "Update an existing user information.")
@@ -275,7 +274,7 @@ public class ManagerApiController {
     public ResponseEntity<Void> saveBankCardToClient(@PathVariable Long userId,
                                                      @Valid @RequestBody BankCardDto bankCardDto) {
         BankCard bankCard = bankCardService.save(bankCardDto);
-//        savingService.assignBankCardToClient(userId, bankCard); //TODO
+        userService.assignBankCardToClient(userId, bankCard);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 

@@ -94,7 +94,6 @@
                 </div>
             </div>
         </div>
-
         <div class="col-xl-8 col-lg-7 col-md-7 order-0 order-md-1">
             <div class="card-body my-container" style="height: auto">
                 <h4 class="pt-4 mb-4 custom-dark-grey">
@@ -174,9 +173,6 @@
                                 calculateRemainingTime();
                             };
                         </script>
-
-
-
                         <small th:text="'Days remaining until your plan requires update'"></small>
                     </div>
                 </div>
@@ -208,7 +204,6 @@
         <div class="d-flex justify-content-between align-items-center mt-2">
             <h5>Client Cards</h5>
         </div>
-
         <!-- Iterate over the list of bank cards -->
         <div th:each="card : ${bank_cards}" class="cardMaster border p-3 rounded mb-3">
             <div class="d-flex justify-content-between flex-sm-row flex-column">
@@ -222,7 +217,6 @@
             </div>
         </div>
     </div>
-
     <!-- Upgrade Plan Modal -->
     <div id="userId" style="display: none" th:text="${userId}"></div>
     <div id="managerId" style="display: none" th:text="${managerId}"></div>
@@ -255,7 +249,6 @@
     <script>
         document.getElementById('submitUpgradePlan').addEventListener('click', function () {
             var clientId = document.getElementById('userId').innerText;
-            var managerId = document.getElementById('managerId').innerText;
             var status = document.getElementById('statusSelect').value;
             var updateUrl = '/managers/users/' + clientId + '/plan/update?status=' + status;
             window.location.href = updateUrl;
@@ -264,13 +257,10 @@
     <script>
         document.getElementById('submitEditUser').addEventListener('click', function () {
             var clientId = document.getElementById('userId').innerText;
-            var managerId = document.getElementById('managerId').innerText;
-            var status = document.getElementById('statusSelect').value;
             var updateUrl = '/managers/users/' + clientId + '/update/form';
             window.location.href = updateUrl;
         });
     </script>
-
 </main>
 </body>
 </html>

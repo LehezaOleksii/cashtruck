@@ -38,8 +38,6 @@
                   <div
                     class="image-preview d-flex justify-content-center align-items-center"
                   >
-<!--                  <img id="preview" class="rounded-3 custom-back-grey mx-auto d-block mb-3" th:if="${user.avatar == null}" height="110" width="110" >-->
-
                     <img
                       id="preview"
                       class="rounded-3 custom-back-grey mb-3"
@@ -49,7 +47,6 @@
                       width="110"
                       alt="Avatar"
                     />
-                    <!-- Placeholder if there is no avatar -->
                     <div
                       th:unless="${user.avatar != null}"
                       class="rounded-3 custom-back-grey mb-3"
@@ -64,35 +61,6 @@
                 </div>
               </div>
             </div>
-
-            <script>
-              function previewImage(input) {
-                var preview = document.getElementById("preview");
-                var uploadedImage = document.getElementById("uploadedImage");
-                var file = input.files[0];
-
-                if (file) {
-                  var reader = new FileReader();
-
-                  reader.onload = function (e) {
-                    preview.src = e.target.result;
-                  };
-
-                  reader.readAsDataURL(file);
-                  // Show the preview image and hide the uploaded image
-                  preview.style.display = "block";
-                  uploadedImage.style.display = "none";
-                }
-              }
-
-              function clearImage() {
-                var preview = document.getElementById("preview");
-                var uploadedImage = document.getElementById("uploadedImage");
-                var fileInput = document.querySelector(".form-control-file");
-                preview.src = "";
-                fileInput.value = "";
-              }
-            </script>
             <hr />
             <h5 class="text-center info-card-font bold mb-5">Information</h5>
             <div class="row mb-4">

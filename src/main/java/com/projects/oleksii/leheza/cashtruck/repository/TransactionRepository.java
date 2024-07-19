@@ -27,10 +27,6 @@ public interface TransactionRepository extends
 
     Page<Transaction> findAll(Specification<?> specification, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t JOIN t.bankCard bc JOIN bc.user u JOIN t.category cat WHERE u.id = ?1 AND cat.name = ?2")
-    List<Transaction> findTransactionsByClientIdAndCategoryName(Long userId, String categoryName);
-
-
     @Query("SELECT t FROM Transaction t WHERE t.bankCard IN :bankCards AND t.bankTransaction.time >= :startDate AND t.bankTransaction.time <= :endDate AND t.category.transactionType = :transactionType")
     List<Transaction> findTransactionForPeriod(@Param("bankCards") List<BankCard> bankCards,
                                                @Param("transactionType") TransactionType transactionType,

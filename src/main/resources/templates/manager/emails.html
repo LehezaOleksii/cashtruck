@@ -7,6 +7,8 @@
   <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   </head>
   <body th:object="${manager}">
     <main layout:fragment="content" >
@@ -18,9 +20,7 @@
             <a id="composeBtn" class="btn btn-primary custom-back-violet mt-1 mx-auto d-block" style="width: 85%">
               Compose
             </a>
-
           </div>
-
         </div>
         <div class="col-9 p-0">
           <div class="border-bottom d-flex align-items-center pl-2 pt-1 pb-1">
@@ -41,7 +41,6 @@
               window.location.href = searchUrl;
             }
           </script>
-
           <div class="border-bottom pr-3 pt-2 pb-2">
           <div class="d-flex">
             <div class="ml-3">Users :</div>
@@ -61,10 +60,6 @@
       </ul>
         </div>
       </div>
-
- <!-- Add these script tags to include Bootstrap and jQuery -->
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
   $(document).ready(function() {
     $("#composeBtn").click(function() {
@@ -72,7 +67,6 @@
     });
   });
 </script>
-
 <div class="modal fade" tabindex="-1" role="dialog" id="composeForm">
   <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -93,7 +87,6 @@
       <div class="d-flex border-bottom" style="height: 200px;">
         <textarea class="form-control" th:field="*{email}" id="exampleFormControlTextarea1" rows="3" placeholder="Enter your message here..." required></textarea>
       </div>
-
     <div class="email-compose-actions d-flex justify-content-between align-items-center my-2 py-1 mt-2">
       <div class="d-flex align-items-center">
         <div class=" ml-4 mb-2">
@@ -112,13 +105,7 @@
                         type: 'POST',
                         data: formData,
                         processData: false,
-                        contentType: false,
-                        success: function(response) {
-                            console.log('Email sent successfully!');
-                        },
-                        error: function(xhr, status, error) {
-                            console.error('Error sending email:', error);
-                        }
+                        contentType: false
                     });
                 }
             </script>
@@ -135,7 +122,6 @@
     </div>
   </div>
   </div>
-
   <script>
     $(document).ready(function() {
       $("#composeBtn").click(function() {

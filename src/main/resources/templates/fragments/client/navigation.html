@@ -1,18 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-
 <body >
   <!-- Left Sidebar Menu -->
       <nav id="sidebar" class="col-3 col-md-3 col-lg-2 d-md-block bg-light navigation">
         <div class="position-sticky">
           <ul class="nav flex-column">
-
      <div class="line-container">
   <div class="line-left"></div>
   <span class="line-text">Menu</span>
   <div class="line-right"></div>
 </div>
-
             <li class="nav-item">
     <a class="nav-link" th:href="@{/clients/dashboard}">
                   <!-- house   -->
@@ -22,8 +19,6 @@
                 Dashboard
               </a>
             </li>
-
-
                  <li class="nav-item">
     <a class="nav-link" th:href="@{/clients/categories}">
                   <!-- income & expneses -->
@@ -34,7 +29,6 @@
                 Income & Expenses
               </a>
             </li>
-
                  <li class="nav-item">
     <a class="nav-link" th:href="@{/clients/bank_cards}">
                   <!-- add card   -->
@@ -45,7 +39,6 @@
                 Add card
               </a>
             </li>
-
               <li class="nav-item">
                   <a class="nav-link" th:href="@{/clients/transactions}">
                       <!-- add transaction   -->
@@ -58,7 +51,6 @@
                       Add transaction
                   </a>
               </li>
-
             <li class="nav-item">
     <a class="nav-link" th:href="@{'/clients/bank_cards/update'}">
                   <!-- change card   -->
@@ -69,7 +61,6 @@
                 Change card
               </a>
             </li>
-
             <li class="nav-item">
     <a class="nav-link" th:href="@{'/clients/bank_cards/update'}">
                   <!-- delete card   -->
@@ -79,7 +70,6 @@
                 Delete card
               </a>
             </li>
-
     <div class="line-container">
   <div class="line-left"></div>
   <span class="line-text">Communication</span>

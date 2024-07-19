@@ -4,7 +4,6 @@ import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.create.CreateUserDto;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
@@ -75,16 +74,6 @@ public class DtoMapper {
                 .build();
     }
 
-    public CreateUserDto clientToCreateDto(User user) {
-        return CreateUserDto.builder()
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .firstName(user.getFirstName())
-                .lastName(user.getLastName())
-//                .avatar(user.getAvatar().getBytes())
-                .build();
-    }
-
     public UserDto userToDto(User user) {
         UserDto dto = UserDto.builder()
                 .id(user.getId())
@@ -113,22 +102,6 @@ public class DtoMapper {
         return dto;
     }
 
-//    public User dtoToClient(UserDto clientdto) { TODO
-//        List<Transaction> transactions = clientdto.getIncomes();
-//        transactions.addAll(clientdto.getExpenses());
-//        return User.builder()
-//                .id(clientdto.getId())
-//                .firstName(clientdto.getFirstName())
-//                .lastName(clientdto.getLastName())
-//                .avatar(new Image(clientdto.getAvatar().getBytes()))
-//                .email(clientdto.getEmail())
-//                .password(clientdto.getPassword())
-//                .bankCards(clientdto.getBankCards())
-//                .transactions(transactions)
-//                .status(ActiveStatus.valueOf(clientdto.getStatus()))
-//                .build();
-//    }
-
     public UserUpdateDto clientToClientUpdateDto(User user) {
         UserUpdateDto userUpdateDto = new UserUpdateDto();
         Image image = user.getAvatar();
@@ -142,16 +115,6 @@ public class DtoMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .email(user.getEmail())
-                .build();
-    }
-
-    public User updateClientDtoToClient(UserUpdateDto userUpdateDto) {
-        return User.builder()
-                .id(userUpdateDto.getId())
-                .firstName(userUpdateDto.getFirstName())
-                .lastName(userUpdateDto.getLastName())
-                .avatar(new Image(imageConvertor.convertStringToByteImage(userUpdateDto.getAvatar())))
-                .email(userUpdateDto.getEmail())
                 .build();
     }
 
@@ -171,17 +134,6 @@ public class DtoMapper {
                 .password(passwordEncoder.encode(user.getPassword()))
                 .role(user.getRole().toString())
                 .status(String.valueOf(user.getStatus()))
-                .build();
-    }
-
-    public User userDtoToUser(UserDto userDto) {
-        return User.builder()
-                .id(userDto.getId())
-                .firstName(userDto.getFirstName())
-                .lastName(userDto.getLastName())
-                .avatar(new Image(imageConvertor.convertStringToByteImage(userDto.getAvatar())))
-                .email(userDto.getEmail())
-                .password(userDto.getPassword())
                 .build();
     }
 

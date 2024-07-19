@@ -69,67 +69,6 @@
             </div>
         </div>
     </div>
-<!--    <div id="solid-payment-form-container">-->
-<!--        <div class="my-container card-body">-->
-<!--            <h2 class="custom-dark-grey">Payment menu</h2>-->
-<!--            <div class="row justify-content-center mt-5">-->
-<!--                <div class="col-md-6">-->
-<!--                    <form th:action="@{'/clients/' + ${client.id} + '/premium/payment_form'}" method="GET" enctype="application/json" >-->
-<!--                        <input type="hidden" name="public_key" value="[YOUR_PUBLIC_KEY]">-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="subscription">Choose Subscription</label>-->
-<!--                            <select class="form-control" id="subscription" name="subscription" onchange="updatePrice()" required>-->
-<!--                                <option value="PLUS">Plus</option>-->
-<!--                                <option value="PRO">Pro</option>-->
-<!--                            </select>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="card_number">Card Number</label>-->
-<!--                            <input type="text" class="form-control" id="card_number" name="cardNumber" placeholder="Card number" pattern="[0-9]{16}" title="Card number must be exactly 16 digits" required>-->
-<!--                        </div>-->
-<!--                        <div class="form-row">-->
-<!--                            <div class="form-group col-md-6">-->
-<!--                                <label for="expiry_date">Expiry Date (MM/YY)</label>-->
-<!--                                <input type="text" class="form-control" id="expiry_date" name="dateValue" placeholder="MM/YY" required>-->
-<!--                            </div>-->
-<!--                            <div class="form-group col-md-6">-->
-<!--                                <label for="cvv">CVV</label>-->
-<!--                                <input type="text" class="form-control" id="cvv" name="cvc" placeholder="CVV" required>-->
-<!--                            </div>-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <label for="amount">Price</label>-->
-<!--                            <input type="text" class="form-control" id="amount" name="amount" readonly required>-->
-<!--&lt;!&ndash;                            <script>&ndash;&gt;-->
-<!--&lt;!&ndash;                                function updatePrice() {&ndash;&gt;-->
-<!--&lt;!&ndash;                                    var subscription = document.getElementById("subscription").value;&ndash;&gt;-->
-<!--&lt;!&ndash;                                    var price = (subscription === "PLUS") ? 50 : 150;&ndash;&gt;-->
-<!--&lt;!&ndash;                                    document.getElementById("amount").value = price;&ndash;&gt;-->
-<!--&lt;!&ndash;                                }&ndash;&gt;-->
-<!--&lt;!&ndash;                                updatePrice();&ndash;&gt;-->
-<!--&lt;!&ndash;                            </script>&ndash;&gt;-->
-<!--                        </div>-->
-<!--                        <div class="form-group">-->
-<!--                            <input type="hidden" id="payment_method" name="paymentMethod" value="card"> &lt;!&ndash; Hidden field for payment method &ndash;&gt;-->
-<!--                        </div>-->
-<!--                        <button type="submit" class="btn btn-primary custom-back-violet">Pay Now</button>-->
-<!--                    </form>-->
-
-<!--                </div>-->
-<!--            </div>-->
-<!--        </div>-->
-<!--    </div>-->
-<!--    <script-->
-<!--            src='https://checkout.stripe.com/checkout.js'-->
-<!--            class='stripe-button'-->
-<!--            th:attr='data-key=${stripePublicKey},-->
-<!--         data-amount=${amount},-->
-<!--         data-currency=${currency}'-->
-<!--            data-name='Baeldung'-->
-<!--            data-description='Spring course checkout'-->
-<!--            data-locale='auto'-->
-<!--            data-zip-code='false'>-->
-<!--    </script>-->
 </main>
 </body>
 </html>

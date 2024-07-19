@@ -73,26 +73,6 @@ public class UserServiceImpl implements UserService {
     private final UserDetailsService userDetailsService;
     private final BankCardRepository bankCardRepository;
 
-//    @Override TODO
-//    public User save(CreateUserDto createUserDto) throws IllegalArgumentException {
-//        if (Optional.ofNullable(createUserDto).isEmpty()) {
-//            throw new ResourceNotFoundException("User is empty");
-//        }
-//        if (existByEmail(createUserDto.getEmail())) {
-//            log.warn("User with email already exist email:{}", createUserDto.getEmail());
-//            throw new ResourceAlreadyExistException("Email taken");
-//        }
-//        User user = User.builder()
-//                .firstName(createUserDto.getFirstName())
-//                .lastName(createUserDto.getLastName())
-//                .email(createUserDto.getEmail())
-//                .password((createUserDto.getPassword()))
-//                .status(ActiveStatus.ACTIVE)
-//                .build();
-//        log.info("save user with email:{}", createUserDto.getEmail());
-//        return userRepository.save(user);
-//    }
-
     @Override
     public User save(User user) {
         return userRepository.save(user);
@@ -115,19 +95,6 @@ public class UserServiceImpl implements UserService {
         log.info("save user with email:{}", loginDto.getLogin());
         return user;
     }
-
-//    @Override TODO
-//    @Transactional
-//    public Boolean verifyEmailToken(String token) {
-//        Confirmation confirmation = confirmationRepository.findByToken(token);
-//        User user = userRepository.findByEmailIgnoreCase(confirmation.getUser().getEmail())
-//                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + token));
-//        user.setStatus(ActiveStatus.ACTIVE);
-//        userRepository.save(user);
-//        confirmationRepository.delete(confirmation);
-//        log.info("successfully verifying user with email: {}", user.getEmail());
-//        return Boolean.TRUE;
-//    }
 
     @Override
     public Page<UserDto> findAll(int page, int size) {
@@ -177,27 +144,6 @@ public class UserServiceImpl implements UserService {
         return dtoMapper.userToDto(userRepository.save(currentUser));
     }
 
-//    @Override //TODO
-//    @Transactional
-//    public UserDto updateClient(Long clientId, UserUpdateDto userDto) {
-//        User currentClient = userRepository.findById(clientId).get();
-//        String updatedEmail = userDto.getEmail();
-//        String currentEmail = currentClient.getEmail();
-//        if (isEmailTaken(currentEmail, updatedEmail)) {
-//            log.warn("user with email already taken. email:{}", userDto.getEmail());
-//            throw new ResourceAlreadyExistException("Client with email: " + updatedEmail + " has already exist");
-//        }
-//        User user = currentClient.toBuilder()
-//                .firstName(userDto.getFirstName())
-//                .lastName(userDto.getLastName())
-//                .email(userDto.getEmail())
-//                .password(userDto.getPassword())
-//                .avatar(imageRepository.save(new Image(imageConvertor.convertStringToByteImage(userDto.getAvatar()))))
-////                .role(UserRole.Client)
-//                .build();
-//        return dtoMapper.userToDto(userRepository.save(user));
-//    }
-
     @Override
     public UserUpdateDto getClientUpdateDto(Long clientId) {
         return dtoMapper.clientToClientUpdateDto(userRepository.findById(clientId)
@@ -215,23 +161,6 @@ public class UserServiceImpl implements UserService {
         Optional<User> optionalClient = userRepository.findById(userId);
         return optionalClient.map(this::createStatisticDto).orElseGet(ClientStatisticDto::new);
     }
-
-//    @Override TODO
-//    @Transactional
-//    public Transaction addTransaction(Long clientId, Transaction transaction) {
-//        Optional.ofNullable(transaction)
-//                .orElseThrow(() -> new ResourceNotFoundException("Transaction cannot be null"));
-//        Optional.ofNullable(transaction.getBankTransaction())
-//                .orElseThrow(() -> new ResourceNotFoundException("Transaction cannot be null"));
-//        transactionRepository.save(transaction);
-//        User client = userRepository.findById(clientId)
-//                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
-//        List<Transaction> transactions = client.getTransactions();
-//        transactions.add(transaction);
-//        client.setTransactions(transactions);
-//        userRepository.save(client);
-//        return transaction;
-//    }
 
     @Override
     public TransactionDto addTransaction(Long userId, CreateTransactionDto createTransactionDto) {
@@ -506,11 +435,10 @@ public class UserServiceImpl implements UserService {
         BigDecimal incomeSum = clientStatisticDto.getTotalIncomeSum();
         BigDecimal expenseSum = clientStatisticDto.getTotalExpenseSum();
         BigDecimal sum = incomeSum.add(expenseSum);
-        BigDecimal totalBalance = client.getBankCards().stream()
+        return client.getBankCards().stream()
                 .map(BankCard::getBalance)
                 .filter(Objects::nonNull)
                 .reduce(sum, BigDecimal::add);
-        return totalBalance;
 
     }
 

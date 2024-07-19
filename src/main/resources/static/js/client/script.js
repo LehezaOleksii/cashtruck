@@ -1,8 +1,9 @@
- 
-    // Function to change the displayed bank name at the add bank menu
-    function changeBankName(selectedBank) {
-        var dropdownButton = document.getElementById("dropdownMenuButton");
-        dropdownButton.textContent = selectedBank;
-    } 
+document.addEventListener("DOMContentLoaded", function () {
+    var cardHolderElement = document.querySelector(".card-holder");
+    var maxLength = parseInt(cardHolderElement.getAttribute("data-max-length"));
 
-    
+    if (cardHolderElement.textContent.length > maxLength) {
+        cardHolderElement.textContent =
+            cardHolderElement.textContent.slice(0, maxLength) + "...";
+    }
+});

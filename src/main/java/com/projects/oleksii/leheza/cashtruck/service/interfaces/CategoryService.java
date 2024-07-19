@@ -9,10 +9,6 @@ import java.util.List;
 
 public interface CategoryService {
 
-//    List<Category> findAll();TODO
-//
-//    Category save(Category category);
-
     Category save(CreateCategoryDto category);
 
     List<Category> findAllIncomeCategories();

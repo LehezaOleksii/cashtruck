@@ -116,9 +116,9 @@ public class ManagerController {
                                             @AuthenticationPrincipal User user,
                                             BindingResult bindingResult) {
         Long managerId = user.getId();
-        if (bindingResult.hasFieldErrors()) { //TODO
+        if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the update client account. userId:{}", userId);
-            return new ModelAndView("manager/client_info_edit")//TODO paramiters and UI
+            return new ModelAndView("manager/client_info_edit")
                     .addObject("manager", userService.getHeaderClientData(managerId))
                     .addObject("user", userService.getUserById(userId))
                     .addObject("statuses", ActiveStatus.values());
@@ -131,16 +131,14 @@ public class ManagerController {
     }
 
     @GetMapping(path = "/users/{userId}/block")
-    RedirectView blockUser(@PathVariable("userId") Long userId,
-                           @AuthenticationPrincipal User user) {//TODO
+    RedirectView blockUser(@PathVariable("userId") Long userId) {
         log.info("Start blocking user. User id: {}", userId);
         userService.blockUser(userId);
         return new RedirectView("/managers/users");
     }
 
     @GetMapping(path = "/users/{userId}/unblock")
-    RedirectView unblockUser(@PathVariable("userId") Long userId,
-                             @AuthenticationPrincipal User user) {//TODO
+    RedirectView unblockUser(@PathVariable("userId") Long userId) {
         log.info("Start unblocking user. User id: {}", userId);
         userService.unblockUser(userId);
         return new RedirectView("/managers/users");
@@ -199,9 +197,8 @@ public class ManagerController {
     @PostMapping(path = "/users/{clientId}/profile")
     ModelAndView changeClientProfile(@PathVariable("clientId") Long clientId,
                                      @Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto,
-                                     BindingResult bindingResult, //TODO
-                                     @RequestParam("image") MultipartFile avatar,
-                                     @AuthenticationPrincipal User user) {//TODO
+                                     BindingResult bindingResult,
+                                     @RequestParam("image") MultipartFile avatar) {
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the update client account by manager. userId:{}", clientId);
             return new ModelAndView("manager/client_profile")
@@ -220,7 +217,6 @@ public class ManagerController {
                 userService.updateUserInfo(clientId, userUpdateDto);
             } catch (Exception e) {
                 ModelAndView modelAndView = new ModelAndView("redirect:/managers/users/" + clientId + "/profile");
-//                modelAndView.addObject("client", userService.getHeaderClientData(clientId)); //TODO
                 return modelAndView.addObject("errorMessage", e.getMessage());
             }
             return new ModelAndView("redirect:/managers/users/" + clientId);
@@ -248,14 +244,12 @@ public class ManagerController {
         modelAndView.addObject("currentPage", usersPage.getNumber());
         modelAndView.addObject("totalPages", usersPage.getTotalPages());
         modelAndView.addObject("filterCriteria", new UserSearchCriteria());
-        //TODO exceptions with page number
         return modelAndView;
     }
 
     @GetMapping(path = "/users/{userId}/plan/update")
     ModelAndView updatePlanStatus(@PathVariable("userId") Long userId,
-                                  @RequestParam("status") String status,
-                                  @AuthenticationPrincipal User user) {//TODO
+                                  @RequestParam("status") String status) {
         log.info("Update user plan. User id: {}", userId);
         userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
         return new ModelAndView("redirect:/managers/users/" + userId);
@@ -272,16 +266,14 @@ public class ManagerController {
     }
 
     @PostMapping(path = "/emails/send")
-    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email,
-                           @AuthenticationPrincipal User user) {//TODO
+    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email) {
         log.info("Start sending email. send for user with email: {}", email.getTo());
         emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/managers/emails");
     }
 
     @PostMapping(path = "/emails/send/clients/all")
-    ModelAndView sendEmailsForAllClients(@Valid @ModelAttribute("email") EmailContext email,
-                                         @AuthenticationPrincipal User user) {//TODO
+    ModelAndView sendEmailsForAllClients(@Valid @ModelAttribute("email") EmailContext email) {
         log.info("Start sending email. send for all clients with email");
         userService.sendEmailForAllClients(email);
         return new ModelAndView("redirect:/managers/emails");
@@ -320,7 +312,6 @@ public class ManagerController {
     public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") BankCardDto bankCardDto,
                                              @AuthenticationPrincipal User user,
                                              BindingResult bindingResult) {
-        //TODO bindingResult and valid checking
         Long userId = user.getId();
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the save bank card process. userId:{} ,bank card number{}", userId, bankCardDto.getCardNumber());
@@ -376,7 +367,6 @@ public class ManagerController {
         modelAndView.addObject("currentPage", transactionPage.getNumber());
         modelAndView.addObject("totalPages", transactionPage.getTotalPages());
         modelAndView.addObject("transactions", transactionPage);
-        //TODO exceptions with page number
         return modelAndView;
     }
 

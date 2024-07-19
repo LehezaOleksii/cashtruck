@@ -20,8 +20,6 @@
             return true;
         }
     </script>
-
-    <!-- Credit card form -->
     <div class="mt-4" style="margin-left: 60px;">
         <div class="card mb-4">
             <div class="card-header py-3">
@@ -29,7 +27,6 @@
             </div>
             <div class="card-body">
                 <form method="post" th:object="${bank_card}" th:action="@{'/clients/bank_cards/save'}" onsubmit="return validateForm();">
-                    <!-- choose bank -->
                     <div class="row mb-3">
                         <div class="col">
                             <div class="dropdown">
@@ -55,7 +52,6 @@
                             </div>
                         </div>
                     </div>
-
                     <input type="hidden" th:field="*{id}" style="display: none;"/>
                     <input type="hidden" th:field="*{balance}" style="display: none;"/>
                     <script>
@@ -70,8 +66,6 @@
                             });
                         });
                     </script>
-
-                    <!-- Input for cardHolder -->
                     <div class="row mb-4">
                         <div class="col">
                             <div class="form-outline">
@@ -100,7 +94,6 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="row mb-4">
                         <div class="col-6">
                             <div class="form-outline">
@@ -130,10 +123,8 @@
                             </div>
                         </div>
                     </div>
-
                     <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit" style="width: 30%;">Save bank card</button>
                 </form>
-
             </div>
         </div>
     </div>

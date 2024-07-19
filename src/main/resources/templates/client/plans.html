@@ -10,7 +10,6 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
           crossorigin="anonymous">
-
 </head>
 <body th:object="${client}">
 <main layout:fragment="content">
@@ -35,7 +34,6 @@
                     <a th:if="${client_plan != 'FREE'}" th:href="@{'/clients/premium/payment_form?plan=FREE'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
                 </div>
             </div>
-            <!-- Plus Plan -->
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
                     <h4 class="my-0 font-weight-normal custom-dark-grey">Plus</h4>
@@ -51,7 +49,6 @@
                     <a th:if="${client_plan != 'PLUS'}" th:href="@{'/clients/premium/payment_form?plan=PLUS'}" class="btn btn-lg btn-block btn-outline-primary">Choose</a>
                 </div>
             </div>
-            <!-- Pro Plan -->
             <div class="card mb-4 box-shadow">
                 <div class="card-header">
                     <h4 class="my-0 font-weight-normal custom-dark-grey">Professional</h4>

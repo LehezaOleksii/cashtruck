@@ -11,7 +11,6 @@ import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
-import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,6 @@ public class ClientController {
     private final TransactionService transactionService;
     private final CategoryService categoryService;
     private final EmailService emailService;
-    private final UserRepository userRepository;
 
     @GetMapping(path = "/dashboard")
     public ModelAndView showClientDashboard(@AuthenticationPrincipal User user) {
@@ -70,7 +68,6 @@ public class ClientController {
     public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") BankCardDto bankCardDto,
                                              @AuthenticationPrincipal User user,
                                              BindingResult bindingResult) {
-        //TODO bindingResult and valid checking
         Long userId = user.getId();
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the save bank card process. userId:{} ,bank card number{}", userId, bankCardDto.getCardNumber());
@@ -127,7 +124,6 @@ public class ClientController {
         modelAndView.addObject("currentPage", transactionPage.getNumber());
         modelAndView.addObject("totalPages", transactionPage.getTotalPages());
         modelAndView.addObject("transactions", transactionPage);
-        //TODO exceptions with page number
         return modelAndView;
     }
 
@@ -188,8 +184,7 @@ public class ClientController {
 
 
     @PostMapping(path = "/emails/send")
-    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email,
-                           @AuthenticationPrincipal User user) { //TODO
+    ModelAndView sendEmail(@Valid @ModelAttribute("email") EmailContext email) {
         log.info("start sending email to user with email: {}", email.getTo());
         emailService.sendEmailWithAttachment(email);
         return new ModelAndView("redirect:/clients/emails");

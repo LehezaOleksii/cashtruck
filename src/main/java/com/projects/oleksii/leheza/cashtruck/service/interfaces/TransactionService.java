@@ -12,7 +12,7 @@ public interface TransactionService {
 
     List<Transaction> findAll();
 
-    Transaction save(Transaction transaction); //TODO return Optional/entity
+    Transaction save(Transaction transaction);
 
     List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId);
 

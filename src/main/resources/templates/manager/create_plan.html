@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorator="layout/manager/layout">
-
 <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
 </head>
-
 <body th:object="${manager}">
     <main layout:fragment="content">
         <h2 class="text-center custom-dark-grey mt-4">New plan</h2>
@@ -67,7 +65,6 @@
         </div>
         <script>
             var checkpointCounter = 0;
-
             function previewImagePlan(input) {
                 var preview = document.getElementById('preview');
                 var preview_card = document.getElementById('preview-card');
@@ -87,7 +84,6 @@
                     preview_card.style.display = 'block';
                 }
             }
-
             function clearImagePlan() {
                 var preview = document.getElementById('preview');
                 var preview_card = document.getElementById('preview-card');
@@ -96,12 +92,10 @@
                 preview_card.src = "";
                 fileInput.value = "";
             }
-
             function doubleText(inputId, outputId) {
                 var inputText = document.getElementById(inputId).value;
                 document.getElementById(outputId).innerText = inputText;
             }
-
             function addCheckpoint() {
                 var checkpointText = document.getElementById("checkpointInput").value;
 
@@ -109,7 +103,6 @@
                     alert("Please enter a checkpoint text.");
                     return;
                 }
-
                 var list = document.getElementById("checkpointList");
                 var outputCheckpointsList = document.getElementById("outputCheckpointsList");
                 var listItem = document.createElement("li");
@@ -138,5 +131,4 @@
         </script>
     </main>
 </body>
-
 </html>

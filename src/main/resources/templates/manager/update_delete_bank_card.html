@@ -10,8 +10,7 @@
   </head> 
   <body>
     <main layout:fragment="content">
-     <!-- Credit card form -->
-      <section class="info-card-container d-flex justify-content-center align-items-center"> 
+      <section class="info-card-container d-flex justify-content-center align-items-center">
           <div class="col-md-10 mb-4">
             <div class="card mb-4  my-container">
               <div class="card-header py-3">
@@ -19,10 +18,8 @@
               </div>
               <div class="card-body">
 <div th:object="${bank_cards}">   
- <!-- choose bank -->
               <div class="card-body" th:if="${not #lists.isEmpty(bank_cards)}" th:with="card=${bank_cards[0]}">
            <div class="row">
-    <!-- Bank cards dropdown --> 
     <div class="col-6">
         <h5>Bank cards</h5> 
         <div class="dropdown">
@@ -101,12 +98,10 @@
       </div>
     </div>
   </div>
-</div> 
-
+</div>
             </div>
     </div>
 
-    <!-- Bank card details on the right -->
     <div class="col-md-6">
          <div class="bank-card card-container mt-4">
                         <div class="bank-name-and-currency-name">
@@ -132,15 +127,12 @@
       </section> 
       <script th:inline="javascript"> 
        function formatCardNumber(cardNumber) {
-        // Add a space after every 4 digits
         return cardNumber.replace(/(\d{4})/g, '$1 ').trim();
     }
 
     function updateCardNumber() {
         var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
-        var cards = /*[[${bank_cards}]]*/ [];
-
-        // Assuming you want to format the first card in the list
+        var cards = [];
         if (cards.length > 0) {
             var formattedCardNumber = formatCardNumber(cards[0].cardNumber);
 
@@ -149,49 +141,36 @@
             }
         }
     }
-
     window.onload = function () { 
         updateCardNumber();
     };
  function selectBank(button) {
         var selectedBankName = button.innerText;
-        var cards = /*[[${bank_cards}]]*/ [];
-
-        // Find the selected bank card from the list using a unique identifier (card ID)
+        var cards =  [];
         var selectedCard = cards.find(function (card) {
             return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
         });
-
-        // Update the text on the top button to the selected bank name
         document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
-
-
-        // Update card details
         var elementsWithBalanceClass = document.getElementsByClassName('balance');
         for (var i = 0; i < elementsWithBalanceClass.length; i++) {
             elementsWithBalanceClass[i].innerText = selectedCard.balance;
         }
-
         var elementsWithCvvClass = document.getElementsByClassName('cvv');
         for (var i = 0; i < elementsWithCvvClass.length; i++) {
             elementsWithCvvClass[i].innerText = selectedCard.cvv;
         }
-
          var elementsWithIdClass = document.getElementsByClassName('card-id');
         for (var i = 0; i < elementsWithIdClass.length; i++) {
             elementsWithIdClass[i].innerText = selectedCard.id;
         }
-
         var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
         for (var i = 0; i < elementsWithExpiringDateClass.length; i++) {
-            // Format the date as "year month day"
             var formattedDate = new Date(selectedCard.expiringDate).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: '2-digit'
             });
             elementsWithExpiringDateClass[i].innerText = formattedDate;
         }
-
           var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
         for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
             var formattedCardNumber = formatCardNumber(selectedCard.cardNumber);
@@ -199,21 +178,16 @@
         }
         var elementsWithBankNameClass = document.getElementsByClassName('bankName');
         for (var i = 0; i < elementsWithBankNameClass.length; i++) {
-            // Display only the first 22 characters of the bank name
             elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
         }
-
         var elementsWithcardHolderClass = document.getElementsByClassName('cardHolder');
         for (var i = 0; i < elementsWithcardHolderClass.length; i++) {
             elementsWithcardHolderClass[i].innerText = selectedCard.cardHolder;
         }
-
          var elementsWithCardIdClass = document.getElementsByClassName('cardId');
         for (var i = 0; i < elementsWithCardIdClass.length; i++) {
             elementsWithCardIdClass[i].innerText = selectedCard.id;
-        } 
-        
-
+        }
         $('cardId').text(button.getAttribute('card-id')); 
         $('cardId').val(button.getAttribute('card-id'));
         $('cardId').val(button.getAttribute('card-id')); 

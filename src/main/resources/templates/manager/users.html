@@ -12,13 +12,11 @@
     <main layout:fragment="content">
         <div id = "managerId" th:text="${manager.id}" style="display: none"></div>
         <form th:action="@{/managers/users/filter}" method="get">
-
         <div class="my-container mt-4">
             <div class="pt-4 pl-4">
                 <h5 class="custom-dark-grey">Search filter</h5>
             </div>
             <div>
-
             </div>
             <div class="mx-auto">
                 <div class="pl-4 p-0">
@@ -161,14 +159,11 @@
                             $('#confirmationModal').modal('show');
                         });
                     });
-
                     document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
                         $('#confirmationModal').modal('hide');
                     });
-
                 </script>
                 <script>
-
                     document.querySelectorAll('#unblockUser').forEach(function(unblockUserLink) {
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
@@ -178,7 +173,6 @@
                     });
                 </script>
                 <script>
-
                     document.querySelectorAll('#user-profile').forEach(function(unblockUserLink) {
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
@@ -187,7 +181,6 @@
                             window.location.href = userProfileInfoUrl;});
                     });
                 </script>
-
                 <div class="modal" tabindex="-1" role="dialog" id="confirmationModal">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -218,5 +211,4 @@
         </div>
     </main>
 </body>
-
 </html>

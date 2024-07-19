@@ -18,7 +18,6 @@
                 <h5 class="custom-dark-grey">Search filter</h5>
             </div>
             <div>
-
             </div>
             <div class="mx-auto">
                 <div class="pl-4 p-0">
@@ -63,13 +62,11 @@
                     </div>
                     <script>
                         document.getElementById("cancelButton").addEventListener("click", function() {
-                            var managerId = document.getElementById("managerId").innerText;
                             window.location.href = 'http://localhost:8080/managers/users';
                         });
                     </script>
                 </div>
         </form>
-
                 <table class="table mt-3">
                     <thead>
                         <tr>
@@ -179,7 +176,6 @@
                     document.querySelectorAll('#unblockUser').forEach(function(unblockUserLink) {
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
-                            var managerId = document.getElementById('managerId').innerText;
                             var unblockUserUrl = '/managers/users/' + userId + '/unblock';
                             window.location.href = unblockUserUrl;});
                     });
@@ -188,12 +184,10 @@
                     document.querySelectorAll('#user-profile').forEach(function(unblockUserLink) {
                         unblockUserLink.addEventListener('click', function() {
                             var userId = this.getAttribute('data-user-id');
-                            var managerId = document.getElementById('managerId').innerText;
                             var userProfileInfoUrl = '/managers/users/' + userId;
                             window.location.href = userProfileInfoUrl;});
                     });
                 </script>
-
                 <div class="modal" tabindex="-1" role="dialog" id="confirmationModal">
                     <div class="modal-dialog" role="document">
                         <div class="modal-content">
@@ -209,7 +203,6 @@
                                 <script>
                                     document.getElementById('confirmBlock').addEventListener('click', function() {
                                         var userId = this.getAttribute('data-user-id');
-                                        var managerId = document.getElementById('managerId').innerText;
                                         var blockUserUrl = '/managers/users/' + userId + '/block';
                                         window.location.href = blockUserUrl;});
                                     document.querySelector('[data-dismiss="modal"]').addEventListener('click', function() {
@@ -222,7 +215,6 @@
                 </div>
             </div>
         </div>
-        <!-- Upgrade Role Modal -->
         <div class="modal fade" id="upgradeRoleModal" tabindex="-1" aria-labelledby="upgradeRoleModalLabel"
              aria-hidden="true">
             <input type="hidden" id="selectedUserId">
@@ -254,15 +246,14 @@
         <script>
             document.querySelectorAll('#upgradeRoleModal').forEach(function(upgradeRoleModal) {
                 upgradeRoleModal.addEventListener('show.bs.modal', function (event) {
-                    var button = event.relatedTarget; // Button that triggered the modal
-                    var userId = button.getAttribute('data-user-id'); // Extract info from data-* attributes
-                    document.getElementById('selectedUserId').value = userId; // Set the value to the hidden field
+                    var button = event.relatedTarget;
+                    var userId = button.getAttribute('data-user-id');
+                    document.getElementById('selectedUserId').value = userId;
                 });
             });
             document.querySelectorAll('#submitUpgradeRole').forEach(function(submitUpgradeRole) {
                 submitUpgradeRole.addEventListener('click', function () {
-                    var userId = document.getElementById('selectedUserId').value; // Get the user id from the hidden field
-                    var managerId = document.getElementById('managerId').innerText;
+                    var userId = document.getElementById('selectedUserId').value;
                     var status = document.getElementById('roleSelect').value;
                     var updateUrl = '/admins/users/' + userId + '/role/update?role=' + status;
                     window.location.href = updateUrl;

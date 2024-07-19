@@ -103,7 +103,7 @@ public class ClientApiController {
     public ResponseEntity<BankCard> saveBankCardToUser(@PathVariable Long userId,
                                                        @Valid @RequestBody BankCardDto bankCardDto) {
         BankCard bankCard = bankCardService.save(bankCardDto);
-//        savingService.assignBankCardToClient(userId, bankCard); //TODO
+        userService.assignBankCardToClient(userId, bankCard);
         return new ResponseEntity<>(bankCard, HttpStatus.OK);
     }
 

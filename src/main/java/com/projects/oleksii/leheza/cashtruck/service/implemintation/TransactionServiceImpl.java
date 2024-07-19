@@ -1,16 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
-import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.CategoryRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.TransactionRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.TransactionService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -31,7 +28,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     private final TransactionRepository transactionRepository;
     private final CategoryRepository categoryRepository;
-    private final UserRepository userRepository;
     private final DtoMapper dtoMapper;
 
     @Override
@@ -69,8 +65,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public PageDto<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, Integer pageNumber, Integer pageSize) {
-        User user = userRepository.findById(clientId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + clientId + " does not exist"));
         List<TransactionDto> transactions = transactionRepository.findTransactionsByClientId(clientId).stream()
                 .filter(transaction -> transaction.getCategory().getName().equals(categoryName))
                 .map(dtoMapper::transactionToDto)

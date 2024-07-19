@@ -1,6 +1,5 @@
 package com.projects.oleksii.leheza.cashtruck.service.email;
 
-
 import com.projects.oleksii.leheza.cashtruck.domain.OtpToken;
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
@@ -17,7 +16,6 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-
 
 @Service
 @RequiredArgsConstructor
@@ -81,7 +79,7 @@ public class EmailServiceImpl implements EmailService {
     }
 
     public String getVerificationUrl(String host, String token) {
-        return host + "/auth/users?token=" + token;//TODO change path
+        return host + "/auth/users?token=" + token;
     }
 
     private MimeMessage getMimeMessage() {

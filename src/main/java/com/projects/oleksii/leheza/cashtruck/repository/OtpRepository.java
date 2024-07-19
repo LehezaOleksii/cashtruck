@@ -9,9 +9,6 @@ public interface OtpRepository extends JpaRepository<OtpToken, Long> {
 
     Boolean existsByPassword(int password);
 
-//    @Query("SELECT u FROM OtpToken o JOIN o.user u  WHERE o.password = ?1")
-//    Optional<User> findByPassword(int password); TODO
-
     void deleteByPassword(int password);
 
     Boolean existsByUserEmail(String email);

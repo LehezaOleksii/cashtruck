@@ -35,7 +35,6 @@
             </tr>
         </tbody>
     </table>
-
         <nav aria-label="Page navigation example" class="d-flex justify-content-center">
             <ul class="pagination">
                 <li class="page-item" th:class="${currentPage == 0 ? 'disabled' : ''}">
@@ -53,26 +52,6 @@
                 </li>
             </ul>
         </nav>
-
-        <!-- <div class="my-container">
-            <div class="card-body text-center" >
-                <h4 class="mb-4" th:text="${category.name}"></h4>
-                <ul class="list-group mb-4">
-                    <li  th:each="transaction : ${transactions}" class="list-group-item d-flex justify-content-between align-items-center ">
-                      <div >
-                        <span><img th:src="@{/images/client/cc-primary.png}"></span>
-                        <span class="bankTransaction-name" th:text = "${transaction.name}"></span>
-                        </div>
-                        <div>
-                          <span class="m-4">
-                              <span class="bankTransaction-price" th:text= "${#numbers.formatDecimal(transaction.sum, 1, 2, 'POINT')}">0.00</span> $
-                          </span>
-                              <span th:text="${#temporals.format(transaction.time, 'dd.MM.yyyy')}"></span>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
-             </div> -->
         </div>
     </div>
 </main>

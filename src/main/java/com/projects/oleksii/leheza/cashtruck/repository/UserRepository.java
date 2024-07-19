@@ -49,7 +49,4 @@ public interface UserRepository extends
 
     @Query("SELECT u.email FROM User u WHERE u.role = :role")
     List<String> findAllEmailsByRole(@Param("role") Role role);
-
-//    @Query("SELECT u.role FROM User u WHERE u.id = :id")
-//    Role findRoleById(String id); TODO
 }
