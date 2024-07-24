@@ -1,3 +1,9 @@
+FROM postgres
+ENV POSTGRES_DB=cashtruck
+ENV POSTGRES_USER=postgres
+ENV POSTGRES_PASSWORD=1234
+EXPOSE 5432
+
 FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
 COPY ./pom.xml /app
