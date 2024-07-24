@@ -6,9 +6,9 @@ import com.projects.oleksii.leheza.cashtruck.service.implemintation.UserServiceI
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
 import com.projects.oleksii.leheza.cashtruck.service.subscription.SubscriptionChecker;
 import com.stripe.Stripe;
-import io.github.cdimascio.dotenv.Dotenv;
 import net.datafaker.Faker;
 import nz.net.ultraq.thymeleaf.LayoutDialect;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -26,6 +26,9 @@ import java.util.Random;
 @EnableTransactionManagement
 public class CashtruckApplication {
 
+    @Value("${STRIPE_SECRET_KEY}")
+    private String stripeSecret;
+
     public static void main(String[] args) {
         SpringApplication.run(CashtruckApplication.class, args);
     }
@@ -37,8 +40,7 @@ public class CashtruckApplication {
             randomUsersGenerator.generateRandomClientFields(10, 5, 1, 32, 200);
             SubscriptionChecker subscriptionChecker = new SubscriptionChecker(userService, emailService);
             subscriptionChecker.checkAndUpdateSubscriptionStatus();
-            Dotenv dotenv = Dotenv.load();
-            Stripe.apiKey = dotenv.get("STRIPE_SECRET_KEY");
+            Stripe.apiKey = stripeSecret;
         };
     }
 
