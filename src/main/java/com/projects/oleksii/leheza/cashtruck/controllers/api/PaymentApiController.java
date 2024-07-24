@@ -14,7 +14,6 @@ import com.stripe.model.Event;
 import com.stripe.model.PaymentIntent;
 import com.stripe.net.Webhook;
 import com.stripe.param.PaymentIntentCreateParams;
-import io.github.cdimascio.dotenv.Dotenv;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,6 +21,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -38,9 +38,10 @@ public class PaymentApiController {
 
     private final UserService userService;
     private final SubscriptionService subscriptionService;
-    private final Dotenv dotenv = Dotenv.load();
-    private final String stripePublishableKey = dotenv.get("STRIPE_PUBLISHABLE_KEY");
-    private final String END_POINT_SECRET = dotenv.get("STRIPE_WEBHOOK_SECRET");
+    @Value("${STRIPE_PUBLISHABLE_KEY}")
+    private String stripePublishableKey;
+    @Value("${STRIPE_WEBHOOK_SECRET}")
+    private String END_POINT_SECRET;
 
     private final Gson gson = new Gson();
 
