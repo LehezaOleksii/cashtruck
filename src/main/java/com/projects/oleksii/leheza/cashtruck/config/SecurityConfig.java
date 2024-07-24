@@ -1,7 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.config;
 
 import com.projects.oleksii.leheza.cashtruck.security.CustomUserDetailsService;
-import io.github.cdimascio.dotenv.Dotenv;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -21,14 +20,14 @@ import org.springframework.security.web.authentication.rememberme.TokenBasedReme
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final Dotenv dotenv = Dotenv.load();
-    private final String REMEMBER_ME_KEY = dotenv.get("REMEMBER_ME_KEY");
     private final CustomUserDetailsService userDetailsService;
     private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
     @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String clientId;
     @Value("${spring.security.oauth2.client.registration.google.client-secret}")
     private String clientSecret;
+    @Value("${spring.security.remember-me}")
+    private String rememberMeKey;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -64,7 +63,7 @@ public class SecurityConfig {
     @Bean
     RememberMeServices rememberMeServices(CustomUserDetailsService userDetailsService) {
         TokenBasedRememberMeServices.RememberMeTokenAlgorithm encodingAlgorithm = TokenBasedRememberMeServices.RememberMeTokenAlgorithm.SHA256;
-        TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices(REMEMBER_ME_KEY, userDetailsService, encodingAlgorithm);
+        TokenBasedRememberMeServices rememberMe = new TokenBasedRememberMeServices(rememberMeKey, userDetailsService, encodingAlgorithm);
         rememberMe.setMatchingAlgorithm(TokenBasedRememberMeServices.RememberMeTokenAlgorithm.MD5);
         return rememberMe;
     }
