@@ -1,3 +1,8 @@
+FROM postgres 
+ENV POSTGRES_PASSWORD 1234 
+ENV POSTGRES_DB cashtruck 
+COPY init.sql /docker-entrypoint-initdb.d/
+
 FROM maven:3.8.4-openjdk-17 AS build
 WORKDIR /app
 COPY ./pom.xml /app
