@@ -8,6 +8,7 @@ target/
 !**/src/test/**/target/
 /log.txt
 /*.gz
+/out
 
 ### STS ###
 .apt_generated
