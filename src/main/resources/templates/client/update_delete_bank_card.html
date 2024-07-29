@@ -100,7 +100,7 @@ $('#confirmationModal').modal('hide');
                         <div class="bank-name bankName" th:text="${card != null ? #strings.length(card.bankName) > 22 ? #strings.substring(card.bankName, 0, 22) : card.bankName : '-'}"></div>
                             <div class="currency-name">USD</div>
                         </div>
-                        <div class="card-number cardNumber"></div>
+                        <div class="card-number" th:text="${card != null ? card.cardNumber : 'xxxx-xxxx-xxxx-xxxx'}"></div>
                         <div class="card-holder-and-expiry">
                         <div class="card-holder cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></div>
                         <div class="expiry expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></div>
