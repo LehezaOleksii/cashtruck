@@ -11,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
 
 import java.math.BigDecimal;
 
-@Configuration //TODO?
+@Configuration
 @RequiredArgsConstructor
 public class MainEntitiesGenerator {
 

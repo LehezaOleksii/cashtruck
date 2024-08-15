@@ -1,6 +1,5 @@
-package com.projects.oleksii.leheza.cashtruck.config;
+package com.projects.oleksii.leheza.cashtruck.security;
 
-import com.projects.oleksii.leheza.cashtruck.security.CustomUserDetailsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;

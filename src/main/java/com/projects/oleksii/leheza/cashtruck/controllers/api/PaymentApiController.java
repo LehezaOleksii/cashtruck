@@ -170,6 +170,7 @@ public class PaymentApiController {
                 Long userId = Long.valueOf(paymentIntent.getMetadata().get("userId"));
                 String status = paymentIntent.getMetadata().get("subscriptionPlan");
                 userService.updateUserPlan(userId, SubscriptionStatus.valueOf(status));
+
                 log.info("User status was updated by webhook. user id:{}, user status:{}", userId, status);
                 break;
             case "payment_intent.payment_failed":

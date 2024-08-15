@@ -1,7 +1,6 @@
-package com.projects.oleksii.leheza.cashtruck.config;
+package com.projects.oleksii.leheza.cashtruck.security;
 
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
-import com.projects.oleksii.leheza.cashtruck.security.OAuth2UserService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

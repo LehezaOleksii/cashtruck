@@ -393,9 +393,6 @@ pre {
   transform: translate(68px, -100px);
   opacity: 1;
 }
-
-/* todo: spinner/processing state, errors, animations */
-
 .spinner,
 .spinner:before,
 .spinner:after {
