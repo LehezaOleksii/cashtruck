@@ -54,7 +54,7 @@ public class EmailServiceImpl implements EmailService {
         simpleMailMessage.setFrom(USER_EMAIL);//TODO prod input "from" variable
         simpleMailMessage.setTo(USER_EMAIL);//TODO prod input "to" variable
         simpleMailMessage.setSubject(NEW_USER_ACCOUNT_VERIFICATION);
-        simpleMailMessage.setText(getEmailMessage("localhost:8080", token));//TODO change path
+        simpleMailMessage.setText(getEmailMessage("http://localhost:8080", token));//TODO change path
         mailSender.send(simpleMailMessage);
     }
 
