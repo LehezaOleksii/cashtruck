@@ -5,7 +5,7 @@ services:
     environment:
       POSTGRES_DB: cashtruck
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_PASSWORD: root
     ports:
       - '5433:5432'
   app:
@@ -19,4 +19,4 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/cashtruck
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: 1234
+      SPRING_DATASOURCE_PASSWORD: root
