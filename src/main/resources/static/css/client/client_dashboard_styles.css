@@ -1,172 +1,263 @@
 .nav-link {
-  color: inherit; 
-  text-decoration: none;  
+    color: inherit;
+    text-decoration: none;
 }
 
 a {
-  color: inherit; 
-  text-decoration: none; 
+    color: inherit;
+    text-decoration: none;
 }
 
 a:hover {
-  color: #696CFF;
-  text-decoration: none; 
+    color: #696CFF;
+    text-decoration: none;
 
 }
 
 ul {
-  list-style: none;
+    list-style: none;
 }
 
 hr {
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  border: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 body {
-    background-color: #F5F5F9;  
+    background-color: #F5F5F9;
 }
 
-.bold{
- font-weight: bold;
+.bold {
+    font-weight: bold;
 }
 
-.my-container {  
+.border-radius-10 {
+    border-radius: 10px;
+}
+
+.border-radius-16 {
+    border-radius: 16px;
+}
+
+.my-container {
     font-size: 18px;
     color: grey;
     border-radius: 8px;
     background-color: white;
-    border: 2px  ; 
+    border: 2px;
     position: relative;
     box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
     height: 100%;
-} 
-
-.navigation {
-  box-shadow: 10px 0 5px -2px rgba(0, 0, 0, 0.02);
 }
 
-    /* --- navbar styles ---*/
-    .line-container {
-      display: flex;
-      align-items: center;
-      margin: 10px 0;
-    } 
+.navigation {
+    box-shadow: 10px 0 5px -2px rgba(0, 0, 0, 0.02);
+}
 
-    .line-left {
-      flex-grow: 1;
-      border-top: 1px solid #ccc;
-      margin-right: 10px; 
-    }
-    
-    .line-text {
-      font-weight: bold; 
-    }
+/* --- navbar styles ---*/
+.line-container {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
 
-    .line-right {
-      flex-grow: 1;
-      border-top: 1px solid #ccc;
-      margin-left: 10px; 
-    }
+.line-left {
+    flex-grow: 1;
+    border-top: 1px solid #ccc;
+    margin-right: 10px;
+}
 
- /* --- card styles --- */
-       .bank-card {
-            width: 300px;  
-            height: 180px;  
-            margin: 0 auto;
-            background: linear-gradient(45deg, #45B649, #57ACF2);
-            border-radius: 10px;
-            padding: 20px;
-            color: #fff;
-            box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.1);
-            position: relative;
-        }
+.line-text {
+    font-weight: bold;
+}
 
-    .bank-name-and-currency-name {
-        display: flex;
-        justify-content: space-between; 
-        text-align: center; 
-    }
+.line-right {
+    flex-grow: 1;
+    border-top: 1px solid #ccc;
+    margin-left: 10px;
+}
 
-        .bank-name {   
-            font-size: 18px;
-        }
+/* --- card styles --- */
+.bank-card {
+    width: 300px;
+    height: 180px;
+    margin: 0 auto;
+    background: linear-gradient(45deg, #45B649, #57ACF2);
+    border-radius: 10px;
+    padding: 20px;
+    color: #fff;
+    box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
 
-        .currency-name {   
-            font-size: 16px;
-        }
+.monobank-card {
+    width: 350px;
+    height: 210px;
+    border-radius: 20px;
+    background: linear-gradient(to bottom, #444, #111);
+    color: white;
+    padding: 20px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+    font-family: 'PT Mono', monospace;
+}
 
-        .card-holder-and-expiry {
-        display: flex;
-        justify-content: space-between;
-        font-size: 14px;
-        text-align: center;
-        margin-top: 25px;
-    }
+.monobank-card-container {
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.05);
+}
 
-    .card-padding { 
-    padding: 30px; 
-} 
-
-        .card-number {
-            font-size: 20px;
-            text-align: left;
-            margin-top: 40px;
-        }
-          
-        .card-holder {
-            font-size: 14px;
-            text-align: left;
-        }
-
-        .expiry {
-            font-size: 14px;
-            text-align: right;
-        } 
-
-        
+.monobank-card-container.clicked {
+    background-color: rgba(0, 123, 255, 0.1);
+}
 
 
-/* --- Bank cards dropdown menu --- */ 
+.monobank-card-container:hover {
+    background-color: rgba(0, 123, 255, 0.1);
+    cursor: pointer;
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.card-checkbox {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    appearance: none;
+    border: 2px solid #444;
+    border-radius: 4px;
+    transition: background-color 0.3s, border 0.3s;
+}
+
+.card-checkbox:checked {
+    background: linear-gradient(45deg, #333, #666);
+}
+
+.card-checkbox:checked::after {
+    content: '✔';
+    font-size: 16px;
+    color: white;
+    position: absolute;
+    top: 0;
+    left: 4px;
+}
+
+.monobank-subtitle {
+    font-size: 12px;
+    opacity: 0.7;
+}
+
+/* Card number styling */
+.card-number-monobank {
+    font-size: 22px;
+    letter-spacing: 3px;
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Cardholder name */
+.card-holder-monobank {
+    font-size: 16px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    letter-spacing: 1px;
+}
+
+/* Visa logo */
+.card-brand-monobank {
+    font-size: 24px;
+    font-weight: bold;
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+}
+
+.bank-name-and-currency-name {
+    display: flex;
+    justify-content: space-between;
+    text-align: center;
+}
+
+.bank-name {
+    font-size: 18px;
+}
+
+.currency-name {
+    font-size: 16px;
+}
+
+.card-holder-and-expiry {
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    text-align: center;
+    margin-top: 25px;
+}
+
+.card-padding {
+    padding: 30px;
+}
+
+.card-number {
+    font-size: 20px;
+    text-align: left;
+    margin-top: 40px;
+}
+
+.card-holder {
+    font-size: 14px;
+    text-align: left;
+}
+
+.expiry {
+    font-size: 14px;
+    text-align: right;
+}
+
+
+/* --- Bank cards dropdown menu --- */
 
 
 .custom-back-violet {
-  background-color: #696CFF;
-  color: #fff;
+    background-color: #696CFF;
+    color: #fff;
 }
- 
+
 .custom-back-violet:active {
-  border-color: #696CFF;
+    border-color: #696CFF;
 }
- 
+
 .custom-back-violet:focus {
-  background-color: #696CFF;
-  border-color: #696CFF;
+    background-color: #696CFF;
+    border-color: #696CFF;
 }
 
- .custom-back-violet:hover {
-  background-color: #696CFF;
-  border-color: #696CFF;
+.custom-back-violet:hover {
+    background-color: #696CFF;
+    border-color: #696CFF;
 }
- 
+
 .custom-back-red:hover {
-  background-color: #FF3E1D;
-  border-color: #FF3E1D;
-  color: white;
-} 
-
-
+    background-color: #FF3E1D;
+    border-color: #FF3E1D;
+    color: white;
+}
 
 
 /* --- Custom colors --- */
 .custom-red {
     color: red;
-} 
+}
 
 .custom-red:hover {
-  color: red;
+    color: red;
 }
 
 .custom-green {
@@ -174,135 +265,156 @@ body {
 }
 
 .custom-grey {
-  color: grey;
+    color: grey;
 }
 
 .custom-fair-grey {
-  color: #697A8D;
+    color: #697A8D;
 }
 
 
 .custom-dark-grey {
-  color:#566A7F;
+    color: #566A7F;
 }
 
 .custom-back-red {
     background-color: #FF3E1D;
-     color: #fff;
-} 
+    color: #fff;
+}
 
 .custom-back-grey {
-  background-color: #EAEEF1;
-   color: #696d74;
-} 
+    background-color: #EAEEF1;
+    color: #696d74;
+}
 
 .custom-back-white {
     background-color: white;
 }
 
 /* --- squares info cards--- */
-.info-card{ 
-    padding: 15px; 
-    width: 85%; 
+.info-card {
+    padding: 15px;
+    width: 85%;
 }
 
-.justify-content-end{
-  display: flex;
-  justify-content: flex-end;  
+.justify-content-end {
+    display: flex;
+    justify-content: flex-end;
 }
 
-.justify-content-center{
-  display: flex;
-  justify-content: center;  
-}
- 
-.info-card-font{
- color:#566A7F;
- font-size: 20px; 
+.justify-content-center {
+    display: flex;
+    justify-content: center;
 }
 
-.info-card-img{ 
- width: 50px;
-height: 50px; 
+.info-card-font {
+    color: #566A7F;
+    font-size: 20px;
 }
-   
+
+.info-card-img {
+    width: 50px;
+    height: 50px;
+}
+
 .custom-font-size-cli-dash {
-  font-size: 16px; 
+    font-size: 16px;
 }
- 
+
+.add-bank-card-img-wrapper {
+    position: relative;
+    display: inline-block;
+}
+
+.add-bank-card-img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+.add-bank-card-img-wrapper::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%),
+    linear-gradient(to left, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%),
+    linear-gradient(to right, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0) 30%);
+    background-blend-mode: lighten;
+    pointer-events: none;
+}
 
 /* ---radio button--- */
-  /* Custom violet background color for checked radio button */
-  .custom-violet-bg {
+/* Custom violet background color for checked radio button */
+.custom-violet-bg {
     background-color: #696CFF;
-    color: #fff;  
-  } 
+    color: #fff;
+}
 
+/* Style the unchecked radio buttons and labels */
+input[type="radio"].btn-check:not(:checked).custom-back-white + label {
+    background-color: white;
+    color: grey;
+}
 
-  /* Style the unchecked radio buttons and labels */
-  input[type="radio"].btn-check:not(:checked).custom-back-white + label {
-    background-color: white; 
-    color: grey;  
-  }
-
-  /* Style the checked radio buttons and labels */
-  input[type="radio"].btn-check.custom-back-white:checked + label {
-    background-color: #696CFF;  
-    color: #fff; 
-  } 
+/* Style the checked radio buttons and labels */
+input[type="radio"].btn-check.custom-back-white:checked + label {
+    background-color: #696CFF;
+    color: #fff;
+}
 
 /* profile */
 
-.profile-container{
-  font-size: 18px;
-  padding: 5%;
-  color: grey;
-  border-radius: 8px;
-  background-color: white;
-  border: 2px  ; 
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
-  width: 60%;
+.profile-container {
+    font-size: 18px;
+    padding: 5%;
+    color: grey;
+    border-radius: 8px;
+    background-color: white;
+    border: 2px;
+    box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.1);
+    width: 60%;
 }
 
 
-.profile-atribute{
-  font-weight: bold;
-  font-size: medium;
-  margin-bottom: 10px;
+.profile-atribute {
+    font-weight: bold;
+    font-size: medium;
+    margin-bottom: 10px;
 }
- 
+
 .overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(149, 151, 255, 0.15);
-  z-index: 1000;
-  display: flex;
-  justify-content: center;
-  overflow: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(149, 151, 255, 0.15);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    overflow: auto;
 }
 
 .overlay-content {
-  margin-top: 80px;
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 80%;
-  padding: 20px;
+    margin-top: 80px;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80%;
+    padding: 20px;
 }
 
 
 /* Table without last border line */
 
 .my-table tr:last-child td {
-  border-bottom: none;
+    border-bottom: none;
 }
 
 .my-table td:last-child {
-  border-right: none;
+    border-right: none;
 }
 
 /* Login */
@@ -317,4 +429,70 @@ height: 50px;
 
 .login-btn-primary {
     border-radius: 10px;
+}
+
+/*Monobank*/
+@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;700&display=swap');
+
+.monobank-label {
+    background: linear-gradient(90deg,
+    #2c2c2c 0%,
+    #3a3a3a 25%,
+    #4a4a4a 50%,
+    #5a5a5a 75%,
+    #6a6a6a 100%);
+    color: white;
+    font-family: 'SF Pro Display', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.button-hover-shadow:hover{
+    box-shadow: 0 4px 8px rgba(5, 5, 5, 0.4);
+}
+
+.usa-canada-label {
+    background: linear-gradient(90deg, #696CFF, #7a7eff, #4e53d1);
+    color: white;
+    font-family: 'SF Pro Display', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #4e53d1;
+
+}
+
+.manually-add-card-label {
+    background: linear-gradient(90deg, #ffffff, #f0f0f0, #d6d6d6);
+    color: black;
+    font-family: 'SF Pro Display', sans-serif;
+    font-size: 18px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+.monobank-input:focus {
+    border-color: #888;
+}
+
+.monobank-link {
+    color: #696CFF;
+    text-decoration: none;
+}
+
+.monobank-link:hover {
+    color: #4f53e1;
+}
+
+.monobank-label-token {
+    font-size: 16px;
+    font-weight: bold;
 }

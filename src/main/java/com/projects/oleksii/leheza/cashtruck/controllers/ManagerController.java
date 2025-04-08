@@ -386,8 +386,8 @@ public class ManagerController {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/create_transaction");
         modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
-        modelAndView.addObject("incomes", categoryService.findAllIncomeCategories());
-        modelAndView.addObject("expenses", categoryService.findAllExpensesCategories());
+        modelAndView.addObject("incomes", categoryService.getIncomeAndUniversalCategories());
+        modelAndView.addObject("expenses", categoryService.getExpenseAndUniversalCategories());
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
         modelAndView.addObject("transaction", new CreateTransactionDto());
         return modelAndView;

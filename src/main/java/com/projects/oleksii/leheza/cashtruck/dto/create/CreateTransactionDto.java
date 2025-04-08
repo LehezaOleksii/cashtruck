@@ -1,13 +1,10 @@
 package com.projects.oleksii.leheza.cashtruck.dto.create;
 
-import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.PastOrPresent;
 import lombok.*;
 import org.hibernate.validator.constraints.CreditCardNumber;
-
-import java.math.BigDecimal;
 
 @Getter
 @Setter
@@ -26,6 +23,5 @@ public class CreateTransactionDto {
     private String cardNumber;
     @PastOrPresent
     private String time;
-    @DecimalMin(value = "0")
-    private BigDecimal sum;
+    private double sum;
 }

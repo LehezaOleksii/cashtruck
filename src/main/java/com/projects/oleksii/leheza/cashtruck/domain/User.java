@@ -1,5 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import jakarta.persistence.*;
@@ -53,6 +54,8 @@ public class User implements UserDetails {
     @ManyToOne
     private Subscription subscription;
     private Date subscriptionFinishDate;
+    @OneToOne
+    private MonobankIntegration monobankIntegration;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -19,8 +19,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.time.Instant;
-import java.time.LocalDateTime;
+import java.net.http.HttpClient;
+import java.time.Duration;
 import java.util.Random;
 
 @SpringBootApplication
@@ -55,6 +55,13 @@ public class CashtruckApplication {
     @Scope("prototype")
     public Random getRandom() {
         return new Random();
+    }
+
+    @Bean
+    public HttpClient getHttpClient() {
+        return HttpClient.newBuilder()
+                .connectTimeout(Duration.ofSeconds(10))
+                .build();
     }
 
     @Bean

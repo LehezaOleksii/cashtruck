@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,8 +21,19 @@ public interface CategoryRepository extends JpaRepository<Category, Long>,
 
     List<Category> findByTransactionType(TransactionType transactionType);
 
-    @Query("SELECT cat FROM User u JOIN u.bankCards bc JOIN bc.transactions t JOIN t.category cat WHERE cat.transactionType = ?1 AND u.id = ?2")
-    List<Category> findCategoriesByTransactionTypeAndClientId(TransactionType transactionType, Long clientId);
+    @Query("SELECT c FROM Transaction t " +
+            "JOIN t.category c " +
+            "JOIN t.bankCard bc " +
+            "JOIN bc.user u " +
+            "WHERE c.transactionType IN :transactionTypes AND u.id = :clientId " +
+            "AND ((:isPositive = true AND t.bankTransaction.sum > 0) OR (:isPositive = false AND t.bankTransaction.sum < 0))")
+    List<Category> findCategoriesByTransactionTypesAndClientId(
+            @Param("transactionTypes") List<TransactionType> transactionTypes,
+            @Param("clientId") Long clientId,
+            @Param("isPositive") boolean isPositiveTransactionSum);
 
     Page<Category> findAll(Pageable pageable);
+
+    @Query("SELECT c FROM Category c WHERE c.mccs LIKE %:mcc%")
+    Optional<Category> findByMcc(@Param("mcc") String mcc);
 }

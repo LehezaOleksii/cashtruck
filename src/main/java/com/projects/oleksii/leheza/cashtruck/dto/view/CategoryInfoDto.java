@@ -1,10 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.dto.view;
 
-import lombok.*;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import java.math.BigDecimal;
+import lombok.*;
 
 @AllArgsConstructor
 @Getter
@@ -16,6 +14,6 @@ public class CategoryInfoDto {
     @NotNull
     @NotBlank
     private String name;
-    private BigDecimal fullCategoryTransactionSum;
-    private double categoryPercentage;
+    private long fullCategoryTransactionSum;
+    private int categoryPercentage;
 }

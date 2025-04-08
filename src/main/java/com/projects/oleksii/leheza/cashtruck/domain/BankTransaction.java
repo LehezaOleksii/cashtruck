@@ -1,10 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.domain;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMin;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Getter
@@ -21,6 +19,7 @@ public final class BankTransaction {
     private Long id;
     private String name;
     private LocalDateTime time;
-    @DecimalMin(value = "0")
-    private BigDecimal sum;
+    private long sum;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Currency currency;
 }

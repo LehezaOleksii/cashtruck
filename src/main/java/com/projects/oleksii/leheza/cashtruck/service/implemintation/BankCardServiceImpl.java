@@ -1,11 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.Currency;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.CurrencyRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +26,7 @@ public class BankCardServiceImpl implements BankCardService {
     private final BankCardRepository bankCardRepository;
     private final UserRepository userRepository;
     private final DtoMapper dtoMapper;
-
+    private final CurrencyRepository currencyRepository;
 
     @Override
     public BankCard save(BankCard bankCard) {
@@ -33,7 +35,9 @@ public class BankCardServiceImpl implements BankCardService {
 
     @Override
     public BankCard save(BankCardDto bankCardDto) {
-        BankCard bankCard = dtoMapper.bankCardDtoToBankCard(bankCardDto);
+        Currency currency = currencyRepository.findByShortName(bankCardDto.getCurrencyShortName())
+                .orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + bankCardDto.getCurrencyShortName() + "not found"));
+        BankCard bankCard = dtoMapper.bankCardDtoToBankCard(bankCardDto, currency);
         return bankCardRepository.save(bankCard);
     }
 

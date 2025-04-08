@@ -12,9 +12,9 @@ import java.util.Optional;
 @Repository
 public interface BankCardRepository extends JpaRepository<BankCard, Long> {
 
-    @Query("SELECT bc FROM BankCard bc WHERE bc.cardNumber=?1")
-    Optional<BankCard> findCardByNumber(String bankCard);
-
-    @Query("SELECT u.bankCards FROM User u WHERE u.id = :userId")
+    @Query("SELECT bc FROM BankCard bc JOIN bc.user u WHERE u.id = :userId")
     List<BankCard> getBankCardsByUserId(@Param("userId") Long userId);
+
+    @Query("SELECT bc FROM BankCard bc JOIN bc.user u WHERE bc.cardNumber=:cardNumber AND u.id=:userId")
+    Optional<BankCard> findCardByNumberAndUserId(String cardNumber, Long userId);
 }

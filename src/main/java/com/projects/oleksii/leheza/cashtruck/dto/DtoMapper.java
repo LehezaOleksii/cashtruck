@@ -1,9 +1,13 @@
 package com.projects.oleksii.leheza.cashtruck.dto;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
+import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountDto;
+import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
@@ -17,8 +21,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,6 +30,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DtoMapper {
 
+    private static final int HRYVNIA_CURRENCY_CODE = 980;
     private final ImageConvertor imageConvertor;
     private final ImageService imageService;
     private final PasswordEncoder passwordEncoder;
@@ -42,19 +47,18 @@ public class DtoMapper {
 
     public CategoryInfoDto categoryToDtoInfo(List<TransactionDto> transactionDtos, Category category) {
         String categoryName = category.getName();
-        double totalSum = transactionDtos
-                .stream()
-                .mapToDouble(transactionDto -> transactionDto.getSum().doubleValue())
+        long totalSum = transactionDtos.stream()
+                .mapToLong(TransactionDto::getSum)
                 .sum();
-        double totalSumByCategory = transactionDtos.stream()
+        long totalSumByCategory = transactionDtos.stream()
                 .filter(transactionDto -> transactionDto.getCategory().equals(categoryName))
-                .mapToDouble(transactionDto -> transactionDto.getSum().doubleValue())
+                .mapToLong(TransactionDto::getSum)
                 .sum();
-        double categoryPercentage = (totalSum == 0) ? 0 : (totalSumByCategory / totalSum * 100);
+        int categoryPercentage = (totalSum == 0) ? 0 : (int) (totalSumByCategory * 100 / totalSum);
         return CategoryInfoDto.builder()
                 .name(categoryName)
                 .categoryPercentage(categoryPercentage)
-                .fullCategoryTransactionSum(new BigDecimal(totalSumByCategory))
+                .fullCategoryTransactionSum(totalSumByCategory)
                 .build();
     }
 
@@ -137,11 +141,11 @@ public class DtoMapper {
                 .build();
     }
 
-    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto) {
+    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto, int currencyDelimiter) {
         return BankTransaction.builder()
                 .name(transactionDto.getTransactionName())
                 .time(LocalDateTime.parse(transactionDto.getTime()))
-                .sum(transactionDto.getSum())
+                .sum((int) Math.round(transactionDto.getSum() * currencyDelimiter))
                 .build();
     }
 
@@ -155,12 +159,12 @@ public class DtoMapper {
 
     public PaymentCreateRequest subscriptionToPaymentRequest(Subscription subscription) {
         return PaymentCreateRequest.builder()
-                .price(subscription.getPrice().longValue())
+                .price((long) subscription.getPrice())
                 .subscriptionPlan(subscription.getSubscriptionStatus().name())
                 .build();
     }
 
-    public BankCard bankCardDtoToBankCard(BankCardDto bankCardDto) {
+    public BankCard bankCardDtoToBankCard(BankCardDto bankCardDto, Currency currency) {
         return BankCard.builder()
                 .id(bankCardDto.getId())
                 .cvv(bankCardDto.getCvv())
@@ -168,7 +172,8 @@ public class DtoMapper {
                 .cardNumber(bankCardDto.getCardNumber())
                 .cardHolder(bankCardDto.getCardHolder())
                 .expiringDate(bankCardDto.getExpiringDate())
-                .balance(BigDecimal.valueOf(bankCardDto.getBalance()))
+                .currency(currency)
+                .balance((int) Math.round((bankCardDto.getBalance()) * currency.getDelimiter()))
                 .build();
     }
 
@@ -180,7 +185,60 @@ public class DtoMapper {
                 .cardNumber(bankCard.getCardNumber())
                 .cardHolder(bankCard.getCardHolder())
                 .expiringDate(bankCard.getExpiringDate())
-                .balance(bankCard.getBalance().doubleValue())
+                .currencyShortName(bankCard.getCurrency().getShortName())
+                .delimiter(bankCard.getCurrency().getDelimiter())
+                .balance(bankCard.getBalance())
+                .build();
+    }
+
+    public MonobankAccount monobankAccountDtoToMonobankAccount(MonobankAccountDto monobankAccountDto, Currency currency, MonobankIntegration monobankIntegration) {
+        return MonobankAccount.builder()
+                .monobankId(monobankAccountDto.getId())
+                .type(monobankAccountDto.getType())
+                .balance(monobankAccountDto.getBalance())
+                .currency(currency)
+                .maskedPan(monobankAccountDto.getMaskedPan().get(0))
+                .holderName(monobankAccountDto.getHolderName())
+                .creditLimit(monobankAccountDto.getCreditLimit())
+                .monobankId(monobankAccountDto.getId())
+                .monobankIntegration(monobankIntegration)
+                .build();
+    }
+
+    public MonobankAccountDto monobankAccountToMonobankAccountDto(MonobankAccount monobankAccount) {
+        return MonobankAccountDto.builder()
+                .type(monobankAccount.getType())
+                .balance(monobankAccount.getBalance())
+                .currency(monobankAccount.getCurrency().getShortName())
+                .maskedPan(Collections.singletonList(monobankAccount.getMaskedPan()))
+                .currencyCode(monobankAccount.getCurrency().getCode())
+                .holderName(monobankAccount.getHolderName())
+                .currencyDelimiter(monobankAccount.getCurrency().getDelimiter())
+                .creditLimit(monobankAccount.getCreditLimit())
+                .build();
+    }
+
+    public BankCard monobankAccountToBankCard(MonobankAccount monobankAccount, User user) {
+        String bankName = "monobank(" + monobankAccount.getType();
+        if (monobankAccount.getCurrency().getCode() != HRYVNIA_CURRENCY_CODE) {
+            bankName +=", " + monobankAccount.getCurrency().getShortName();
+        }
+        bankName += ")";
+        return BankCard.builder()
+                .bankName(bankName)
+                .currency(monobankAccount.getCurrency())
+                .balance(monobankAccount.getBalance())
+                .cardNumber(monobankAccount.getMaskedPan())
+                .cardHolder(monobankAccount.getHolderName())
+                .user(user)
+                .build();
+    }
+
+    public Transaction MonobankAccountTransactionDto(MonobankAccountTransactionDto monobankAccountTransactionDto, BankCard bankCard, BankTransaction bankTransaction, Category category) {
+        return Transaction.builder()
+                .bankCard(bankCard)
+                .bankTransaction(bankTransaction)
+                .category(category)
                 .build();
     }
 }

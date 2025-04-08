@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-import jakarta.validation.constraints.DecimalMin;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @AllArgsConstructor
@@ -19,6 +17,5 @@ public class TransactionDto {
     private String category;
     private String transactionType;
     private LocalDateTime time;
-    @DecimalMin(value = "0", inclusive = true)
-    private BigDecimal sum;
+    private long sum;
 }

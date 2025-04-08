@@ -6,6 +6,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @Setter
 @AllArgsConstructor
@@ -14,19 +18,34 @@ import lombok.*;
 @Entity
 @Table(name = "categories")
 public final class Category {
+
+    private static final String MCC_DELIMITER = ",";
     @Id
     @SequenceGenerator(name = "category_sequence", sequenceName = "category_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "category_sequence")
     private Long id;
-    @NotNull
     @Enumerated(EnumType.ORDINAL)
     private TransactionType transactionType;
-    @NotBlank
-    @Column(length = 50)
+    private String mccs;
+    @Column(length = 50, nullable = false)
     private String name;
 
     public Category(TransactionType transactionType, String name) {
         this.transactionType = transactionType;
         this.name = name;
+    }
+
+    public Category(TransactionType transactionType, String name,List<String> mccs) {
+        this.transactionType = transactionType;
+        this.name = name;
+        this.mccs = String.join(MCC_DELIMITER, mccs);
+    }
+
+    public void addMcc(String mcc) {
+        this.mccs += MCC_DELIMITER + mcc;
+    }
+
+    public List<String> getMccs() {
+        return new ArrayList<>(List.of(mccs.split(MCC_DELIMITER)));
     }
 }

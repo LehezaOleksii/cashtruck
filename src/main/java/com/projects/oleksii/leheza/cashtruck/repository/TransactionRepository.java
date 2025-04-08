@@ -22,14 +22,23 @@ public interface TransactionRepository extends
 
     List<Transaction> findTransactionsByCategoryTransactionType(TransactionType transactionType);
 
-    @Query("SELECT t FROM User u JOIN u.bankCards bc JOIN bc.transactions t WHERE u.id = ?1")
+    @Query("SELECT t FROM Transaction t JOIN t.bankCard bc JOIN bc.user u WHERE u.id = ?1")
     List<Transaction> findTransactionsByClientId(Long userId);
 
     Page<Transaction> findAll(Specification<?> specification, Pageable pageable);
 
-    @Query("SELECT t FROM Transaction t WHERE t.bankCard IN :bankCards AND t.bankTransaction.time >= :startDate AND t.bankTransaction.time <= :endDate AND t.category.transactionType = :transactionType")
-    List<Transaction> findTransactionForPeriod(@Param("bankCards") List<BankCard> bankCards,
-                                               @Param("transactionType") TransactionType transactionType,
-                                               @Param("startDate") LocalDateTime startDate,
-                                               @Param("endDate") LocalDateTime endDate);
+    @Query("""
+    SELECT t FROM Transaction t
+    WHERE t.bankCard IN :bankCards
+    AND t.bankTransaction.time >= :startDate
+    AND t.bankTransaction.time <= :endDate
+    AND t.category.transactionType IN :transactionTypes
+    AND ((:isPositiveTransactionSum = true AND t.bankTransaction.sum > 0)
+         OR (:isPositiveTransactionSum = false AND t.bankTransaction.sum < 0))
+    """)
+    List<Transaction> findByBankCardsAndDateRangeAndTransactionTypes(@Param("bankCards") List<BankCard> bankCards,
+                                                                     @Param("startDate") LocalDateTime startDate,
+                                                                     @Param("endDate") LocalDateTime endDate,
+                                                                     @Param("transactionTypes") List<TransactionType> transactionTypes,
+                                                                     @Param("isPositiveTransactionSum") boolean isPositiveTransactionSum);
 }

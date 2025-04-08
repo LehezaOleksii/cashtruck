@@ -48,7 +48,7 @@
                     <div class="bank-card card-container mt-4">
                         <div class="bank-name-and-currency-name">
                         <div class="bank-name bankName" th:text="${card != null ? #strings.length(card.bankName) > 22 ? #strings.substring(card.bankName, 0, 22) : card.bankName : '-'}"></div>
-                            <div class="currency-name">USD</div>
+                            <div class="currency-name" th:text="${card != null ? card.currencyShortName : '-'}"></div>
                         </div>
                         <div class="card-number" th:text="${card != null ? card.cardNumber : '-'}"></div>
 
@@ -60,7 +60,7 @@
                 </div>
                 <div class="col-sm-5">
                     <div class="additional-info mt-4">        
-              <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div> 
+              <div> Balance: <span class="balance" th:text="${card != null ? card.balance/card.delimiter : '-'}"></span></div>
               <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
               <div> Holder: <span class="cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></span></div> 
               <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
@@ -75,7 +75,7 @@
                     <div class="bank-card mt-4">
                         <div class="bank-name-and-currency-name">
                             <div class="bank-name" th:text="'Bank'"></div>
-                            <div class="currency-name">USD</div>
+                            <div class="currency-name">Currency</div>
                         </div>
                         <div class="card-number" th:text="'xxxx xxxx xxxx xxxx'"></div>
                         <div class="card-holder-and-expiry">
@@ -93,7 +93,7 @@
                         </a>
                     </div>
                     <div class="additional-info mt-5">
-                       <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div>
+                       <div> Balance: <span class="balance" th:text="${card != null ? card.balance/card.delimiter : '-'}"></span></div>
                         <div> Exp date: <span th:text="${card != null ? card.expiringDate : '-'}"></span></div>
                         <div> Holder: <span th:text="${card != null ? card.cardHolder : '-'}"></span></div>
                        <div>  CVV: <span th:text="${card != null ? card.cvv : '-'}"></span></div>

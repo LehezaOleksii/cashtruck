@@ -34,7 +34,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Validated
 @Slf4j
-@Tag(name = "Admins", description = "Methods related to admins")
+@Tag(name = "Clients", description = "Methods related to clients")
 public class ClientApiController {
 
     private final UserService userService;
