@@ -9,7 +9,8 @@ target/
 /log.txt
 /*.gz
 /out
-
+/src/main/resources/priv.key
+/src/main/resources/public.key
 ### STS ###
 .apt_generated
 .classpath
