@@ -11,6 +11,7 @@ target/
 /out
 /src/main/resources/priv.key
 /src/main/resources/public.key
+/src/main/resources/application.properties
 ### STS ###
 .apt_generated
 .classpath
