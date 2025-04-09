@@ -7,6 +7,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankClientInfoDto;
+import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankRequestPersonalClientDataDto;
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
@@ -88,47 +89,66 @@ public class ClientController {
     }
 
     @GetMapping({"/bank_cards/add/monobank"})
-    public ModelAndView addMonobankCardPage(@AuthenticationPrincipal User user) {
+    public ModelAndView addMonobankCardPage(
+            @ModelAttribute("error") String error,
+            RedirectAttributes redirectAttributes,
+            @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/add_monobank_card");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        if (error != null && !error.isEmpty()) {
+            return modelAndView;
+        }
+        MonobankRequestPersonalClientDataDto requestDto;
+        try {
+            requestDto = monobankRequestService.requestToPersonalClientData(userId);
+        } catch (Exception e) {
+            log.error(e.getMessage() + "; casue: " + e.getCause());
+            redirectAttributes.addFlashAttribute("error", "Can not get connection with Monobank service.");
+            return new ModelAndView("redirect:/clients/bank_cards/add/monobank");
+        }
+        if (Optional.ofNullable(requestDto).isPresent() && requestDto.getAcceptUrl() != null && !requestDto.getTokenRequestId().isEmpty()) {
+            modelAndView.addObject("accept_url", requestDto.getAcceptUrl());
+            monobankIntegrationService.setMonobankRequestId(userId, requestDto.getTokenRequestId());
+        } else {
+            log.error("Can not retrieve accept url from monobank request");
+            redirectAttributes.addFlashAttribute("error", "Can not get Monobank qr code.");
+            return new ModelAndView("redirect:/clients/bank_cards/add/monobank");
+        }
         return modelAndView;
     }
 
-    @PostMapping("/bank_cards/add/monobank/token/save")
-    public ModelAndView saveMonobankToken(@RequestParam("monobankToken") String monobankToken, RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
+    @PostMapping("/bank_cards/add/monobank/token/connect")
+    public ModelAndView saveMonobankRequestId(RedirectAttributes redirectAttributes,
+                                              @AuthenticationPrincipal User user) {
         Long userId = user.getId();
-        monobankToken = monobankToken.trim();
-        if (monobankToken.isBlank()) {
-            log.warn("Validation failed for Monobank token. User ID: {}", userId);
-            redirectAttributes.addFlashAttribute("error", "Monobank token cannot be empty.");
+        user = userService.getUserById(userId);
+        if (!Optional.ofNullable(user).isPresent()) {
+            throw new SecurityException("user with id:" + userId + " does not exists");
+        }
+        String requestId = user.getMonobankIntegration().getRequestId();
+        MonobankClientInfoDto monobankClientInfoDto = null;
+        if (requestId != null && monobankRequestService.checkAccessToUserData(requestId)) {
+            try {
+                monobankClientInfoDto = monobankRequestService.getMonobankClientInfo(requestId);
+                if (monobankClientInfoDto == null) {
+                    redirectAttributes.addFlashAttribute("error", "Monobank data access is denied.");
+                }
+            } catch (Exception e) {
+                log.error(e.getMessage() + "; casue: " + e.getCause());
+                redirectAttributes.addFlashAttribute("warn", "Please confirm permission request in Monobank application.");
+            }
+        } else {
+            redirectAttributes.addFlashAttribute("warn", "Please confirm permission request in Monobank application.");
+        }
+        if (monobankClientInfoDto != null && monobankClientInfoDto.getAccounts() != null && !monobankClientInfoDto.getAccounts().isEmpty()) {
+            monobankAccountService.saveMonobankAccounts(userId, monobankClientInfoDto.getAccounts());
+        } else {
+            redirectAttributes.addFlashAttribute("warn", "Please confirm permission request in Monobank application.");
+        }
+        if (redirectAttributes.containsAttribute("error") || redirectAttributes.containsAttribute("warn")) {
             return new ModelAndView("redirect:/clients/bank_cards/add/monobank");
         }
-        MonobankClientInfoDto monobankClientInfoDto = null;
-        try {
-            monobankClientInfoDto = monobankRequestService.getMonobankClientInfo(monobankToken);
-        } catch (HttpTimeoutException e) {
-            redirectAttributes.addFlashAttribute("error", "Request to Monobank API timed out.");
-            log.error("Request to Monobank API timed out: {}", e.getMessage());
-        } catch (IOException e) {
-            redirectAttributes.addFlashAttribute("error", "IO Exception while calling Monobank API.");
-            log.error("IO Exception while calling Monobank API: {}", e.getMessage());
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            redirectAttributes.addFlashAttribute("error", "Request to Monobank API was interrupted.");
-            log.error("Request to Monobank API was interrupted: {}", e.getMessage());
-        } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("error", "Unexpected error while fetching Monobank client info.");
-            log.error("Unexpected error while fetching Monobank client info: {}", e.getMessage());
-        }
-        if (monobankClientInfoDto == null) {
-            redirectAttributes.addFlashAttribute("error", "Monobank token is invalid.");
-        }
-        if (redirectAttributes.containsAttribute("error")) {
-            return new ModelAndView("redirect:/clients/bank_cards/add/monobank/token/save");
-        }
-        monobankIntegrationService.setMonobankToken(userId, monobankToken);
-        monobankAccountService.saveMonobankAccounts(userId, monobankClientInfoDto.getAccounts());
         return new ModelAndView("redirect:/clients/bank_cards/add/monobank/cards");
     }
 
@@ -146,20 +166,21 @@ public class ClientController {
                                                  RedirectAttributes redirectAttributes,
                                                  @RequestParam("selectedPans") List<String> selectedPans) {
         Long userId = user.getId();
-        String monobankToken = user.getMonobankIntegration().getMonobankToken();
+        user = userService.getUserById(userId);
+        String requestId = user.getMonobankIntegration().getRequestId();
         Set<MonobankAccount> monobankAccounts = new HashSet<>(monobankAccountService.findByPans(selectedPans));
         monobankIntegrationService.saveMonobankAccountsAsBankCards(userId, monobankAccounts);
         long timeNow = Instant.now().toEpochMilli();
         try {
             int maxTransactionsResponseAmount = 500;
             for (MonobankAccount monobankAccount : monobankAccounts) {
-                List<MonobankAccountTransactionDto> transactions = monobankRequestService.getClientStatementInfo(monobankToken, monobankAccount.getMonobankId(), timeNow);
+                List<MonobankAccountTransactionDto> transactions = monobankRequestService.getClientStatementInfo(requestId, monobankAccount.getMonobankId(), timeNow);
                 transactions
                         .forEach(transaction -> transactionService.save(transaction, monobankAccount.getMaskedPan(), userId));
                 while (transactions.size() == maxTransactionsResponseAmount) {
                     MonobankAccountTransactionDto lastTransaction = transactions.get(maxTransactionsResponseAmount - 1);
                     Long lastTransactionTime = lastTransaction.getTime();
-                    transactions = monobankRequestService.getClientStatementInfo(monobankToken, monobankAccount.getMonobankId(), lastTransactionTime);
+                    transactions = monobankRequestService.getClientStatementInfo(requestId, monobankAccount.getMonobankId(), lastTransactionTime);
                     transactions
                             .forEach(transaction -> transactionService.save(transaction, monobankAccount.getMaskedPan(), userId));
                 }

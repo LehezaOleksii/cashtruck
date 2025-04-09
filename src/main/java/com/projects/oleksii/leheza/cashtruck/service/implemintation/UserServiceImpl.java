@@ -130,7 +130,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(new User());
+    }
+
+    @Override
+    public UserDto getUserDtoById(Long userId) {
         return dtoMapper.userToDto(userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with does not exist")));
     }

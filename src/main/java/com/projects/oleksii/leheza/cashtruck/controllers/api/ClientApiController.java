@@ -55,7 +55,7 @@ public class ClientApiController {
     })
     @GetMapping(path = "/{userId}")
     public ResponseEntity<UserDto> getUser(@PathVariable(value = "userId") Long clientId) {
-        return new ResponseEntity<>(userService.getUserById(clientId), HttpStatus.OK);
+        return new ResponseEntity<>(userService.getUserDtoById(clientId), HttpStatus.OK);
     }
 
     @Operation(summary = "Find user`s bank cards by user id", description = "Find a list of user`s bank cards posts by user id.")

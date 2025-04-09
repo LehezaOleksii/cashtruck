@@ -496,3 +496,33 @@ input[type="radio"].btn-check.custom-back-white:checked + label {
     font-size: 16px;
     font-weight: bold;
 }
+/*qr code */
+ .qr-container {
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+ }
+
+.qr-wrapper {
+    position: relative;
+    width: 310px;
+    height: 310px;
+    display: inline-block;
+    margin: 20px;
+}
+.qr-background {
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: block;
+}
+
+.qr-code-container {
+    position: absolute;
+    top: 25%;
+    left: 18%;
+    width: 140px;
+    height: 140px;
+    background-color: transparent;
+}

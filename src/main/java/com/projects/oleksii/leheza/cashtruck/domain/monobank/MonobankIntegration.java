@@ -18,7 +18,7 @@ public class MonobankIntegration {
     @SequenceGenerator(name = "monobank_integration_sequence", sequenceName = "monobank_integration_sequence")
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "monobank_integration_sequence")
     private Long id;
-    private String monobankToken;
+    private String requestId;
     @OneToMany(mappedBy = "monobankIntegration")
     private Set<MonobankAccount> monobankAccounts;
 }

@@ -9,7 +9,6 @@ import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
-import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankClientInfoDto;
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
@@ -22,9 +21,6 @@ import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
-import java.net.http.HttpConnectTimeoutException;
-import java.net.http.HttpTimeoutException;
 import java.util.List;
 
 public interface UserService {
@@ -39,13 +35,16 @@ public interface UserService {
 
     PageDto<UserDto> findAll(Integer page, Integer size);
 
-    UserDto getUserById(Long userId);
+    UserDto getUserDtoById(Long userId);
+
+    User getUserById(Long userId);
 
     UserDto updateUserInfo(Long userId, UserUpdateDto userUpdateDto);
 
     UserUpdateDto getClientUpdateDto(Long clientId);
 
     UserDto getUserDto(Long userId);
+
     //For UI
     ClientStatisticDto getClientStatisticByUserId(Long userId);
 

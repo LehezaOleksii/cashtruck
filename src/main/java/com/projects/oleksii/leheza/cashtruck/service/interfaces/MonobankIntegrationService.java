@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface MonobankIntegrationService {
 
-    void setMonobankToken(Long userId, String monobankToken);
+    void setMonobankRequestId(Long userId, String requestId);
 
     void saveMonobankAccountsAsBankCards(Long userId, Set<MonobankAccount> monobankAccounts);
 }

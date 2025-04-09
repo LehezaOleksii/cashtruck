@@ -26,10 +26,10 @@ public class MonobankIntegrationServiceImpl implements MonobankIntegrationServic
     private final UserRepository userRepository;
 
     @Override
-    public void setMonobankToken(Long userId, String monobankToken) {
+    public void setMonobankRequestId(Long userId, String requestId) {
         MonobankIntegration monobankIntegration = monobankIntegrationRepository.findByUserId(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Monobank Integration with user id:" + userId + " does not exist"));
-        monobankIntegration.setMonobankToken(monobankToken);
+        monobankIntegration.setRequestId(requestId);
         monobankIntegrationRepository.save(monobankIntegration);
     }
 
