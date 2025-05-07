@@ -11,6 +11,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankRequestPers
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.DashboardBankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
@@ -54,14 +55,28 @@ public class ClientController {
     private final MonobankRequestService monobankRequestService;
 
     @GetMapping(path = "/dashboard")
-    public ModelAndView showClientDashboard(@AuthenticationPrincipal User user) {
+    public ModelAndView showClientDashboard(@AuthenticationPrincipal User user,
+                                            @RequestParam(value = "cardNumber", required = false) String selectedCardNumber) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/dashboard");
-        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
+
+        List<DashboardBankCardDto> cards = userService.getDashboardBankCardsDtoByUserId(userId);
+        modelAndView.addObject("bank_cards", cards);
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
         modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(userId));
+
+        if (selectedCardNumber != null) {
+            DashboardBankCardDto selectedCard = cards.stream()
+                    .filter(c -> c.getCardNumber().equals(selectedCardNumber))
+                    .findFirst()
+                    .orElse(null);
+            modelAndView.addObject("bank_card", selectedCard);
+        } else if (!cards.isEmpty()) {
+            modelAndView.addObject("bank_card", cards.get(0));
+        }
         return modelAndView;
     }
+
 
     @GetMapping({"/bank_cards"})
     public ModelAndView clientBankCardsForm(@RequestParam(required = false) Long bankCardId, @AuthenticationPrincipal User user) {

@@ -1,17 +1,21 @@
 package com.projects.oleksii.leheza.cashtruck.controllers.api;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
+import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
 import com.projects.oleksii.leheza.cashtruck.exception.ErrorResponse;
-import com.projects.oleksii.leheza.cashtruck.service.interfaces.*;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.EmailService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.TransactionService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -23,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -250,5 +255,11 @@ public class ClientApiController {
                                                           @Valid @RequestBody CreateTransactionDto transaction) {
         userService.addTransaction(userId, transaction);
         return new ResponseEntity<>(HttpStatus.CREATED);
+    }
+
+    @GetMapping("/statistics")
+    public ResponseEntity<ClientStatisticDto> getClientStatistics(@AuthenticationPrincipal User user) {
+        Long userId = user.getId();
+        return ResponseEntity.ok(userService.getClientStatisticByUserId(userId));
     }
 }

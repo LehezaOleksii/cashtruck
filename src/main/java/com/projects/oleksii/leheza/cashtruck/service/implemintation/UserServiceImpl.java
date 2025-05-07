@@ -1,6 +1,8 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.domain.Currency;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
 import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
@@ -10,10 +12,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.*;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
@@ -46,7 +45,9 @@ import org.springframework.web.multipart.MultipartFile;
 import java.beans.Transient;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,6 +81,7 @@ public class UserServiceImpl implements UserService {
     private final UserDetailsService userDetailsService;
     private final BankCardRepository bankCardRepository;
     private final MonobankIntegrationRepository monobankIntegrationRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Override
     public User save(User user) {
@@ -190,7 +192,7 @@ public class UserServiceImpl implements UserService {
                     .bankTransaction(bankTransaction)
                     .category(categoryOptional.get())
                     .build();
-            Set<BankCard> bankCards = user.getBankCards();
+            List<BankCard> bankCards = bankCardRepository.getBankCardsByUserId(userId);
             if (bankCards.contains(bankCard)) {
                 transactionRepository.save(transaction);
                 return dtoMapper.transactionToDto(transaction);
@@ -311,6 +313,33 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<DashboardBankCardDto> getDashboardBankCardsDtoByUserId(Long userId) {
+        return userRepository.findById(userId).map(user -> {
+            List<BankCard> bankCards = bankCardRepository.getBankCardsByUserId(userId);
+            List<DashboardBankCardDto> bankCardsDtos = bankCards.stream()
+                    .map(dtoMapper::bankCardToDashboardBankCardDto)
+                    .toList();
+            monobankIntegrationRepository.findByUserId(userId)
+                    .map(MonobankIntegration::getMonobankAccounts)
+                    .ifPresent(monoAccounts -> {
+                        bankCardsDtos.stream()
+                                .filter(dto -> monoAccounts.stream()
+                                        .map(MonobankAccount::getMaskedPan)
+                                        .anyMatch(maskedPan -> maskedPan.equals(dto.getCardNumber())))
+                                .forEach(dto -> {
+                                    dto.setBank("Monobank");
+                                    monoAccounts.stream()
+                                            .filter(acc -> acc.getMaskedPan().equals(dto.getCardNumber()))
+                                            .findFirst()
+                                            .ifPresent(acc -> dto.setType(acc.getType())); // встановлюємо type
+                                });
+                    });
+
+            return bankCardsDtos;
+        }).orElseGet(ArrayList::new);
+    }
+
+    @Override
     public Role updateUserRole(Long userId, Role role) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
@@ -423,84 +452,131 @@ public class UserServiceImpl implements UserService {
     }
 
     private ClientStatisticDto createStatisticDto(User client) {
-        ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
-        Long clientId = client.getId();
-        LocalDateTime endDate = LocalDateTime.now();
-        setLastYearTransactions(clientId, endDate, clientStatisticDto);
-        setLastMonthTransactions(clientId, endDate, clientStatisticDto);
-        setLastWeekTransactions(clientId, endDate, clientStatisticDto);
-        setTotalIncomeSum(clientId, endDate, clientStatisticDto);
-        setTotalExpenseSum(clientId, endDate, clientStatisticDto);
-        clientStatisticDto.setTotalBalance(getTotalBalance(client, clientStatisticDto));
+        boolean isPositiveTransactionSumIncome = true;
+        boolean isPositiveTransactionSumExpense = false;
+        String currencyName = "UAH";
+        Currency currency = currencyRepository.findByShortName(currencyName).orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneYear = now.minusYears(1);
+        LocalDateTime oneMonth = now.minusMonths(1);
+        LocalDateTime twoMonth = now.minusMonths(2);
+        List<TransactionDto> lastYearIncome = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneYear, now, isPositiveTransactionSumIncome)
+                .stream()
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        List<TransactionDto> lastYearExpense = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneYear, now, isPositiveTransactionSumExpense)
+                .stream()
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        List<BankCard> bankCards = bankCardRepository.getBankCardsByUserId(client.getId());
+        long totalBalance = bankCards.stream()
+                .flatMap(card -> card.getTransactions().stream())
+                .mapToLong(transaction -> transaction.getBankTransaction().getSum())
+                .sum();
+        long lastMonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumIncome).stream()
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long previous2MonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumIncome).stream()
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long lastMonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumExpense).stream()
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long previous2MonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumExpense).stream()
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long lastMonthProfit = lastMonthIncomes + lastMonthExpenses;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
+        int lastMonthAmount = 6;
+        Map<String, Long> totalBalanceGraphic = getTotalBalanceGraphic(client.getId(), lastMonthAmount, formatter);
+        List<DashboardCategoryDto> categoriesDiagram = getUserCategorySummaryLast6Months(client.getId());
+        int lastTransactionsPageNumber = 0;
+        int lastTransactionsPageSize = 5;
+        List<DashboardTransactionDto> lastTransactions = getLastUserTransactions(client.getId(), lastTransactionsPageNumber, lastTransactionsPageSize);
+        DashboardIncomeExpensesDiagramDto incomeExpensesDiagramDto = DashboardIncomeExpensesDiagramDto.builder()
+                .incomes(getMonthSumMap(client.getId(), isPositiveTransactionSumIncome, formatter, lastMonthAmount))
+                .expenses(getMonthSumMap(client.getId(), isPositiveTransactionSumExpense, formatter, lastMonthAmount))
+                .build();
+        double totalBalancePercentage = 100 - (double) ((totalBalance - (lastMonthIncomes + lastMonthExpenses)) * 100) / (totalBalance - (previous2MonthIncomes + previous2MonthExpenses));
+        double lastMonthIncomesPercentage = 100 - (double) (lastMonthIncomes * 100) / previous2MonthIncomes;
+        double lastMonthExpensesPercentage = 100 - (double) (lastMonthExpenses * 100) / previous2MonthExpenses;
+        double lastMonthProfitPercentage = 100 - (double) ((lastMonthIncomes + lastMonthExpenses) * 100) / (previous2MonthIncomes + previous2MonthExpenses);
+        ClientStatisticDto clientStatisticDto = new ClientStatisticDto().toBuilder()
+                .expenses(lastYearExpense)
+                .incomes(lastYearIncome)
+                .totalBalance(totalBalance)
+                .totalBalancePercentage(totalBalancePercentage)
+                .lastMonthIncomes(lastMonthIncomes)
+                .lastMonthIncomesPercentage(lastMonthIncomesPercentage)
+                .lastMonthExpenses(lastMonthExpenses)
+                .lastMonthExpensesPercentage(lastMonthExpensesPercentage)
+                .lastMonthProfit(lastMonthProfit)
+                .lastMonthProfitPercentage(lastMonthProfitPercentage)
+                .totalBalanceGraphic(totalBalanceGraphic)
+                .categoriesDiagram(categoriesDiagram)
+                .lastTransactions(lastTransactions)
+                .incomeExpensesDiagram(incomeExpensesDiagramDto)
+                .delimiter(currency.getDelimiter())
+                .build();
         return clientStatisticDto;
     }
 
-    private void setTotalIncomeSum(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        boolean isPositiveTransactionSum = true;
-        LocalDateTime tenYearsStartDate = endDate.minusYears(10);
-        List<Transaction> lastTenYearsIncome = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), tenYearsStartDate, endDate, INCOME_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setTotalIncomeSum(getAllTransactionSum(lastTenYearsIncome));
+    private List<DashboardTransactionDto> getLastUserTransactions(Long userId, int pageNumber, int pageSize) {
+        Pageable topFive = PageRequest.of(pageNumber, pageSize);
+        return transactionRepository.findLast5TransactionsByUserId(userId, topFive);
     }
 
-    private void setTotalExpenseSum(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        boolean isPositiveTransactionSum = false;
-        LocalDateTime tenYearsStartDate = endDate.minusYears(10);
-        List<Transaction> lastTenYearsExpense = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), tenYearsStartDate, endDate, EXPENSE_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setTotalExpenseSum(getAllTransactionSum(lastTenYearsExpense));
+    private List<DashboardCategoryDto> getUserCategorySummaryLast6Months(Long userId) {
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
+        return categoryRepository.getCategorySums(userId, sixMonthsAgo);
     }
 
-    private long getTotalBalance(User client, ClientStatisticDto clientStatisticDto) {
-        if (client == null || client.getBankCards() == null) {
-            return 0;
+    private Map<String, Long> getTotalBalanceGraphic(Long userId, int lastMonthAmount, DateTimeFormatter formatter) {
+        Map<String, Long> totalIncomeGraphic = getMonthSumMap(userId, true, formatter, lastMonthAmount);
+        Map<String, Long> totalExpenseGraphic = getMonthSumMap(userId, false, formatter, lastMonthAmount);
+
+        // First calculate raw balance
+        Map<String, Long> totalBalanceGraphic = new HashMap<>();
+        for (Map.Entry<String, Long> entry : totalIncomeGraphic.entrySet()) {
+            totalBalanceGraphic.put(entry.getKey(), entry.getValue());
+        }
+        for (Map.Entry<String, Long> entry : totalExpenseGraphic.entrySet()) {
+            totalBalanceGraphic.merge(entry.getKey(), -entry.getValue(), Long::sum);
         }
 
-        long incomeSum = clientStatisticDto.getTotalIncomeSum();
-        long expenseSum = clientStatisticDto.getTotalExpenseSum();
-        long sum = incomeSum + expenseSum;
+        // Define desired month order
+        List<String> monthOrder = Arrays.asList(
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        );
 
-        return client.getBankCards().stream()
-                .map(BankCard::getBalance)
-                .reduce(sum, Long::sum);
+        // Sort map based on month order
+        Map<String, Long> sortedTotalBalanceGraphic = totalBalanceGraphic.entrySet().stream()
+                .sorted(Comparator.comparing(e -> monthOrder.indexOf(e.getKey())))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new // preserve sorted order
+                ));
+
+        return sortedTotalBalanceGraphic;
     }
 
 
-    private void setLastYearTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime oneYearStartDate = endDate.minusYears(1);
-        boolean isPositiveTransactionSum = false;
-        List<Transaction> lastYearExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), oneYearStartDate, endDate, EXPENSE_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setExpenses(lastYearExpenses);
-        clientStatisticDto.setLastYearExpense(getAllTransactionSum(lastYearExpenses));
-        isPositiveTransactionSum = true;
-        List<Transaction> lastYearIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), oneYearStartDate, endDate, INCOME_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setIncomes(lastYearIncomes);
-        clientStatisticDto.setLastYearIncome(getAllTransactionSum(lastYearIncomes));
-    }
-
-    private void setLastMonthTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime oneMonthStartDate = endDate.minusMonths(1);
-        boolean isPositiveTransactionSum = false;
-        List<Transaction> lastMonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), oneMonthStartDate, endDate, EXPENSE_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setLastMonthExpense(getAllTransactionSum(lastMonthExpenses));
-        isPositiveTransactionSum = true;
-        List<Transaction> lastMonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), oneMonthStartDate, endDate, INCOME_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setLastMonthIncome(getAllTransactionSum(lastMonthIncomes));
-    }
-
-    private void setLastWeekTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime oneWeekStartDate = endDate.minusWeeks(1);
-        boolean isPositiveTransactionSum = false;
-        List<Transaction> lastWeekExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), oneWeekStartDate, endDate, EXPENSE_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setLastWeekExpense(getAllTransactionSum(lastWeekExpenses));
-        isPositiveTransactionSum = true;
-        List<Transaction> lastWeekIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(clientId), oneWeekStartDate, endDate, INCOME_TRANSACTION_TYPE_LIST, isPositiveTransactionSum);
-        clientStatisticDto.setLastWeekIncome(getAllTransactionSum(lastWeekIncomes));
-    }
-
-    private long getAllTransactionSum(List<Transaction> transactions) {
-        return transactions.stream()
-                .map(Transaction::getBankTransaction)
-                .mapToLong(BankTransaction::getSum)
-                .sum();
+    private Map<String, Long> getMonthSumMap(Long userId, boolean isPositiveTransactionSum, DateTimeFormatter formatter, int lastMonthAmount) {
+        return transactionRepository
+                .findByBankCardsAndDateRangeAndTransactionTypes(
+                        bankCardRepository.getBankCardsByUserId(userId),
+                        LocalDateTime.now().minusMonths(lastMonthAmount),
+                        LocalDateTime.now(),
+                        isPositiveTransactionSum)
+                .stream()
+                .collect(Collectors.groupingBy(
+                        t -> t.getBankTransaction().getTime().format(formatter),
+                        TreeMap::new,
+                        Collectors.summingLong(t -> t.getBankTransaction().getSum())
+                ));
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {

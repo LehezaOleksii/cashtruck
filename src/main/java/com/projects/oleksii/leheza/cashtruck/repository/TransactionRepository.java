@@ -2,6 +2,7 @@ package com.projects.oleksii.leheza.cashtruck.repository;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
+import com.projects.oleksii.leheza.cashtruck.dto.view.DashboardTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +33,27 @@ public interface TransactionRepository extends
     WHERE t.bankCard IN :bankCards
     AND t.bankTransaction.time >= :startDate
     AND t.bankTransaction.time <= :endDate
-    AND t.category.transactionType IN :transactionTypes
     AND ((:isPositiveTransactionSum = true AND t.bankTransaction.sum > 0)
          OR (:isPositiveTransactionSum = false AND t.bankTransaction.sum < 0))
     """)
     List<Transaction> findByBankCardsAndDateRangeAndTransactionTypes(@Param("bankCards") List<BankCard> bankCards,
                                                                      @Param("startDate") LocalDateTime startDate,
                                                                      @Param("endDate") LocalDateTime endDate,
-                                                                     @Param("transactionTypes") List<TransactionType> transactionTypes,
                                                                      @Param("isPositiveTransactionSum") boolean isPositiveTransactionSum);
+
+    @Query("""
+        SELECT new com.projects.oleksii.leheza.cashtruck.dto.view.DashboardTransactionDto(
+            t.category.name,
+            bt.name,
+            bt.sum,
+            bt.currency.delimiter
+        )
+        FROM Transaction t
+        JOIN t.bankTransaction bt
+        JOIN t.bankCard bc
+        WHERE bc.user.id = :userId
+        ORDER BY bt.time DESC
+        """)
+    List<DashboardTransactionDto> findLast5TransactionsByUserId(@Param("userId") Long userId, Pageable pageable);
+
 }

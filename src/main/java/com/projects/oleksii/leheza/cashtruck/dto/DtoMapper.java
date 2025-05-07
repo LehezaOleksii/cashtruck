@@ -10,10 +10,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountDto;
 import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.payment.PaymentCreateRequest;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.CategoryInfoDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.*;
 import com.projects.oleksii.leheza.cashtruck.enums.TransactionType;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.ImageService;
 import com.projects.oleksii.leheza.cashtruck.util.ImageConvertor;
@@ -221,7 +218,7 @@ public class DtoMapper {
     public BankCard monobankAccountToBankCard(MonobankAccount monobankAccount, User user) {
         String bankName = "monobank(" + monobankAccount.getType();
         if (monobankAccount.getCurrency().getCode() != HRYVNIA_CURRENCY_CODE) {
-            bankName +=", " + monobankAccount.getCurrency().getShortName();
+            bankName += ", " + monobankAccount.getCurrency().getShortName();
         }
         bankName += ")";
         return BankCard.builder()
@@ -239,6 +236,20 @@ public class DtoMapper {
                 .bankCard(bankCard)
                 .bankTransaction(bankTransaction)
                 .category(category)
+                .build();
+    }
+
+    public DashboardBankCardDto bankCardToDashboardBankCardDto(BankCard bankCard) {
+        return DashboardBankCardDto.builder()
+                .id(bankCard.getId())
+                .holderName(bankCard.getCardHolder())
+                .balance(bankCard.getBalance())
+                .delimiter(bankCard.getCurrency().getDelimiter())
+                .cardNumber(String.valueOf(bankCard.getCardNumber()))
+                .currencyShortName(bankCard.getCurrency().getShortName())
+                .bankName(bankCard.getBankName())
+                .currency(bankCard.getCurrency().getShortName())
+                .currencyCode(bankCard.getCurrency().getCode())
                 .build();
     }
 }

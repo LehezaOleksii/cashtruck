@@ -81,16 +81,20 @@ body {
 
 /* --- card styles --- */
 .bank-card {
-    width: 300px;
-    height: 180px;
+    width: 350px;
+    height: 210px;
     margin: 0 auto;
-    background: linear-gradient(45deg, #45B649, #57ACF2);
-    border-radius: 10px;
+    background: linear-gradient(135deg, #ff758c, #ff7eb3, #9face6, #6dd5fa);
+    border-radius: 20px;
     padding: 20px;
     color: #fff;
-    box-shadow: 3px 4px 6px rgba(0, 0, 0, 0.1);
-    position: relative;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
+
 
 .monobank-card {
     width: 350px;
@@ -294,7 +298,7 @@ body {
 /* --- squares info cards--- */
 .info-card {
     padding: 15px;
-    width: 85%;
+    width: 100%;
 }
 
 .justify-content-end {
