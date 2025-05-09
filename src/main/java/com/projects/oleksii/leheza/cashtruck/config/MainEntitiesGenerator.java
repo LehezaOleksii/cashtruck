@@ -23,7 +23,7 @@ public class MainEntitiesGenerator {
 
     private final TransactionType transactionTypeUniversal = TransactionType.UNIVERSAL;
     private final TransactionType transactionTypeIncome = TransactionType.INCOME;
-
+    private final TransactionType transactionTypeExpense = TransactionType.EXPENSE;
 
     public void generateMainEntities() {
         if (categoryRepository.findAll().isEmpty()) {
@@ -195,7 +195,7 @@ public class MainEntitiesGenerator {
                 List.of("4304"));
         categoryRepository.save(uncategorizedIncomeCategory);
 
-        Category uncategorizedExpenseCategory = new Category(transactionTypeIncome, "Uncategorized expense",
+        Category uncategorizedExpenseCategory = new Category(transactionTypeExpense, "Uncategorized expense",
                 List.of("4304"));
         categoryRepository.save(uncategorizedExpenseCategory);
     }

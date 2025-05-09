@@ -180,8 +180,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public TransactionDto addTransaction(Long userId, CreateTransactionDto createTransactionDto) {
         Optional<Category> categoryOptional = categoryRepository.findByName(createTransactionDto.getCategoryName());
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " does not found"));
         BankCard bankCard = bankCardRepository.findCardByNumberAndUserId(createTransactionDto.getCardNumber(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank card with number: " + createTransactionDto.getCardNumber() + " deos not found "));
         BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto, bankCard.getCurrency().getDelimiter());
