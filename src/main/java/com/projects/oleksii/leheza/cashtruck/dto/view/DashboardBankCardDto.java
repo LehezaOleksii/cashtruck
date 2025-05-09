@@ -19,5 +19,4 @@ public class DashboardBankCardDto {
     private double balance;
     private String currencyShortName;
     private String type;
-    private int delimiter;
 }

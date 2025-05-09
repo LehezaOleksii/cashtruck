@@ -1,5 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.service.interfaces;
 
+import com.projects.oleksii.leheza.cashtruck.domain.Currency;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountTransactionDto;
@@ -15,15 +16,15 @@ public interface TransactionService {
 
     Transaction save(Transaction transaction);
 
-    void save(MonobankAccountTransactionDto monobankAccountTransactionDto, String bankCardNumber,Long userId);
+    void save(MonobankAccountTransactionDto monobankAccountTransactionDto, String bankCardNumber, Long userId);
 
     List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId);
 
     List<CategoryInfoDto> findClientExpenseCategoriesByClientId(Long clientId);
 
-    Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, int page, int size);
+    Page<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName,  int page, int size);
 
-    PageDto<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName, Integer page, Integer size);
+    PageDto<TransactionDto> findTransactionsByClientIdAndCategoryName(Long clientId, String categoryName,  Integer page, Integer size);
 
     List<Transaction> findAllIncomeTransactions();
 

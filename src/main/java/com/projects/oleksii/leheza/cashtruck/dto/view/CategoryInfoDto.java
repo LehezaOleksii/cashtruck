@@ -14,6 +14,7 @@ public class CategoryInfoDto {
     @NotNull
     @NotBlank
     private String name;
-    private long fullCategoryTransactionSum;
+    private double fullCategoryTransactionSum;
     private int categoryPercentage;
+    private int currencyCode;
 }

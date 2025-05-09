@@ -17,5 +17,7 @@ public class TransactionDto {
     private String category;
     private String transactionType;
     private LocalDateTime time;
-    private long sum;
+    private int currencyCode;
+    private int delimiter;
+    private double sum;
 }

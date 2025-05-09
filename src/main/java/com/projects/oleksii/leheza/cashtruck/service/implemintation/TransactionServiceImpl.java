@@ -137,14 +137,16 @@ public class TransactionServiceImpl implements TransactionService {
         List<TransactionDto> transactionDtos = transactionRepository.findTransactionsByClientId(clientId).stream().map(dtoMapper::transactionToDto).toList();
         List<TransactionType> transactionTypes = new ArrayList<>(
                 List.of(transactionType, UNIVERSAL_TRANSACTION_TYPE));
-        boolean isPositiveTransactionSum = false;
+        boolean isPositiveTransactionSum;
         if (transactionType.equals(INCOME_TRANSACTION_TYPE)) {
             isPositiveTransactionSum = true;
+        } else {
+            isPositiveTransactionSum = false;
         }
         List<Category> userCategories = categoryRepository.findCategoriesByTransactionTypesAndClientId(transactionTypes, clientId, isPositiveTransactionSum).stream()
                 .toList();
         return userCategories.stream()
-                .map(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category))
+                .flatMap(category -> dtoMapper.categoryToDtoInfo(transactionDtos, category, isPositiveTransactionSum).stream())
                 .collect(Collectors.toList());
     }
 

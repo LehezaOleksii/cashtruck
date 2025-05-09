@@ -42,18 +42,19 @@ public interface TransactionRepository extends
                                                                      @Param("isPositiveTransactionSum") boolean isPositiveTransactionSum);
 
     @Query("""
-        SELECT new com.projects.oleksii.leheza.cashtruck.dto.view.DashboardTransactionDto(
-            t.category.name,
-            bt.name,
-            bt.sum,
-            bt.currency.delimiter
-        )
-        FROM Transaction t
-        JOIN t.bankTransaction bt
-        JOIN t.bankCard bc
-        WHERE bc.user.id = :userId
-        ORDER BY bt.time DESC
-        """)
-    List<DashboardTransactionDto> findLast5TransactionsByUserId(@Param("userId") Long userId, Pageable pageable);
+            SELECT new com.projects.oleksii.leheza.cashtruck.dto.view.DashboardTransactionDto(
+                t.category.name,
+                bt.name,
+                bt.sum,
+                bc.currency.shortName,
+                bt.currency.delimiter
+            )
+            FROM Transaction t
+            JOIN t.bankTransaction bt
+            JOIN t.bankCard bc
+            WHERE bc.user.id = :userId
+            ORDER BY bt.time DESC
+            """)
+    List<DashboardTransactionDto> findLastTransactionsByUserId(@Param("userId") Long userId, Pageable pageable);
 
 }

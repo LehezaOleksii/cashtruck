@@ -16,11 +16,16 @@
                 <div class="my-container card-body"
                      style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="info-card-font bold">
-                        <span th:text="${category.getName}"></span>
-                        <span class="card-title"
-                              th:text="${#numbers.formatDecimal(category.categoryPercentage, 1, 2, 'POINT')}">0.00</span>%
+                        <div class="d-inline-block text-truncate" style="max-width: 25vw;">
+                            <span th:text="${category.getName}"></span>
+                        </div>
                         <div><span class="card-title bold"
-                                   th:text="${#numbers.formatDecimal(category.fullCategoryTransactionSum, 1, 2, 'POINT')}"></span>$
+                                   th:text="${#numbers.formatDecimal(category.fullCategoryTransactionSum, 1, 2, 'POINT')}"></span>
+                            <span th:if="${category.currencyCode == 980}">₴ UAH</span>
+                            <span th:if="${category.currencyCode == 840}">$ USD</span>
+                            <span th:if="${category.currencyCode == 978}">€ EUR</span>
+                            (<span class="card-title"
+                                  th:text="${#numbers.formatDecimal(category.categoryPercentage, 1, 2, 'POINT')}">0.00</span>% )
                         </div>
                     </div>
                     <div>
@@ -51,11 +56,16 @@
                 <div class="my-container card-body"
                      style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="info-card-font bold">
-                        <span th:text="${category.getName}"></span>
-                        <span class="card-title"
-                              th:text="${#numbers.formatDecimal(category.categoryPercentage, 1, 2, 'POINT')}">0.00</span>%
+                        <div class="d-inline-block text-truncate" style="max-width: 25vw;">
+                            <span th:text="${category.getName}"></span>
+                        </div>
                         <div><span class="card-title bold"
-                                   th:text="${#numbers.formatDecimal(category.fullCategoryTransactionSum, 1, 2, 'POINT')}"></span>$
+                                   th:text="${#numbers.formatDecimal(category.fullCategoryTransactionSum, 1, 2, 'POINT')}"></span>
+                            <span th:if="${category.currencyCode == 980}">₴ UAH</span>
+                            <span th:if="${category.currencyCode == 840}">$ USD</span>
+                            <span th:if="${category.currencyCode == 978}">€ EUR</span>
+                            (<span class="card-title"
+                                   th:text="${#numbers.formatDecimal(category.categoryPercentage, 1, 2, 'POINT')}">0.00</span>%)
                         </div>
                     </div>
                     <a th:href="@{'/clients/categories/' + ${category.name}}">
@@ -69,7 +79,7 @@
         <div class="d-flex justify-content-center align-items-center mt-4">
             <div class="card col-7 p-3 shadow-sm text-center">
                 <div class="card-body">
-                        <p>You have no expense transactions.</p>
+                    <p>You have no expense transactions.</p>
                     <p>Synchronize your bank card with the application or add transactions manually.</p>
                 </div>
             </div>

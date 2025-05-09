@@ -24,7 +24,8 @@ public class ClientStatisticDto {
     private double lastMonthProfit;
     private double lastMonthProfitPercentage;
     private double delimiter;
-    private Map<String, Long> totalBalanceGraphic;
+    private String currencyShortName;
+    private Map<String, Double> totalBalanceGraphic;
     private List<DashboardCategoryDto> categoriesDiagram;
     private List<DashboardTransactionDto> lastTransactions;
     private DashboardIncomeExpensesDiagramDto incomeExpensesDiagram;

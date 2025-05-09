@@ -12,5 +12,6 @@ public class DashboardTransactionDto {
     private String categoryName;
     private String description;
     private long sum;
+    private String currencyShortName;
     private long delimiter;
 }

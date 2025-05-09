@@ -21,6 +21,7 @@ import org.springframework.stereotype.Component;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
@@ -33,31 +34,56 @@ public class DtoMapper {
     private final PasswordEncoder passwordEncoder;
 
     public TransactionDto transactionToDto(Transaction transaction) {
+        Currency currency = transaction.getBankTransaction().getCurrency();
         return TransactionDto.builder()
-                .sum(transaction.getBankTransaction().getSum())
+                .sum((double) transaction.getBankTransaction().getSum() / currency.getDelimiter())
                 .name(transaction.getBankTransaction().getName())
                 .time(transaction.getBankTransaction().getTime())
                 .category(transaction.getCategory().getName())
                 .transactionType(transaction.getCategory().getTransactionType().toString())
+                .currencyCode(currency.getCode())
+                .delimiter(currency.getDelimiter())
                 .build();
     }
 
-    public CategoryInfoDto categoryToDtoInfo(List<TransactionDto> transactionDtos, Category category) {
+    public List<CategoryInfoDto> categoryToDtoInfo(List<TransactionDto> transactionDtos, Category category, boolean isTransactionPositive) {
         String categoryName = category.getName();
-        long totalSum = transactionDtos.stream()
-                .mapToLong(TransactionDto::getSum)
-                .sum();
-        long totalSumByCategory = transactionDtos.stream()
+
+        List<TransactionDto> categoryTransactions = transactionDtos.stream()
                 .filter(transactionDto -> transactionDto.getCategory().equals(categoryName))
-                .mapToLong(TransactionDto::getSum)
+                .filter(transactionDto -> isTransactionPositive ? transactionDto.getSum() > 0 : transactionDto.getSum() < 0)
+                .toList();
+
+        Map<Integer, List<TransactionDto>> transactionsByCurrency = categoryTransactions.stream()
+                .collect(Collectors.groupingBy(TransactionDto::getCurrencyCode));
+
+        double totalSum = transactionDtos.stream()
+                .filter(transactionDto -> isTransactionPositive ? transactionDto.getSum() > 0 : transactionDto.getSum() < 0)
+                .mapToDouble(t -> t.getSum())
                 .sum();
-        int categoryPercentage = (totalSum == 0) ? 0 : (int) (totalSumByCategory * 100 / totalSum);
-        return CategoryInfoDto.builder()
-                .name(categoryName)
-                .categoryPercentage(categoryPercentage)
-                .fullCategoryTransactionSum(totalSumByCategory)
-                .build();
+
+        return transactionsByCurrency.entrySet().stream()
+                .map(entry -> {
+                    int currency = entry.getKey();
+                    List<TransactionDto> currencyTransactions = entry.getValue();
+
+                    double totalSumByCategoryAndCurrency = currencyTransactions.stream()
+                            .mapToDouble(t -> t.getSum())
+                            .sum();
+
+                    int categoryPercentage = (totalSum == 0) ? 0
+                            : (int) (totalSumByCategoryAndCurrency * 100 / totalSum);
+
+                    return CategoryInfoDto.builder()
+                            .name(categoryName)
+                            .categoryPercentage(categoryPercentage)
+                            .fullCategoryTransactionSum(totalSumByCategoryAndCurrency)
+                            .currencyCode(currency)
+                            .build();
+                })
+                .toList();
     }
+
 
     public CategoryDto categoryToDto(Category category) {
         return CategoryDto.builder()
@@ -192,7 +218,7 @@ public class DtoMapper {
         return MonobankAccount.builder()
                 .monobankId(monobankAccountDto.getId())
                 .type(monobankAccountDto.getType())
-                .balance(monobankAccountDto.getBalance())
+                .balance(monobankAccountDto.getBalance() - monobankAccountDto.getCreditLimit())
                 .currency(currency)
                 .maskedPan(monobankAccountDto.getMaskedPan().get(0))
                 .holderName(monobankAccountDto.getHolderName())
@@ -243,8 +269,7 @@ public class DtoMapper {
         return DashboardBankCardDto.builder()
                 .id(bankCard.getId())
                 .holderName(bankCard.getCardHolder())
-                .balance(bankCard.getBalance())
-                .delimiter(bankCard.getCurrency().getDelimiter())
+                .balance((double) bankCard.getBalance() / bankCard.getCurrency().getDelimiter())
                 .cardNumber(String.valueOf(bankCard.getCardNumber()))
                 .currencyShortName(bankCard.getCurrency().getShortName())
                 .bankName(bankCard.getBankName())

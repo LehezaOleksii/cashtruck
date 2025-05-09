@@ -11,6 +11,6 @@ import java.util.Map;
 @Builder(toBuilder = true)
 public class DashboardIncomeExpensesDiagramDto {
 
-    private Map<String, Long> incomes;
-    private Map<String, Long> expenses;
+    private Map<String, Double> incomes;
+    private Map<String, Double> expenses;
 }
