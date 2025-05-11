@@ -350,6 +350,7 @@ public class ClientController {
         modelAndView.addObject("incomes", categoryService.getIncomeAndUniversalCategories());
         modelAndView.addObject("expenses", categoryService.getExpenseAndUniversalCategories());
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
+        modelAndView.addObject("currencies", currencyService.getCurrenciesShortNames());
         modelAndView.addObject("transaction", new CreateTransactionDto());
         return modelAndView;
     }

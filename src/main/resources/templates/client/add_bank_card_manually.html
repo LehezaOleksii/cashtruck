@@ -32,31 +32,15 @@
                     <!-- choose bank -->
                     <div class="row mb-3">
                         <div class="col">
-                            <div class="dropdown">
-                                <select id="bankNameButton" required class="form-select" th:field="*{bankName}">
-                                    <option value="" disabled selected>Select Bank</option>
-                                    <option class="dropdown-item custom-back-white" style="color:black"
-                                            value="Monobank">Monobank
-                                    </option>
-                                    <option class="dropdown-item custom-back-white" style="color:black"
-                                            value="Privat bank">Privat bank
-                                    </option>
-                                    <option class="dropdown-item custom-back-white" style="color:black"
-                                            value="Alfa bank">Alfa bank
-                                    </option>
-                                </select>
-                            </div>
-                            <div class="dropdown">
-                                <select id="CurrencyNameButton" required class="form-select" th:field="*{currencyShortName}">
-                                    <option value="" disabled selected>Select Currency</option>
-                                    <option class="dropdown-item custom-back-white"
-                                            style="color:black"
-                                            th:each="currency : ${currency_short_names}"
-                                            th:value="${currency}"
-                                            th:text="${currency}">
-                                    </option>
-                                </select>
-                            </div>
+                            <input id="bankName" type="text" placeholder="Bank name" class="form-control"
+                                   th:field="*{bankName}" required/>
+                            <small th:if="${#fields.hasErrors('bankName')}"
+                                   th:errors="*{bankName}"
+                                   th:text="${#strings.listJoin(#fields.errors('bankName'), ', ')}"
+                                   class="text-danger">
+                                Please provide a valid bank name.
+                            </small>
+                            <label class="form-label" for="balance">Bank name</label>
                         </div>
                         <div class="col">
                             <div class="form-outline">
@@ -108,7 +92,7 @@
                         <div class="col">
                             <div class="form-outline">
                                 <input id="cardNumber" type="text" class="form-control" placeholder="Credit card number"
-                                       th:field="*{cardNumber}" required pattern="^[0-9]{16}$">
+                                       th:field="*{cardNumber}" required pattern="^[0-9\*]{16}$">
                                 <label class="form-label" for="formCardNumber">Credit card number</label>
                                 <div>
                                     <small th:if="${#fields.hasErrors('cardNumber')}"
@@ -124,40 +108,35 @@
                     <div class="row mb-4">
                         <div class="col-6">
                             <div class="form-outline">
-                                <input type="hidden" th:field="*{expiringDate}" id="hiddenExpiringDate"/>
-                                <input id="expiringDate" type="text" class="form-control" placeholder="MM/YYYY"
-                                       th:field="*{expiringDate}" required
-                                       pattern="^(0[1-9]|1[0-2])\/[0-9]{4}|[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$">
-                                <label class="form-label" for="formExpiringDate">Expiration date</label>
+                                <div class="dropdown">
+                                    <select id="CurrencyNameButton" required class="form-select" th:field="*{currencyShortName}">
+                                        <option value="" disabled selected>Select Currency</option>
+                                        <option class="dropdown-item custom-back-white"
+                                                style="color:black"
+                                                th:each="currency : ${currency_short_names}"
+                                                th:value="${currency}"
+                                                th:text="${currency}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="form-label" for="formCurrency">Currency</label>
                                 <div>
-                                    <small th:if="${#fields.hasErrors('expiringDate')}"
-                                           th:errors="*{expiringDate}"
-                                           th:text="${#strings.listJoin(#fields.errors('expiringDate'), ', ')}"
+                                    <small th:if="${#fields.hasErrors('currencyShortName')}"
+                                           th:errors="*{currencyShortName}"
+                                           th:text="${#strings.listJoin(#fields.errors('currencyShortName'), ', ')}"
                                            class="text-danger">
-                                        Please provide an expiring date.
+                                        Please provide a currency.
                                     </small>
                                 </div>
                             </div>
                         </div>
                         <div class="col-6">
-                            <div class="form-outline">
-                                <input id="cvv" type="text" class="form-control" placeholder="CVV" th:field="*{cvv}"
-                                       required maxlength="3" pattern="\d{3}">
-                                <label class="form-label" for="formCVV">CVV</label>
-                                <div>
-                                    <small th:if="${#fields.hasErrors('cvv')}"
-                                           th:errors="*{cvv}"
-                                           th:text="${#strings.listJoin(#fields.errors('cvv'), ', ')}"
-                                           class="text-danger">
-                                        Please provide a CVV.
-                                    </small>
-                                </div>
-                            </div>
+                            <button class="btn btn-primary btn-lg btn-block custom-back-violet d-flex justify-content-center align-items-center"
+                                    type="submit" style="height: 40px;">
+                                Save bank card
+                            </button>
                         </div>
                     </div>
-                    <button class="btn btn-primary btn-lg btn-block custom-back-violet" type="submit"
-                            style="width: 30%;">Save bank card
-                    </button>
                 </form>
             </div>
         </div>

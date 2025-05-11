@@ -28,8 +28,6 @@ public final class BankCard {
     @Column(length = 3)
     private String cvv;
     private long balance;
-    @Column(name = "expiring_date")
-    private Date expiringDate;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;

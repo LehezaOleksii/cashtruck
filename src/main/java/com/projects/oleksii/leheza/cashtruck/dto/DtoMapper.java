@@ -59,7 +59,7 @@ public class DtoMapper {
 
         double totalSum = transactionDtos.stream()
                 .filter(transactionDto -> isTransactionPositive ? transactionDto.getSum() > 0 : transactionDto.getSum() < 0)
-                .mapToDouble(t -> t.getSum())
+                .mapToDouble(TransactionDto::getSum)
                 .sum();
 
         return transactionsByCurrency.entrySet().stream()
@@ -71,8 +71,8 @@ public class DtoMapper {
                             .mapToDouble(t -> t.getSum())
                             .sum();
 
-                    int categoryPercentage = (totalSum == 0) ? 0
-                            : (int) (totalSumByCategoryAndCurrency * 100 / totalSum);
+                    double categoryPercentage = (totalSum == 0) ? 0
+                            : (totalSumByCategoryAndCurrency * 100 / totalSum);
 
                     return CategoryInfoDto.builder()
                             .name(categoryName)
@@ -164,11 +164,12 @@ public class DtoMapper {
                 .build();
     }
 
-    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto, int currencyDelimiter) {
+    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto,Currency currency) {
         return BankTransaction.builder()
                 .name(transactionDto.getTransactionName())
                 .time(LocalDateTime.parse(transactionDto.getTime()))
-                .sum((int) Math.round(transactionDto.getSum() * currencyDelimiter))
+                .sum((int) Math.round(transactionDto.getSum() * currency.getDelimiter()))
+                .currency(currency)
                 .build();
     }
 
@@ -190,11 +191,9 @@ public class DtoMapper {
     public BankCard bankCardDtoToBankCard(BankCardDto bankCardDto, Currency currency) {
         return BankCard.builder()
                 .id(bankCardDto.getId())
-                .cvv(bankCardDto.getCvv())
                 .bankName(bankCardDto.getBankName())
                 .cardNumber(bankCardDto.getCardNumber())
                 .cardHolder(bankCardDto.getCardHolder())
-                .expiringDate(bankCardDto.getExpiringDate())
                 .currency(currency)
                 .balance((int) Math.round((bankCardDto.getBalance()) * currency.getDelimiter()))
                 .build();
@@ -203,11 +202,9 @@ public class DtoMapper {
     public BankCardDto bankCardToBankCardDto(BankCard bankCard) {
         return BankCardDto.builder()
                 .id(bankCard.getId())
-                .cvv(bankCard.getCvv())
                 .bankName(bankCard.getBankName())
                 .cardNumber(bankCard.getCardNumber())
                 .cardHolder(bankCard.getCardHolder())
-                .expiringDate(bankCard.getExpiringDate())
                 .currencyShortName(bankCard.getCurrency().getShortName())
                 .delimiter(bankCard.getCurrency().getDelimiter())
                 .balance(bankCard.getBalance())

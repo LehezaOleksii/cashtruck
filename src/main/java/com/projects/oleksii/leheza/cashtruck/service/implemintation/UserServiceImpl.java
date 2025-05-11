@@ -182,7 +182,11 @@ public class UserServiceImpl implements UserService {
         Optional<Category> categoryOptional = categoryRepository.findByName(createTransactionDto.getCategoryName());
         BankCard bankCard = bankCardRepository.findCardByNumberAndUserId(createTransactionDto.getCardNumber(), userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank card with number: " + createTransactionDto.getCardNumber() + " deos not found "));
-        BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto, bankCard.getCurrency().getDelimiter());
+        Currency currency = currencyRepository.findByShortName(createTransactionDto.getCurrencyShortName()).orElseThrow(() -> new ResourceNotFoundException("Currency with shortName: " + createTransactionDto.getCurrencyShortName() + " not found"));
+        BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto, currency);
+        if (!createTransactionDto.isIncome()){
+            bankTransaction.setSum(bankTransaction.getSum()*(-1));
+        }
         bankTransactionRepository.save(bankTransaction);
         if (categoryOptional.isPresent()) {
             Transaction transaction = Transaction.builder()
@@ -510,12 +514,6 @@ public class UserServiceImpl implements UserService {
 
         double previousMonthProfit = previous2MonthIncomes + previous2MonthExpenses;
         double currentMonthProfit = lastMonthIncomes + lastMonthExpenses;
-
-        double percentChange = ((currentMonthProfit - previousMonthProfit)
-                / Math.abs(previousMonthProfit))
-                * 100.0;
-
-        System.out.printf("Зростання: %.2f%%\n", percentChange);
 
         double lastMonthProfitPercentage;
         if (previousMonthProfit == 0) {

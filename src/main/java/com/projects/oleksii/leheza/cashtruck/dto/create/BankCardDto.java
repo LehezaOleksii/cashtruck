@@ -16,7 +16,7 @@ public class BankCardDto {
     private Long id;
     @NotNull(message = "Bank name cannot be null")
     @NotBlank(message = "Bank name cannot be blank")
-    @Size(max = 100, message = "Must be exactly 16 characters")
+    @Size(max = 100, message = "Must be less 100 characters")
     private String bankName;
     private String cardNumber;
     @NotNull(message = "Name on card cannot be null")
@@ -24,13 +24,8 @@ public class BankCardDto {
     @Size(max = 50, message = "Must be at most 50 characters")
     @Pattern(regexp = "^[A-Za-z ]+$", message = "Only letters and spaces are allowed")
     private String cardHolder;
-    @Size(min = 3, max = 3, message = "CCV must be exactly 3 digits")
-    @Pattern(regexp = "\\d{3}", message = "Must contain only digits")
-    private String cvv;
     private double balance;
     @Size(min = 3, max = 3, message = "Currency name must be exactly 3 digits")
     private String currencyShortName;
     private int delimiter;
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private Date expiringDate;
 }

@@ -150,9 +150,6 @@ public class RandomUsersGenerator {
                     .balance(random.nextInt() * 500000 + 500000)
                     .bankName(faker.company().name())
                     .cardNumber(faker.number().digits(16))
-                    .expiringDate(faker.date().between(
-                            Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                            Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant())))
                     .cvv(Integer.toString(random.nextInt(900) + 100))
                     .transactions(new HashSet<>(allTransactions))
                     .build();
