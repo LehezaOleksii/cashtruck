@@ -530,3 +530,10 @@ input[type="radio"].btn-check.custom-back-white:checked + label {
     height: 140px;
     background-color: transparent;
 }
+
+@media (max-width: 1000.98px) {
+    .mt-mobile-4 {
+        margin-top: 1.5rem !important;
+    }
+}
+

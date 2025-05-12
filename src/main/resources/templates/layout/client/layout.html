@@ -58,10 +58,10 @@
 <body th:data-client-id="${client.id}">
     <header th:replace="fragments/client/header"></header>
     <div class="col-12">
-        <div class="row"> 
+        <div class="row">
             <nav th:replace="fragments/client/navigation"></nav>
-            <div class="col-9 mt-3" style="margin-left: 2rem;"> 
-                <main layout:fragment="content"></main> 
+            <div class="col-sm-12 col-md-12 col-lg-9 mt-3">
+                <main layout:fragment="content"></main>
             </div>
         </div>
     </div>
