@@ -10,13 +10,15 @@
 <body>
 <content layout:fragment="content">
     <div class="d-flex justify-content-center align-items-center mt-4">
-        <div class="card p-0 col-6 mb-4 border-radius-16" style="overflow: hidden;">
+        <div class="card p-0 col-sm-12 col-md-10 col-xl-6 mb-4 border-radius-16" style="overflow: hidden;">
             <div class="card-header py-3" >
                 <h5 class="mb-0 text-center">Add your bank card</h5>
             </div>
             <div class="card-body">
                 <div class="add-bank-card-img-wrapper text-center">
-                    <img th:src="@{/images/client/cards_photo.jpg}" style="width: 33vw; height: 52vh;" class="add-bank-card-img"/>
+                <img th:src="@{/images/client/cards_photo.jpg}"
+                     class="add-bank-card-img img-fluid"
+                     style="max-width: 100%; height: auto;" />
                 </div>
                 <hr class="mt-0">
                 <div>

@@ -501,12 +501,12 @@ input[type="radio"].btn-check.custom-back-white:checked + label {
     font-weight: bold;
 }
 /*qr code */
- .qr-container {
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
- }
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
 
 .qr-wrapper {
     position: relative;
@@ -536,4 +536,3 @@ input[type="radio"].btn-check.custom-back-white:checked + label {
         margin-top: 1.5rem !important;
     }
 }
-

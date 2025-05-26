@@ -224,8 +224,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserHeaderDto getHeaderClientData(Long userId) {
         byte[] avatar = userRepository.findAvatarByUserId(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         UserHeaderDto dto = UserHeaderDto.builder()
                 .id(userId)
+                .role(String.valueOf(user.getRole()))
                 .build();
         if (avatar != null && avatar.length > 0) {
             return dto.toBuilder()

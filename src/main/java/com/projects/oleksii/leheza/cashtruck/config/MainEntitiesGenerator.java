@@ -191,13 +191,15 @@ public class MainEntitiesGenerator {
                 List.of("5300", "9950"));
         categoryRepository.save(wholesaleCorporateCategory);
 
-        Category uncategorizedIncomeCategory = new Category(transactionTypeIncome, "Uncategorized income",
-                List.of("4304"));
+        Category uncategorizedIncomeCategory = new Category(transactionTypeIncome, "Uncategorized income");
         categoryRepository.save(uncategorizedIncomeCategory);
 
         Category uncategorizedExpenseCategory = new Category(transactionTypeExpense, "Uncategorized expense",
                 List.of("4304"));
         categoryRepository.save(uncategorizedExpenseCategory);
+
+        Category initialCardBalanceCategory = new Category(transactionTypeUniversal, "Initial card balance");
+        categoryRepository.save(initialCardBalanceCategory);
     }
 
     private void generateIncomeCategories() {

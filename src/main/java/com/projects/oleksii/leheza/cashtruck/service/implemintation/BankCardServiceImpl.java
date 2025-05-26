@@ -1,19 +1,16 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
-import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
-import com.projects.oleksii.leheza.cashtruck.domain.Currency;
-import com.projects.oleksii.leheza.cashtruck.domain.User;
+import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException;
-import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.CurrencyRepository;
-import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
+import com.projects.oleksii.leheza.cashtruck.repository.*;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -27,6 +24,9 @@ public class BankCardServiceImpl implements BankCardService {
     private final UserRepository userRepository;
     private final DtoMapper dtoMapper;
     private final CurrencyRepository currencyRepository;
+    private final BankTransactionRepository bankTransactionRepository;
+    private final TransactionRepository transactionRepository;
+    private final CategoryRepository categoryRepository;
 
     @Override
     public BankCard save(BankCard bankCard) {
@@ -38,7 +38,23 @@ public class BankCardServiceImpl implements BankCardService {
         Currency currency = currencyRepository.findByShortName(bankCardDto.getCurrencyShortName())
                 .orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + bankCardDto.getCurrencyShortName() + "not found"));
         BankCard bankCard = dtoMapper.bankCardDtoToBankCard(bankCardDto, currency);
-        return bankCardRepository.save(bankCard);
+        bankCard = bankCardRepository.save(bankCard);
+        String firstTransactionName = "First transaction";
+        BankTransaction bankTransaction = BankTransaction.builder()
+                .currency(currency)
+                .name(firstTransactionName)
+                .sum((long) bankCardDto.getBalance()*currency.getDelimiter())
+                .time(LocalDateTime.now())
+                .build();
+        bankTransactionRepository.save(bankTransaction);
+        Category initialCategory = categoryRepository.findByName("Initial card balance")
+                .orElseThrow(() -> new ResourceNotFoundException("Initial card balance not found"));
+        Transaction firstTransaction = new Transaction();
+        firstTransaction.setBankCard(bankCard);
+        firstTransaction.setBankTransaction(bankTransaction);
+        firstTransaction.setCategory(initialCategory);
+        transactionRepository.save(firstTransaction);
+        return bankCard;
     }
 
     @Override
