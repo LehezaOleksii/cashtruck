@@ -22,4 +22,6 @@ public class MonobankAccountTransactionDto {
     private long amount;
     @JsonProperty("currencyCode")
     private String currencyCode;
+    @JsonProperty("id")
+    private String id;
 }

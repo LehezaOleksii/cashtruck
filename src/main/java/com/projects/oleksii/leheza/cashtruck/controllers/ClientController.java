@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.controllers;
 
 import com.projects.oleksii.leheza.cashtruck.domain.BankCard;
+import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import com.projects.oleksii.leheza.cashtruck.domain.User;
 import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
@@ -53,10 +54,10 @@ public class ClientController {
     private final MonobankIntegrationService monobankIntegrationService;
     private final MonobankAccountService monobankAccountService;
     private final MonobankRequestService monobankRequestService;
+    private final MonobankTransactionService monobankTransactionService;
 
     @GetMapping(path = "/dashboard")
-    public ModelAndView showClientDashboard(@AuthenticationPrincipal User user,
-                                            @RequestParam(value = "cardNumber", required = false) String selectedCardNumber) {
+    public ModelAndView showClientDashboard(@AuthenticationPrincipal User user, @RequestParam(value = "cardNumber", required = false) String selectedCardNumber) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/dashboard");
 
@@ -66,10 +67,7 @@ public class ClientController {
         modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(userId));
 
         if (selectedCardNumber != null) {
-            DashboardBankCardDto selectedCard = cards.stream()
-                    .filter(c -> c.getCardNumber().equals(selectedCardNumber))
-                    .findFirst()
-                    .orElse(null);
+            DashboardBankCardDto selectedCard = cards.stream().filter(c -> c.getCardNumber().equals(selectedCardNumber)).findFirst().orElse(null);
             modelAndView.addObject("bank_card", selectedCard);
         } else if (!cards.isEmpty()) {
             modelAndView.addObject("bank_card", cards.get(0));
@@ -104,10 +102,7 @@ public class ClientController {
     }
 
     @GetMapping({"/bank_cards/add/monobank"})
-    public ModelAndView addMonobankCardPage(
-            @ModelAttribute("error") String error,
-            RedirectAttributes redirectAttributes,
-            @AuthenticationPrincipal User user) {
+    public ModelAndView addMonobankCardPage(@ModelAttribute("error") String error, RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/add_monobank_card");
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
@@ -134,8 +129,7 @@ public class ClientController {
     }
 
     @PostMapping("/bank_cards/add/monobank/token/connect")
-    public ModelAndView saveMonobankRequestId(RedirectAttributes redirectAttributes,
-                                              @AuthenticationPrincipal User user) {
+    public ModelAndView saveMonobankRequestId(RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         user = userService.getUserById(userId);
         if (!Optional.ofNullable(user).isPresent()) {
@@ -177,9 +171,7 @@ public class ClientController {
     }
 
     @GetMapping({"/bank_cards/add/monobank/cards/save"})
-    public ModelAndView synchronizeMonobankCards(@AuthenticationPrincipal User user,
-                                                 RedirectAttributes redirectAttributes,
-                                                 @RequestParam("selectedPans") List<String> selectedPans) {
+    public ModelAndView synchronizeMonobankCards(@AuthenticationPrincipal User user, RedirectAttributes redirectAttributes, @RequestParam("selectedPans") List<String> selectedPans) {
         Long userId = user.getId();
         user = userService.getUserById(userId);
         String requestId = user.getMonobankIntegration().getRequestId();
@@ -189,15 +181,18 @@ public class ClientController {
         try {
             int maxTransactionsResponseAmount = 500;
             for (MonobankAccount monobankAccount : monobankAccounts) {
-                List<MonobankAccountTransactionDto> transactions = monobankRequestService.getClientStatementInfo(requestId, monobankAccount.getMonobankId(), timeNow);
-                transactions
-                        .forEach(transaction -> transactionService.save(transaction, monobankAccount.getMaskedPan(), userId));
+                boolean isAccountHasTransactions = !monobankAccountService.getAllTransactionsIds(monobankAccount.getMonobankId()).isEmpty();
+                String monobankAccountId = monobankAccount.getMonobankId();
+                List<MonobankAccountTransactionDto> transactions = monobankRequestService.getClientStatementInfo(requestId, monobankAccountId, timeNow);
+                saveUniqueTransactions(monobankAccount, transactions, userId);
                 while (transactions.size() == maxTransactionsResponseAmount) {
                     MonobankAccountTransactionDto lastTransaction = transactions.get(maxTransactionsResponseAmount - 1);
                     Long lastTransactionTime = lastTransaction.getTime();
-                    transactions = monobankRequestService.getClientStatementInfo(requestId, monobankAccount.getMonobankId(), lastTransactionTime);
-                    transactions
-                            .forEach(transaction -> transactionService.save(transaction, monobankAccount.getMaskedPan(), userId));
+                    transactions = monobankRequestService.getClientStatementInfo(requestId, monobankAccountId, lastTransactionTime);
+                    saveUniqueTransactions(monobankAccount, transactions, userId);
+                }
+                if (isAccountHasTransactions) {
+                    monobankAccountService.setMonobankAccountBalance(monobankAccountId, userId, monobankAccount.getBalance());
                 }
             }
         } catch (HttpTimeoutException e) {
@@ -213,11 +208,20 @@ public class ClientController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Unexpected error while fetching Monobank client info.");
             log.error("Unexpected error while fetching Monobank client info: {}", e.getMessage());
-        }
-        if (redirectAttributes.containsAttribute("error")) {
+        } if (redirectAttributes.containsAttribute("error")) {
             return new ModelAndView("redirect:/clients/bank_cards/add/monobank/cards");
         }
         return new ModelAndView("redirect:/clients/dashboard");
+    }
+
+    private void saveUniqueTransactions(MonobankAccount monobankAccount, List<MonobankAccountTransactionDto> transactions, Long userId) {
+        List<String> monobankTransactionIds = monobankAccountService.getAllTransactionsIds(monobankAccount.getMonobankId());
+        transactions.forEach(transaction -> {
+            if (!monobankTransactionIds.contains(transaction.getId())) {
+                Transaction savedTransaction = transactionService.save(transaction, monobankAccount.getMaskedPan(), userId);
+                monobankTransactionService.save(transaction, savedTransaction);
+            }
+        });
     }
 
     @GetMapping({"/bank_cards/add/usa_canada_banks"})

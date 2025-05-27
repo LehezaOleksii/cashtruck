@@ -29,13 +29,13 @@ public interface TransactionRepository extends
     Page<Transaction> findAll(Specification<?> specification, Pageable pageable);
 
     @Query("""
-    SELECT t FROM Transaction t
-    WHERE t.bankCard IN :bankCards
-    AND t.bankTransaction.time >= :startDate
-    AND t.bankTransaction.time <= :endDate
-    AND ((:isPositiveTransactionSum = true AND t.bankTransaction.sum > 0)
-         OR (:isPositiveTransactionSum = false AND t.bankTransaction.sum < 0))
-    """)
+            SELECT t FROM Transaction t
+            WHERE t.bankCard IN :bankCards
+            AND t.bankTransaction.time >= :startDate
+            AND t.bankTransaction.time <= :endDate
+            AND ((:isPositiveTransactionSum = true AND t.bankTransaction.sum > 0)
+                 OR (:isPositiveTransactionSum = false AND t.bankTransaction.sum < 0))
+            """)
     List<Transaction> findByBankCardsAndDateRangeAndTransactionTypes(@Param("bankCards") List<BankCard> bankCards,
                                                                      @Param("startDate") LocalDateTime startDate,
                                                                      @Param("endDate") LocalDateTime endDate,
@@ -57,4 +57,6 @@ public interface TransactionRepository extends
             """)
     List<DashboardTransactionDto> findLastTransactionsByUserId(@Param("userId") Long userId, Pageable pageable);
 
+    @Query("SELECT t FROM Transaction t JOIN t.bankCard WHERE t.bankCard.cardNumber = :cardNumber")
+    List<Transaction> findByBankCardNumber(String cardNumber);
 }

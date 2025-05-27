@@ -3,6 +3,7 @@ package com.projects.oleksii.leheza.cashtruck.dto;
 import com.projects.oleksii.leheza.cashtruck.domain.*;
 import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
 import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankTransaction;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateCategoryDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
@@ -273,5 +274,11 @@ public class DtoMapper {
                 .currency(bankCard.getCurrency().getShortName())
                 .currencyCode(bankCard.getCurrency().getCode())
                 .build();
+    }
+
+    public MonobankTransaction monobankAccountTransactionDtoToMonobankTransaction(MonobankAccountTransactionDto monobankAccountTransactionDto) {
+    return MonobankTransaction.builder()
+            .monobankId(monobankAccountTransactionDto.getId())
+            .build();
     }
 }

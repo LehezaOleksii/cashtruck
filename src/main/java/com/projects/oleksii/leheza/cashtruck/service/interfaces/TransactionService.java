@@ -16,7 +16,7 @@ public interface TransactionService {
 
     Transaction save(Transaction transaction);
 
-    void save(MonobankAccountTransactionDto monobankAccountTransactionDto, String bankCardNumber, Long userId);
+    Transaction save(MonobankAccountTransactionDto monobankAccountTransactionDto, String bankCardNumber, Long userId);
 
     List<CategoryInfoDto> findClientIncomeCategoriesByClientId(Long clientId);
 

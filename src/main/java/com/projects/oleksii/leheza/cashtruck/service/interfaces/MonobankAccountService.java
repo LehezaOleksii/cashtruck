@@ -12,4 +12,8 @@ public interface MonobankAccountService {
     List<MonobankAccountDto> findByUserId(Long userId);
 
     List<MonobankAccount> findByPans(List<String> pans);
+
+    List<String> getAllTransactionsIds(String monobankId);
+
+    void setMonobankAccountBalance(String monobankId, Long userId, Long balance);
 }

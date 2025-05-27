@@ -6,6 +6,7 @@ import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
 import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
+import com.projects.oleksii.leheza.cashtruck.dto.auth.GoogleAuth;
 import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
@@ -44,6 +45,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.beans.Transient;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -184,8 +187,8 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bank card with number: " + createTransactionDto.getCardNumber() + " deos not found "));
         Currency currency = currencyRepository.findByShortName(createTransactionDto.getCurrencyShortName()).orElseThrow(() -> new ResourceNotFoundException("Currency with shortName: " + createTransactionDto.getCurrencyShortName() + " not found"));
         BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto, currency);
-        if (!createTransactionDto.isIncome()){
-            bankTransaction.setSum(bankTransaction.getSum()*(-1));
+        if (!createTransactionDto.isIncome()) {
+            bankTransaction.setSum(bankTransaction.getSum() * (-1));
         }
         bankTransactionRepository.save(bankTransaction);
         if (categoryOptional.isPresent()) {
@@ -336,7 +339,16 @@ public class UserServiceImpl implements UserService {
                                     monoAccounts.stream()
                                             .filter(acc -> acc.getMaskedPan().equals(dto.getCardNumber()))
                                             .findFirst()
-                                            .ifPresent(acc -> dto.setType(acc.getType())); // встановлюємо type
+                                            .ifPresent(acc -> dto.setType(acc.getType()));
+                                    Currency currency = currencyRepository.findByShortName(dto.getCurrency())
+                                            .orElseThrow(() -> new ResourceNotFoundException("Currency with shortName:" + dto.getCurrency() + " does not exist"));
+                                    double sum = transactionRepository.findByBankCardNumber(dto.getCardNumber()).stream()
+                                            .map(t -> t.getBankTransaction().getSum())
+                                            .mapToDouble(Long::doubleValue)
+                                            .map(number -> number / currency.getDelimiter())
+                                            .sum();
+                                    BigDecimal roundedSum = BigDecimal.valueOf(sum).setScale(2, RoundingMode.HALF_UP);
+                                    dto.setBalance(roundedSum.doubleValue());
                                 });
                     });
 
@@ -566,7 +578,7 @@ public class UserServiceImpl implements UserService {
         LocalDateTime periodStart = LocalDateTime.now().minusMonths(lastMonthAmount);
         double initialIncome = sumTransactionsBefore(userId, true, periodStart) / delimiter;
         double initialExpense = sumTransactionsBefore(userId, false, periodStart) / delimiter;
-        double runningBalance = initialIncome - initialExpense;
+        double runningBalance = initialIncome + initialExpense;
 
         // 2. Збираємо нетто-суми за кожен із останніх lastMonthAmount місяців
         Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter);
@@ -577,7 +589,7 @@ public class UserServiceImpl implements UserService {
         for (String month : incomeByMonth.keySet()) {
             double income = incomeByMonth.getOrDefault(month, 0.0);
             double expense = expenseByMonth.getOrDefault(month, 0.0);
-            netByMonth.put(month, income - expense);
+            netByMonth.put(month, income + expense);
         }
 
         // 3. Сортуємо місяці в хронологічному порядку

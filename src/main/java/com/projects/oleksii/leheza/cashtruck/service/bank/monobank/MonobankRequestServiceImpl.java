@@ -135,7 +135,6 @@ public class MonobankRequestServiceImpl implements MonobankRequestService {
                     .header("X-Sign", xSign)
                     .timeout(Duration.ofSeconds(10))
                     .build();
-
             HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() == 200) {
                 return true;

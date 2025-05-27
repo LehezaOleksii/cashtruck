@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface MonobankAccountRepository extends JpaRepository<MonobankAccount, Long> {
@@ -16,4 +17,8 @@ public interface MonobankAccountRepository extends JpaRepository<MonobankAccount
 
     @Query("SELECT ma FROM MonobankAccount ma WHERE ma.maskedPan IN :pans")
     List<MonobankAccount> findByPans(List<String> pans);
+
+    @Query("SELECT ma FROM MonobankAccount ma WHERE ma.monobankId = :monobankId")
+    Optional<MonobankAccount> findByMonobankId(String monobankId);
+
 }

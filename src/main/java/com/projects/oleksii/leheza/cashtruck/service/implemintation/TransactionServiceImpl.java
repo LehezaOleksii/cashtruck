@@ -1,6 +1,7 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankTransaction;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountTransactionDto;
@@ -41,6 +42,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final BankCardRepository bankCardRepository;
     private final BankTransactionRepository bankTransactionRepository;
     private final CurrencyRepository currencyRepository;
+    private final MonobankTransactionRepository monobankTransactionRepository;
 
     @Override
     public List<Transaction> findAll() {
@@ -53,7 +55,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public void save(MonobankAccountTransactionDto monobankAccountTransactionDto, String bankCardNumber, Long userId) {
+    public Transaction save(MonobankAccountTransactionDto monobankAccountTransactionDto, String bankCardNumber, Long userId) {
         BankCard bankCard = bankCardRepository.findCardByNumberAndUserId(bankCardNumber, userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bank card with bank card number: " + bankCardNumber + " and user id: " + userId + " not found"));
         Currency currency = currencyRepository.findByCode(Integer.parseInt(monobankAccountTransactionDto.getCurrencyCode()))
@@ -80,6 +82,7 @@ public class TransactionServiceImpl implements TransactionService {
         }
         Transaction transaction = dtoMapper.MonobankAccountTransactionDto(monobankAccountTransactionDto, bankCard, bankTransaction, category);
         transactionRepository.save(transaction);
+        return transaction;
     }
 
     @Override
