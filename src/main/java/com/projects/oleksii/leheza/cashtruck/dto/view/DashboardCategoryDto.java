@@ -10,5 +10,6 @@ import lombok.*;
 public class DashboardCategoryDto {
 
     private String categoryName;
-    private long sum;
+    private double sum;
+    private String currencyShortName;
 }

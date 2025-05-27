@@ -6,7 +6,6 @@ import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
 import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
-import com.projects.oleksii.leheza.cashtruck.dto.auth.GoogleAuth;
 import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.BankCardDto;
 import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
@@ -493,15 +492,19 @@ public class UserServiceImpl implements UserService {
                 .mapToLong(transaction -> transaction.getBankTransaction().getSum())
                 .sum();
         long lastMonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumIncome).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
                 .mapToLong(t -> t.getBankTransaction().getSum())
                 .sum();
         long previous2MonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumIncome).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
                 .mapToLong(t -> t.getBankTransaction().getSum())
                 .sum();
         long lastMonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumExpense).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
                 .mapToLong(t -> t.getBankTransaction().getSum())
                 .sum();
         long previous2MonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumExpense).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
                 .mapToLong(t -> t.getBankTransaction().getSum())
                 .sum();
         long lastMonthProfit = lastMonthIncomes + lastMonthExpenses;
@@ -513,8 +516,8 @@ public class UserServiceImpl implements UserService {
         int lastTransactionsPageSize = 5;
         List<DashboardTransactionDto> lastTransactions = getLastUserTransactions(client.getId(), lastTransactionsPageNumber, lastTransactionsPageSize);
         DashboardIncomeExpensesDiagramDto incomeExpensesDiagramDto = DashboardIncomeExpensesDiagramDto.builder()
-                .incomes(getMonthSumMap(client.getId(), isPositiveTransactionSumIncome, formatter, lastMonthAmount, delimiter))
-                .expenses(getMonthSumMap(client.getId(), isPositiveTransactionSumExpense, formatter, lastMonthAmount, delimiter))
+                .incomes(getMonthSumMap(client.getId(), isPositiveTransactionSumIncome, formatter, lastMonthAmount, delimiter, currency))
+                .expenses(getMonthSumMap(client.getId(), isPositiveTransactionSumExpense, formatter, lastMonthAmount, delimiter, currency))
                 .build();
         double totalBalanceDenominator = totalBalance - (lastMonthIncomes + lastMonthExpenses);
         double totalBalancePercentage = totalBalanceDenominator != 0
@@ -560,12 +563,30 @@ public class UserServiceImpl implements UserService {
 
     private List<DashboardTransactionDto> getLastUserTransactions(Long userId, int pageNumber, int pageSize) {
         Pageable topFive = PageRequest.of(pageNumber, pageSize);
-        return transactionRepository.findLastTransactionsByUserId(userId, topFive);
+        List<DashboardTransactionDto> transactions = transactionRepository.findLastTransactionsByUserId(userId, topFive);
+        transactions.forEach(t -> {
+            double dividedSum = (double) t.getSum() / t.getDelimiter();
+            double roundedSum = BigDecimal.valueOf(dividedSum)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            t.setSum(roundedSum);
+        });
+        return transactions;
     }
 
     private List<DashboardCategoryDto> getUserCategorySummaryLast6Months(Long userId) {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
-        return categoryRepository.getCategorySums(userId, sixMonthsAgo);
+        return categoryRepository.getCategorySums(userId, sixMonthsAgo).stream()
+                .filter(t->t.getCurrencyShortName().equals("UAH"))
+                .sorted(Comparator.comparing(DashboardCategoryDto::getSum).reversed())
+                .peek(t -> {
+                    double divided = t.getSum() / currencyRepository.findByShortName(t.getCurrencyShortName()).orElseThrow(()->new ResourceNotFoundException("Currency with short name was not found")).getDelimiter();
+                    double rounded = BigDecimal.valueOf(divided)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue();
+                    t.setSum(rounded);
+                })
+                .collect(Collectors.toList());
     }
 
     private Map<String, Double> getTotalBalanceGraphic(
@@ -573,18 +594,17 @@ public class UserServiceImpl implements UserService {
             int lastMonthAmount,
             DateTimeFormatter formatter,
             int delimiter) {
+        String currencyName = "UAH";
+        Currency currency = currencyRepository.findByShortName(currencyName).orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
 
-        // 1. Вираховуємо початковий баланс до старту (now() - lastMonthAmount місяців)
         LocalDateTime periodStart = LocalDateTime.now().minusMonths(lastMonthAmount);
-        double initialIncome = sumTransactionsBefore(userId, true, periodStart) / delimiter;
-        double initialExpense = sumTransactionsBefore(userId, false, periodStart) / delimiter;
+        double initialIncome = sumTransactionsBefore(userId, true, periodStart, currency) / delimiter;
+        double initialExpense = sumTransactionsBefore(userId, false, periodStart, currency) / delimiter;
         double runningBalance = initialIncome + initialExpense;
 
-        // 2. Збираємо нетто-суми за кожен із останніх lastMonthAmount місяців
-        Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter);
-        Map<String, Double> expenseByMonth = getMonthSumMap(userId, false, formatter, lastMonthAmount, delimiter);
+        Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter, currency);
+        Map<String, Double> expenseByMonth = getMonthSumMap(userId, false, formatter, lastMonthAmount, delimiter, currency);
 
-        // нетто = дохід − витрати
         Map<String, Double> netByMonth = new HashMap<>();
         for (String month : incomeByMonth.keySet()) {
             double income = incomeByMonth.getOrDefault(month, 0.0);
@@ -592,7 +612,6 @@ public class UserServiceImpl implements UserService {
             netByMonth.put(month, income + expense);
         }
 
-        // 3. Сортуємо місяці в хронологічному порядку
         List<String> monthOrder = Arrays.asList(
                 "Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -605,12 +624,13 @@ public class UserServiceImpl implements UserService {
                         (a, b) -> a,
                         LinkedHashMap::new
                 ));
-
-        // 4. Обчислюємо кумулятивний баланс
         Map<String, Double> cumulativeBalance = new LinkedHashMap<>();
         for (Map.Entry<String, Double> e : sortedNet.entrySet()) {
             runningBalance += e.getValue();
-            cumulativeBalance.put(e.getKey(), runningBalance);
+            double roundedBalance = BigDecimal.valueOf(runningBalance)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            cumulativeBalance.put(e.getKey(), roundedBalance);
         }
 
         return cumulativeBalance;
@@ -622,7 +642,8 @@ public class UserServiceImpl implements UserService {
     private double sumTransactionsBefore(
             Long userId,
             boolean isIncome,
-            LocalDateTime before) {
+            LocalDateTime before,
+            Currency currency) {
 
         // Замінюємо LocalDateTime.MIN на нормальну дату
         LocalDateTime startDate = LocalDateTime.of(1970, 1, 1, 0, 0);
@@ -634,12 +655,13 @@ public class UserServiceImpl implements UserService {
                         before,
                         isIncome)
                 .stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
                 .mapToDouble(t -> (double) t.getBankTransaction().getSum())
                 .sum();
     }
 
 
-    private Map<String, Double> getMonthSumMap(Long userId, boolean isPositiveTransactionSum, DateTimeFormatter formatter, int lastMonthAmount, int delimiter) {
+    private Map<String, Double> getMonthSumMap(Long userId, boolean isPositiveTransactionSum, DateTimeFormatter formatter, int lastMonthAmount, int delimiter, Currency currency) {
         return transactionRepository
                 .findByBankCardsAndDateRangeAndTransactionTypes(
                         bankCardRepository.getBankCardsByUserId(userId),
@@ -647,10 +669,14 @@ public class UserServiceImpl implements UserService {
                         LocalDateTime.now(),
                         isPositiveTransactionSum)
                 .stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
                 .collect(Collectors.groupingBy(
                         t -> t.getBankTransaction().getTime().format(formatter),
                         TreeMap::new,
-                        Collectors.summingDouble(t -> (double) t.getBankTransaction().getSum() / delimiter)
+                        Collectors.collectingAndThen(
+                                Collectors.summingDouble(t -> (double) t.getBankTransaction().getSum() / delimiter),
+                                sum -> BigDecimal.valueOf(sum).setScale(2, RoundingMode.HALF_UP).doubleValue()
+                        )
                 ));
     }
 

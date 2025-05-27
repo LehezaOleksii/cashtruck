@@ -428,16 +428,35 @@
             .then(data => {
                 const totalBalanceGraphic = data.totalBalanceGraphic || {};
 
-                let categories = Object.keys(totalBalanceGraphic);
-                let seriesData = Object.values(totalBalanceGraphic);
+                let categories = [];
+                let seriesData = [];
 
-                // Fallback defaults if no data
                 const defaultCategories = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'];
                 const defaultSeriesData = [24, 21, 30, 22, 42, 26, 35, 29];
 
-                if (categories.length === 0) {
+                if (Object.keys(totalBalanceGraphic).length === 0) {
                     categories = defaultCategories;
                     seriesData = defaultSeriesData;
+                } else {
+                    const monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                    const now = new Date();
+                    const currentMonthIndex = now.getMonth();
+
+                    const last6Months = [];
+                    for (let i = 5; i >= 0; i--) {
+                        const index = (currentMonthIndex - i + 12) % 12;
+                        last6Months.push(monthOrder[index]);
+                    }
+
+                    last6Months.forEach(month => {
+                        if (!(month in totalBalanceGraphic)) {
+                            totalBalanceGraphic[month] = 0;
+                        }
+                    });
+
+                    categories = last6Months;
+                    seriesData = last6Months.map(month => totalBalanceGraphic[month]);
                 }
 
                 const incomeChartConfig = {

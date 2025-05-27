@@ -35,17 +35,19 @@ public interface CategoryRepository extends JpaRepository<Category, Long>,
             @Param("isPositive") boolean isPositiveTransactionSum);
 
     @Query("""
-        SELECT new com.projects.oleksii.leheza.cashtruck.dto.view.DashboardCategoryDto(
-            t.category.name,
-            SUM(bt.sum)
-        )
-        FROM Transaction t
-        JOIN t.bankTransaction bt
-        JOIN t.bankCard bc
-        WHERE bc.user.id = :userId
-          AND bt.time >= :startDate
-        GROUP BY t.category.name
-        """)
+            SELECT new com.projects.oleksii.leheza.cashtruck.dto.view.DashboardCategoryDto(
+                t.category.name,
+                SUM(ABS(bt.sum)),
+                c.shortName
+                )
+            FROM Transaction t
+            JOIN t.bankTransaction bt
+            JOIN t.bankCard bc
+            JOIN bc.currency c
+            WHERE bc.user.id = :userId
+              AND bt.time >= :startDate
+            GROUP BY t.category.name, c.shortName
+            """)
     List<DashboardCategoryDto> getCategorySums(@Param("userId") Long userId,
                                                @Param("startDate") LocalDateTime startDate);
 
