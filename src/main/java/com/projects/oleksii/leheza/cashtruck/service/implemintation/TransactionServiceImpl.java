@@ -1,7 +1,6 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
-import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankTransaction;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.integration.MonobankAccountTransactionDto;

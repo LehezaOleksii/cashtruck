@@ -636,16 +636,11 @@ public class UserServiceImpl implements UserService {
         return cumulativeBalance;
     }
 
-    /**
-     * Допоміжний метод: підсумовує транзакції до певної дати
-     */
     private double sumTransactionsBefore(
             Long userId,
             boolean isIncome,
             LocalDateTime before,
             Currency currency) {
-
-        // Замінюємо LocalDateTime.MIN на нормальну дату
         LocalDateTime startDate = LocalDateTime.of(1970, 1, 1, 0, 0);
 
         return transactionRepository

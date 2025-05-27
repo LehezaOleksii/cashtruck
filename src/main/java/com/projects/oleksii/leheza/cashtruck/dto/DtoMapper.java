@@ -68,7 +68,12 @@ public class DtoMapper {
                     int currency = entry.getKey();
                     List<TransactionDto> currencyTransactions = entry.getValue();
 
+                    double totalSumByCategory = currencyTransactions.stream()
+                            .mapToDouble(t -> t.getSum())
+                            .sum();
+
                     double totalSumByCategoryAndCurrency = currencyTransactions.stream()
+                            .filter(t -> t.getCurrencyCode() == 980)
                             .mapToDouble(t -> t.getSum())
                             .sum();
 
@@ -78,7 +83,7 @@ public class DtoMapper {
                     return CategoryInfoDto.builder()
                             .name(categoryName)
                             .categoryPercentage(categoryPercentage)
-                            .fullCategoryTransactionSum(totalSumByCategoryAndCurrency)
+                            .fullCategoryTransactionSum(totalSumByCategory)
                             .currencyCode(currency)
                             .build();
                 })
@@ -165,7 +170,7 @@ public class DtoMapper {
                 .build();
     }
 
-    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto,Currency currency) {
+    public BankTransaction transactionDtoToTransaction(CreateTransactionDto transactionDto, Currency currency) {
         return BankTransaction.builder()
                 .name(transactionDto.getTransactionName())
                 .time(LocalDateTime.parse(transactionDto.getTime()))
@@ -277,8 +282,8 @@ public class DtoMapper {
     }
 
     public MonobankTransaction monobankAccountTransactionDtoToMonobankTransaction(MonobankAccountTransactionDto monobankAccountTransactionDto) {
-    return MonobankTransaction.builder()
-            .monobankId(monobankAccountTransactionDto.getId())
-            .build();
+        return MonobankTransaction.builder()
+                .monobankId(monobankAccountTransactionDto.getId())
+                .build();
     }
 }

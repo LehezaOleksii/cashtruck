@@ -437,7 +437,8 @@
                             <!--                                <button type="button" class="nav-link" role="tab">Expenses</button>-->
                             <!--                            </li>-->
                             <li class="btn-primary custom-back-violet card">
-                                <button type="button" class="nav-link" role="tab">Total balance</button>
+                                <button type="button" class="nav-link" role="tab" style="color: white;">Total balance
+                                </button>
                             </li>
                         </ul>
                     </div>
@@ -890,7 +891,12 @@
                                          class="info-card-img"/>
                                     <span th:text="${income.name}"></span><br>
                                     <span th:text="${income.sum}" class="info-card-font bold"
-                                          style="margin-left: auto; margin-right: 30px;"></span><br>
+                                          style="margin-left: auto;"></span>
+                                    <div style="margin-right: 30px;">
+                                        <span class="info-card-font bold" th:if="${income.currencyCode == 840}">$</span>
+                                        <span class="info-card-font bold" th:if="${income.currencyCode == 978}">€</span>
+                                    </div>
+                                    <br>
                                     <span th:text="${#temporals.format(income.time, 'dd.MM.yy')}"></span>
                                 </div>
                             </div>
@@ -906,7 +912,13 @@
                                          class="info-card-img"/>
                                     <span th:text="${expense.name}"></span><br>
                                     <span th:text="${expense.sum}" class="info-card-font bold"
-                                          style="margin-left: auto; margin-right: 30px;"></span><br>
+                                          style="margin-left: auto;"></span>
+                                    <div style="margin-right: 30px;">
+                                        <span class="info-card-font bold"
+                                              th:if="${expense.currencyCode == 840}">$</span>
+                                        <span class="info-card-font bold"
+                                              th:if="${expense.currencyCode == 978}">€</span></div>
+                                    <br>
                                     <span th:text="${#temporals.format(expense.time, 'dd.MM.yy')}"></span>
                                 </div>
                             </div>
