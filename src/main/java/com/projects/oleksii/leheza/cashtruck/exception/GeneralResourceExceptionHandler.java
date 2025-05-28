@@ -1,3 +1,16 @@
+import com.projects.oleksii.leheza.cashtruck.exception.MonobankIntegrationException;
+import com.projects.oleksii.leheza.cashtruck.exception.UserPlanException;
+import com.projects.oleksii.leheza.cashtruck.exception.ValidationErrorResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 //package com.projects.oleksii.leheza.cashtruck.exception;
 //
 //import jakarta.servlet.http.HttpServletRequest;
@@ -139,6 +152,17 @@
 //                .map(entry -> new ValidationErrorResponse(entry.getKey(), entry.getValue()))
 //                .toList();
 //        return new ResponseEntity<>(getErrorsMap(validationErrorResponses), HttpStatus.BAD_REQUEST);
+//    }
+//    @ExceptionHandler(MonobankIntegrationException.class)
+//    public ResponseEntity<ErrorResponse> handleMonobankException(MonobankIntegrationException ex, HttpServletRequest request) {
+//        log.error("handle error MonobankIntegrationException; message:{} , cause: {}", ex.getMessage(), ex.getCause().getMessage());
+//        ErrorResponse errorResponse = ErrorResponse.builder()
+//                .code(HttpStatus.METHOD_NOT_ALLOWED.value())
+//                .error("Monobank Integration Exception")
+//                .message(ex.getMessage())
+//                .path(request.getRequestURI())
+//                .build();
+//        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(errorResponse);
 //    }
 //
 //    private Map<String, List<ValidationErrorResponse>> getErrorsMap(List<ValidationErrorResponse> errors) {

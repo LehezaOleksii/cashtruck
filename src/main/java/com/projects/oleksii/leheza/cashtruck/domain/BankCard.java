@@ -3,7 +3,6 @@ package com.projects.oleksii.leheza.cashtruck.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -28,12 +27,12 @@ public final class BankCard {
     private String cardHolder;
     @Column(length = 3)
     private String cvv;
-    private BigDecimal balance = BigDecimal.ZERO;
-    @Column(name = "expiring_date")
-    private Date expiringDate;
+    private long balance;
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
     @OneToMany(mappedBy = "bankCard")
     private Set<Transaction> transactions = new HashSet<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Currency currency;
 }

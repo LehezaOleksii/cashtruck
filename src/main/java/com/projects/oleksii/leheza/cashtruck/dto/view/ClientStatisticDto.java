@@ -3,26 +3,30 @@ package com.projects.oleksii.leheza.cashtruck.dto.view;
 import com.projects.oleksii.leheza.cashtruck.domain.Transaction;
 import lombok.*;
 
-import java.math.BigDecimal;
 import java.util.List;
+import java.util.Map;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
 @Setter
 @Builder(toBuilder = true)
-//For UI
 public class ClientStatisticDto {
 
-    private List<Transaction> expenses;
-    private List<Transaction> incomes;
-    private BigDecimal totalIncomeSum;
-    private BigDecimal totalExpenseSum;
-    private BigDecimal totalBalance;
-    private BigDecimal lastYearExpense;
-    private BigDecimal lastMonthExpense;
-    private BigDecimal lastWeekExpense;
-    private BigDecimal lastYearIncome;
-    private BigDecimal lastMonthIncome;
-    private BigDecimal lastWeekIncome;
+    private List<TransactionDto> expenses;
+    private List<TransactionDto> incomes;
+    private double totalBalance;
+    private double totalBalancePercentage;
+    private double lastMonthIncomes;
+    private double lastMonthIncomesPercentage;
+    private double lastMonthExpenses;
+    private double lastMonthExpensesPercentage;
+    private double lastMonthProfit;
+    private double lastMonthProfitPercentage;
+    private double delimiter;
+    private String currencyShortName;
+    private Map<String, Double> totalBalanceGraphic;
+    private List<DashboardCategoryDto> categoriesDiagram;
+    private List<DashboardTransactionDto> lastTransactions;
+    private DashboardIncomeExpensesDiagramDto incomeExpensesDiagram;
 }

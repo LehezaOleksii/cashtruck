@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorator="layout/client/layout"
+>
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash truck</title>
+</head>
+<body>
+<link href="https://fonts.googleapis.com/css2?family=PT+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;700&display=swap" rel="stylesheet">
+<content layout:fragment="content">
+    <div class="d-flex justify-content-center align-items-center mt-4">
+        <div class="card p-0 mb-4 border-radius-16" style="overflow: hidden; width: 735px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);">
+            <div class="card-header py-3 bold">
+                Select Monobank accounts
+            </div>
+            <div class="card-body">
+                <form method="get" action="/clients/bank_cards/add/monobank/cards/save" id="monobankForm">
+                    <div th:each="account : ${monobank_cards}">
+                        <div th:if="${(account.type == 'black' or account.type == 'madeInUkraine')}"
+                             class="card mb-3 card-body border-radius-16 monobank-card-container"
+                             id="card-{{account.id}}">
+
+                            <!-- Hidden input to store PAN only if selected -->
+                            <input
+                                    type="checkbox"
+                                    id="checkbox-{{account.id}}"
+                                    class="card-checkbox"
+                                    name="selectedPans"
+                                    th:value="${account.maskedPan[0]}">
+                        <div class="row pl-3">
+                            <!-- Card Content -->
+                            <div class="monobank-card" style="font-family: Arial, sans-serif; width: 350px; overflow: hidden">
+                                <div th:if="${(account.type == 'black' and account.currencyCode == 840)}" style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background-color: #31BA70; border-radius: 10px 0 0 10px;"></div>
+                                <div th:if="${(account.type == 'black' and account.currencyCode == 978)}" style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background-color: #DE4F55; border-radius: 10px 0 0 10px;"></div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <div style="display: flex; flex-direction: column; width: fit-content; margin-bottom: 0;">
+                                        <span class="bold" style="font-size: 20px; margin-top: -5px;">monobank</span>
+                                        <span style="font-size: 8px; text-align: right; margin-top: -4px;">Universal Bank</span>
+                                    </div>
+                                    <div style="font-size: 16px; margin-top: -5px; margin-right: 4px;">
+                                        <span th:text="${account.currency}"></span>
+                                    </div>
+                                </div>
+
+                                <div class="card-number-monobank"
+                                     style="font-family: 'Courier New', monospace; letter-spacing: 5px; font-size: 18px; text-align: center; flex-grow: 1; display: flex; justify-content: center; align-items: center; width: 100%;"
+                                     th:text="${account.maskedPan[0].replaceAll('(.{4})', '$1 ')}">
+                                </div>
+
+                                <div th:if="${account.type == 'black'}" class="card-holder"
+                                     style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px; align-items: center;"
+                                     th:text="${account.holderName}">
+                                </div>
+
+                                <div th:if="${account.type == 'madeInUkraine'}">
+                                    <img src="/images/client/national-cashback-logo.png" style="width: 100px;"/>
+                                </div>
+
+                                <div class="card-brand-monobank">
+                                    <div th:if="${account.maskedPan[0].startsWith('4')}">
+                                        <img src="/images/client/visa-logo.png"
+                                             style="width: 50px; height: auto; background: transparent;"/>
+                                    </div>
+                                    <div th:if="${account.maskedPan[0].startsWith('5')}">
+                                        <img src="/images/client/mastercard-logo.png"
+                                             style="width: 50px; height: auto; background: transparent;"/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ml-4"
+                                 style="width: 275px; border-left: 2px solid #ddd; font-family: 'Inter', Arial, sans-serif; display: flex; flex-direction: column;   justify-content: center;  ">
+                                <div>
+                                    <strong>
+                                        <span>Monobank </span>(<span
+                                            th:text="${#strings.length(account.type) > 14 ? account.type.substring(0, 14) : account.type}"
+                                            style="font-family: 'Courier New', monospace; letter-spacing: 0px; font-size: 14px;">
+                    </span><span  style="font-size: 12px;"  th:if="${account.currencyCode == 840}">, USD</span><span style="font-size: 12px;"   th:if="${account.currencyCode == 978}">, EUR</span>)
+                                    </strong>
+                                </div>
+                                <div
+                                        style="font-family: 'Courier New', monospace; font-size: 18px;  "
+                                >
+                                    <span class="bold">Number:</span><span th:text="${account.maskedPan[0]}"
+                                                                           style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 16px;"></span>
+                                </div>
+                                <div>
+                                    <span class="bold">Currency:</span>
+                                    <span
+                                            th:text="${account.currency}"
+                                            style="font-family: 'Courier New', monospace; letter-spacing: 2px; font-size: 18px;"
+                                    ></span>
+                                </div>
+                                <div>
+                                    <span class="bold">Balance:</span>
+                                    <span th:text="${(account.balance)}"
+                                          class="accountBalance"
+                                          th:data-delimiter="${account.currencyDelimiter}"
+                                          style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px;"></span>
+                                    <span th:if="${account.currencyCode == 980}">₴</span>
+                                    <span th:if="${account.currencyCode == 840}">$</span>
+                                    <span th:if="${account.currencyCode == 978}">€</span>
+                                </div>
+                                <div>
+                                    <span class="bold">Credit Limit:</span>
+                                    <span class="accountBalance"
+                                          th:text="${account.creditLimit}"
+                                          th:data-delimiter="${account.currencyDelimiter}"
+                                          style="font-family: 'Courier New', monospace; letter-spacing: 0; font-size: 18px;"></span>
+                                    <span th:if="${account.currencyCode == 980}">₴</span>
+                                    <span th:if="${account.currencyCode == 840}">$</span>
+                                    <span th:if="${account.currencyCode == 978}">€</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <script>
+                    window.onload = function () {
+                        var balanceElements = document.querySelectorAll('.accountBalance');
+
+                        balanceElements.forEach(function (element) {
+                            var balanceText = element.textContent.trim();
+                            var delimiter = element.getAttribute('data-delimiter');
+                            var formattedBalance = formatNumberWithDelimiter(balanceText, delimiter);
+                            element.textContent = formattedBalance;
+                        });
+                    };
+
+                    function formatNumberWithDelimiter(number, delimiter) {
+                        number = parseFloat(number);
+                        var adjustedNumber = number / delimiter;
+                        var fixed = 0;
+                        for (var i = delimiter; i >= 10;) {
+                            i = i / 10;
+                            fixed += 1;
+                        }
+                        console.log(fixed)
+                        let parts = adjustedNumber.toFixed(fixed).split('.');
+                        let integerPart = parts[0];
+                        let decimalPart = parts[1];
+                        let regex = /(\d)(?=(\d{3})+(?!\d))/g;
+                        integerPart = integerPart.replace(regex, '$1 ');
+                        return integerPart + '.' + decimalPart;
+                    }
+                    document.addEventListener("DOMContentLoaded", function() {
+                        const cardBodies = document.querySelectorAll('.monobank-card-container');
+
+                        cardBodies.forEach(cardBody => {
+                            const checkbox = cardBody.querySelector('.card-checkbox');
+
+                            cardBody.addEventListener('click', function(event) {
+                                if (event.target !== checkbox) {
+                                    checkbox.checked = !checkbox.checked;
+                                }
+                                cardBody.classList.toggle('clicked', checkbox.checked);
+                            });
+
+                            checkbox.addEventListener('click', function(event) {
+                                event.stopPropagation();
+                                cardBody.classList.toggle('clicked', checkbox.checked);
+                            });
+                        });
+                    });
+                </script>
+                    <button type="submit" class="monobank-label button-hover-shadow btn-primary mb-2 align-items-center justify-content-center"
+                            style="width: 100%; padding: 12px">
+                        Connect
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</content>
+</body>
+</html>

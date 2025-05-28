@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -35,14 +36,25 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     @Override
-    public List<Category> findAllIncomeCategories() {
-        return categoryRepository.findByTransactionType(transactionTypeIncome);
+    public List<Category> getIncomeAndUniversalCategories() {
+        List<Category> incomeCategories = categoryRepository.findByTransactionType(TransactionType.INCOME);
+        List<Category> universalCategories = categoryRepository.findByTransactionType(TransactionType.UNIVERSAL);
+        List<Category> combinedCategories = new ArrayList<>();
+        combinedCategories.addAll(incomeCategories);
+        combinedCategories.addAll(universalCategories);
+        return combinedCategories;
     }
 
     @Override
-    public List<Category> findAllExpensesCategories() {
-        return categoryRepository.findByTransactionType(transactionTypeExpense);
+    public List<Category> getExpenseAndUniversalCategories() {
+        List<Category> expensesCategories = categoryRepository.findByTransactionType(TransactionType.EXPENSE);
+        List<Category> universalCategories = categoryRepository.findByTransactionType(TransactionType.UNIVERSAL);
+        List<Category> combinedCategories = new ArrayList<>();
+        combinedCategories.addAll(expensesCategories);
+        combinedCategories.addAll(universalCategories);
+        return combinedCategories;
     }
+
 
     @Override
     public CategoryDto findByName(String categoryName) {

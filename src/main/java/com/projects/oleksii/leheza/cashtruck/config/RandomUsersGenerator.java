@@ -13,7 +13,6 @@ import net.datafaker.Faker;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -41,19 +40,24 @@ public class RandomUsersGenerator {
 
     public void generateRandomClientFields(int clientsNumber, int managersNumber, int adminsNumber, int bankCardsNumber, int transactionNumber) {
 //    prepare for client generation
-        int allUsers = clientsNumber + managersNumber + adminsNumber;
-        generateBankCards(bankCardsNumber, allUsers);
-        generateRandomBankTransactions(transactionNumber);
-        List<BankTransaction> allBankTransactions = bankTransactionService.findAll();
-        List<BankTransaction> firstBankTransactions = allBankTransactions.subList(1, allBankTransactions.size() / 2);
-        List<BankTransaction> lastBankTransactions = allBankTransactions.subList(allBankTransactions.size() / 2, allBankTransactions.size());
-        generateRandomTransactionIncomes(firstBankTransactions);
-        generateRandomTransactionExpenses(lastBankTransactions);
-        generateRandomUsers(allUsers, passwordEncoder);
-        generateRandomClients(clientsNumber);
-        generateRandomManagers(managersNumber, clientsNumber);
-        generateRandomAdmins(adminsNumber, managersNumber, clientsNumber);
-        generateTestAccount(passwordEncoder);
+        if (userRepository.findAll().isEmpty()) {
+            int allUsers = clientsNumber + managersNumber + adminsNumber;
+            generateBankCards(bankCardsNumber, allUsers);
+            generateRandomBankTransactions(transactionNumber);
+            List<BankTransaction> allBankTransactions = bankTransactionService.findAll();
+            List<BankTransaction> firstBankTransactions = allBankTransactions.subList(1, allBankTransactions.size() / 2);
+            List<BankTransaction> lastBankTransactions = allBankTransactions.subList(allBankTransactions.size() / 2, allBankTransactions.size());
+            lastBankTransactions.forEach(transaction -> {
+                transaction.setSum(transaction.getSum() * -1);
+            });
+            generateRandomTransactionIncomes(firstBankTransactions);
+            generateRandomTransactionExpenses(lastBankTransactions);
+            generateRandomUsers(allUsers, passwordEncoder);
+            generateRandomClients(clientsNumber);
+            generateRandomManagers(managersNumber, clientsNumber);
+            generateRandomAdmins(adminsNumber, managersNumber, clientsNumber);
+            generateTestAccount(passwordEncoder);
+        }
     }
 
     private void generateTestAccount(PasswordEncoder passwordEncoder) {
@@ -61,7 +65,7 @@ public class RandomUsersGenerator {
         user.setPassword(
                 passwordEncoder.encode("password"));
         user.setEmail("oleksii.leheza@gmail.com");
-        user.setRole(Role.ROLE_CLIENT);
+        user.setRole(Role.ROLE_ADMIN);
         user.setStatus(ActiveStatus.ACTIVE);
         Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
                 .orElseThrow(() -> new ResourceNotFoundException("Subscription status with name:" + SubscriptionStatus.FREE + " does not exist"));
@@ -143,12 +147,9 @@ public class RandomUsersGenerator {
             allTransactions.addAll(incomes);
             allTransactions.addAll(expenses);
             BankCard bankCard = BankCard.builder()
-                    .balance(BigDecimal.valueOf(random.nextDouble() * 5000 + 5000))
+                    .balance(random.nextInt() * 500000 + 500000)
                     .bankName(faker.company().name())
                     .cardNumber(faker.number().digits(16))
-                    .expiringDate(faker.date().between(
-                            Date.from(startDate.atStartOfDay(ZoneId.systemDefault()).toInstant()),
-                            Date.from(endDate.atStartOfDay(ZoneId.systemDefault()).toInstant())))
                     .cvv(Integer.toString(random.nextInt(900) + 100))
                     .transactions(new HashSet<>(allTransactions))
                     .build();
@@ -165,7 +166,7 @@ public class RandomUsersGenerator {
         List<BankTransaction> bankTransactions = IntStream.range(1, transactionsNumber)
                 .mapToObj(index ->
                         BankTransaction.builder()
-                                .sum(new BigDecimal(random.nextDouble() * 1000 + 50))
+                                .sum(random.nextInt() * 100000 + 5000)
                                 .name(faker.commerce().productName())
                                 .time(now.minus(random.nextInt(60), ChronoUnit.DAYS))
                                 .build()).toList();
@@ -174,7 +175,7 @@ public class RandomUsersGenerator {
 
 
     private void generateRandomTransactionIncomes(List<BankTransaction> bankTransactions) {
-        List<Category> incomeCategories = categoryService.findAllIncomeCategories();
+        List<Category> incomeCategories = categoryService.getIncomeAndUniversalCategories();
         bankTransactions.stream()
                 .skip(1)
                 .map(transaction -> Transaction.builder()
@@ -186,7 +187,7 @@ public class RandomUsersGenerator {
     }
 
     private void generateRandomTransactionExpenses(List<BankTransaction> bankTransactions) {
-        List<Category> expenseCategories = categoryService.findAllExpensesCategories();
+        List<Category> expenseCategories = categoryService.getExpenseAndUniversalCategories();
         bankTransactions.stream()
                 .skip(1)
                 .map(transaction -> Transaction.builder()

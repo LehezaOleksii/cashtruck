@@ -12,7 +12,7 @@
         <div class="alert alert-warning" role="alert">
             You have no bank cards associated with your account. Please add bank cards.
         </div>
-        <a style="width:100%;" th:href="@{/clients/bank_cards}">
+        <a style="width:100%;" th:href="@{/clients/bank_cards/add/menu}">
             <button class="custom-back-violet col-4 mx-auto">
                 <span>Add Bank Cards</span>
             </button>
@@ -30,19 +30,42 @@
                               th:action="@{'/clients/transactions/save'}">
                             <div class="mb-3">
                                 <label for="categoryName" class="form-label">Category</label>
-                                <select id="categoryName" class="form-select" th:field="*{categoryName}" required>
-                                    <option value="" disabled selected>Select Category</option>
-                                    <optgroup label="Incomes">
-                                    </optgroup>
-                                    <optgroup th:each="category : ${incomes}">
-                                        <option th:value="${category.name}" th:text="${category.name}"></option>
-                                    </optgroup>
-                                    <optgroup label="Expenses">
-                                    </optgroup>
-                                    <optgroup th:each="category : ${expenses}">
-                                        <option th:value="${category.name}" th:text="${category.name}"></option>
-                                    </optgroup>
-                                </select>
+                                <form method="post" th:object="${transaction}" th:action="@{/clients/transactions/save}">
+                                    <div class="mb-3">
+                                        <select id="categoryName"
+                                                class="form-select"
+                                                th:field="*{categoryName}"
+                                                required>
+                                            <option value="" disabled selected>Select Category</option>
+
+                                            <optgroup label="Incomes">
+                                                <option th:each="c : ${incomes}"
+                                                        th:value="${c.name}"
+                                                        th:text="${c.name}"
+                                                        data-income="true">
+                                                </option>
+                                            </optgroup>
+                                            <optgroup label="Expenses">
+                                                <option th:each="c : ${expenses}"
+                                                        th:value="${c.name}"
+                                                        th:text="${c.name}"
+                                                        data-income="false">
+                                                </option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                    <input type="hidden" id="income" th:field="*{income}" />
+                                <script>
+                                    const select = document.getElementById('categoryName');
+                                    const hidden = document.getElementById('income');
+
+                                    // whenever the user picks a category, grab its data-income attribute
+                                    select.addEventListener('change', () => {
+                                        const opt = select.options[select.selectedIndex];
+                                        hidden.value = opt.getAttribute('data-income') === 'true';
+                                    });
+                                </script>
+
                             </div>
                             <div class="mb-3">
                                 <label for="cardNumber" class="form-label">Credit Card Number</label>
@@ -76,7 +99,8 @@
                                            class="text-danger">Invalid transaction name.</small>
                                 </div>
                             </div>
-                            <div class="mb-3">
+                            <div class="row">
+                            <div class="mb-3 col-8">
                                 <label for="sum" class="form-label">Sum</label>
                                 <input type="number" step="0.01" class="form-control" id="sum" th:field="*{sum}" placeholder="Sum" min="0" required>
                                 <div>
@@ -84,6 +108,27 @@
                                            th:errors="*{sum}"
                                            class="text-danger">Invalid sum.</small>
                                 </div>
+                            </div>
+                            <div class="mb-3 col-4">
+                                <label for="currencyShortName" class="form-label">Currency</label>
+                                <select id="currencyShortName"
+                                        class="form-select"
+                                        th:field="*{currencyShortName}"
+                                        required>
+                                    <option value="" disabled selected>Select Currency</option>
+                                    <option th:each="c : ${currencies}"
+                                            th:value="${c}"
+                                            th:text="${c}">
+                                    </option>
+                                </select>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('currencyShortName')}"
+                                           th:errors="*{currencyShortName}"
+                                           class="text-danger">
+                                        Invalid currency code.
+                                    </small>
+                                </div>
+                            </div>
                             </div>
                             <button type="submit" class="btn btn-primary custom-back-violet">Submit</button>
                         </form>

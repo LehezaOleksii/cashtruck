@@ -64,7 +64,7 @@ public class ManagerController {
                                 @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView;
-        Role role = Role.valueOf(userService.getUserById(userId).getRole());
+        Role role = Role.valueOf(userService.getUserDtoById(userId).getRole());
         if (role == (Role.ROLE_MANAGER)) {
             modelAndView = new ModelAndView("manager/users");
         } else if (role == (Role.ROLE_ADMIN)) {
@@ -87,13 +87,13 @@ public class ManagerController {
                                @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView;
-        if (userService.getUserById(userId).getRole().equals((Role.ROLE_CLIENT.toString()))) {
+        if (userService.getUserDtoById(userId).getRole().equals((Role.ROLE_CLIENT.toString()))) {
             modelAndView = new ModelAndView("manager/client_info");
         } else {
             modelAndView = new ModelAndView("manager/manager_info");
         }
-        modelAndView.addObject("user", userService.getUserById(userId));
-        modelAndView.addObject("manager", userService.getUserById(managerId));
+        modelAndView.addObject("user", userService.getUserDtoById(userId));
+        modelAndView.addObject("manager", userService.getUserDtoById(managerId));
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         return modelAndView;
     }
@@ -120,7 +120,7 @@ public class ManagerController {
             log.warn("validation problems were occurring at the update client account. userId:{}", userId);
             return new ModelAndView("manager/client_info_edit")
                     .addObject("manager", userService.getHeaderClientData(managerId))
-                    .addObject("user", userService.getUserById(userId))
+                    .addObject("user", userService.getUserDtoById(userId))
                     .addObject("statuses", ActiveStatus.values());
 
         } else {
@@ -159,14 +159,14 @@ public class ManagerController {
                                       @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView;
-        if (userService.getUserById(userId).getRole().equals((Role.ROLE_CLIENT.toString()))) {
+        if (userService.getUserDtoById(userId).getRole().equals((Role.ROLE_CLIENT.toString()))) {
             modelAndView = new ModelAndView("manager/client_profile");
             modelAndView.addObject("client", userService.getClientUpdateDto(userId));
         } else {
             modelAndView = new ModelAndView("manager/manager_info");
-            modelAndView.addObject("user", userService.getUserById(userId));
+            modelAndView.addObject("user", userService.getUserDtoById(userId));
         }
-        modelAndView.addObject("user", userService.getUserById(userId));
+        modelAndView.addObject("user", userService.getUserDtoById(userId));
         modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
         return modelAndView;
     }
@@ -230,7 +230,7 @@ public class ManagerController {
                                   @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView;
-        Role role = Role.valueOf(userService.getUserById(managerId).getRole());
+        Role role = Role.valueOf(userService.getUserDtoById(managerId).getRole());
         if (role == (Role.ROLE_MANAGER)) {
             modelAndView = new ModelAndView("manager/users");
         } else if (role == (Role.ROLE_ADMIN)) {
@@ -299,7 +299,7 @@ public class ManagerController {
         }
         ModelAndView modelAndView = new ModelAndView("manager/add_bank_card");
         modelAndView.addObject("manager", userService.getHeaderClientData(userId));
-        modelAndView.addObject("userId", userService.getUserById(userId).getId());
+        modelAndView.addObject("userId", userService.getUserDtoById(userId).getId());
         if (Optional.ofNullable(bankCardId).isPresent()) {
             modelAndView.addObject("bank_card", bankCardService.getById(bankCardId));
         } else {
@@ -386,8 +386,8 @@ public class ManagerController {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/create_transaction");
         modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
-        modelAndView.addObject("incomes", categoryService.findAllIncomeCategories());
-        modelAndView.addObject("expenses", categoryService.findAllExpensesCategories());
+        modelAndView.addObject("incomes", categoryService.getIncomeAndUniversalCategories());
+        modelAndView.addObject("expenses", categoryService.getExpenseAndUniversalCategories());
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
         modelAndView.addObject("transaction", new CreateTransactionDto());
         return modelAndView;

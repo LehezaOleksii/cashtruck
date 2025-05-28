@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.util.Set;
 
 @Getter
@@ -22,13 +21,13 @@ public class Subscription {
     @Column(name = "subscription_status")
     @Enumerated(EnumType.STRING)
     private SubscriptionStatus subscriptionStatus;
-    private BigDecimal price;
+    private int price;
     @Column(name = "max_card_support")
     private int maxCardsSupport;
     @OneToMany(mappedBy = "subscription")
     private Set<User> users;
 
-    public Subscription(SubscriptionStatus subscriptionStatus, BigDecimal price, int maxCardsSupport) {
+    public Subscription(SubscriptionStatus subscriptionStatus, int price, int maxCardsSupport) {
         this.subscriptionStatus = subscriptionStatus;
         this.price = price;
         this.maxCardsSupport = maxCardsSupport;

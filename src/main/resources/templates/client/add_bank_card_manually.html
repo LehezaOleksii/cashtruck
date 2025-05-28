@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorator="layout/client/layout"
+>
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash truck</title>
+</head>
+<body>
+<content layout:fragment="content">
+    <script th:inline="javascript">
+        function validateForm() {
+            var selectedBankName = document.getElementById('bankNameButton').value;
+            if (!selectedBankName || selectedBankName.trim() === '') {
+                alert('Please select a bank name');
+                return false;
+            }
+            return true;
+        }
+    </script>
+    <!-- Credit card form -->
+    <div class="mt-4" style="margin-left: 60px;">
+        <div class="card mb-4">
+            <div class="card-header py-3">
+                <h5 class="mb-0">Card details</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" th:object="${bank_card}" th:action="@{'/clients/bank_cards/save'}"
+                      onsubmit="return validateForm();">
+                    <!-- choose bank -->
+                    <div class="row mb-3">
+                        <div class="col">
+                            <input id="bankName" type="text" placeholder="Bank name" class="form-control"
+                                   th:field="*{bankName}" required/>
+                            <small th:if="${#fields.hasErrors('bankName')}"
+                                   th:errors="*{bankName}"
+                                   th:text="${#strings.listJoin(#fields.errors('bankName'), ', ')}"
+                                   class="text-danger">
+                                Please provide a valid bank name.
+                            </small>
+                            <label class="form-label" for="balance">Bank name</label>
+                        </div>
+                        <div class="col">
+                            <div class="form-outline">
+                                <input id="balance" type="number" placeholder="Balance" class="form-control"
+                                       th:field="*{balance}" required min="0" step="0.01"/>
+                                <label class="form-label" for="balance">Sum</label>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('balance')}"
+                                           th:errors="*{balance}"
+                                           th:text="${#strings.listJoin(#fields.errors('balance'), ', ')}"
+                                           class="text-danger">
+                                        Please provide a valid sum.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" th:field="*{id}" style="display: none;"/>
+                    <input type="hidden" th:field="*{balance}" style="display: none;"/>
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            var expiringDateInput = document.getElementById('expiringDate');
+                            var hiddenExpiringDateInput = document.getElementById('hiddenExpiringDate');
+
+                            expiringDateInput.addEventListener('input', function () {
+                                var parts = expiringDateInput.value.split('/');
+                                var isoDate = parts[1] + '-' + parts[0] + '-01';
+                                hiddenExpiringDateInput.value = isoDate;
+                            });
+                        });
+                    </script>
+                    <!-- Input for cardHolder -->
+                    <div class="row mb-4">
+                        <div class="col">
+                            <div class="form-outline">
+                                <input id="cardHolder" type="text" placeholder="Name on card" class="form-control"
+                                       th:field="*{cardHolder}" required/>
+                                <label class="form-label" for="cardHolder">Name on card</label>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('cardHolder')}"
+                                           th:errors="*{cardHolder}"
+                                           th:text="${#strings.listJoin(#fields.errors('cardHolder'), ', ')}"
+                                           class="text-danger">
+                                        Please provide a valid name.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <div class="form-outline">
+                                <input id="cardNumber" type="text" class="form-control" placeholder="Credit card number"
+                                       th:field="*{cardNumber}" required pattern="^[0-9\*]{16}$">
+                                <label class="form-label" for="formCardNumber">Credit card number</label>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('cardNumber')}"
+                                           th:errors="*{cardNumber}"
+                                           th:text="${#strings.listJoin(#fields.errors('cardNumber'), ', ')}"
+                                           class="text-danger">
+                                        Please provide a valid card number.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <div class="form-outline">
+                                <div class="dropdown">
+                                    <select id="CurrencyNameButton" required class="form-select" th:field="*{currencyShortName}">
+                                        <option value="" disabled selected>Select Currency</option>
+                                        <option class="dropdown-item custom-back-white"
+                                                style="color:black"
+                                                th:each="currency : ${currency_short_names}"
+                                                th:value="${currency}"
+                                                th:text="${currency}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <label class="form-label" for="formCurrency">Currency</label>
+                                <div>
+                                    <small th:if="${#fields.hasErrors('currencyShortName')}"
+                                           th:errors="*{currencyShortName}"
+                                           th:text="${#strings.listJoin(#fields.errors('currencyShortName'), ', ')}"
+                                           class="text-danger">
+                                        Please provide a currency.
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-primary btn-lg btn-block custom-back-violet d-flex justify-content-center align-items-center"
+                                    type="submit" style="height: 40px;">
+                                Save bank card
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</content>
+</body>
+</html>

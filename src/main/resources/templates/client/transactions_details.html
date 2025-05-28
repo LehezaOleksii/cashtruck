@@ -29,7 +29,10 @@
                 <td th:text="${category.name}"></td>
                 <td>
                     <span class="bankTransaction-price"
-                          th:text="${#numbers.formatDecimal(transaction.sum, 1, 2, 'POINT')}">0.00</span> $
+                          th:text="${#numbers.formatDecimal(transaction.sum, 1, 2, 'POINT')}">0.00</span>
+                    <span th:if="${transaction.currencyCode == 980}">₴</span>
+                    <span th:if="${transaction.currencyCode == 840}">$</span>
+                    <span th:if="${transaction.currencyCode == 978}">€</span>
                 </td>
                 <td th:text="${#temporals.format(transaction.time, 'dd.MM.yyyy')}"></td>
             </tr>

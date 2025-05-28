@@ -12,5 +12,6 @@ import lombok.Setter;
 public class UserHeaderDto {
 
     private Long id;
+    private String role;
     private String avatar;
 }

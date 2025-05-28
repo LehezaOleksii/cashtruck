@@ -11,9 +11,9 @@ public interface CategoryService {
 
     Category save(CreateCategoryDto category);
 
-    List<Category> findAllIncomeCategories();
+    List<Category> getIncomeAndUniversalCategories();
 
-    List<Category> findAllExpensesCategories();
+    List<Category> getExpenseAndUniversalCategories();
 
     CategoryDto findByName(String categoryName);
 

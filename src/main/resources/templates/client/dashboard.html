@@ -1,465 +1,847 @@
 <!DOCTYPE html>
 <html
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="layout/client/layout"
+        xmlns:th="http://www.thymeleaf.org"
+        xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+        layout:decorator="layout/client/layout"
 >
-  <head>
-    <meta charset="utf-8" />
+<head>
+    <meta charset="utf-8"/>
     <title>Cash truck</title>
-  </head> 
-  <body th:object="${client}">
-    <main layout:fragment="content">
+</head>
+<body th:object="${client}">
+<main layout:fragment="content">
     <div class="container">
-      <div class="row">
-<div class="col-sm-7" th:object="${bank_cards}">
-    <div class="my-container">
-        <div class="card-body" th:if="${not #lists.isEmpty(bank_cards)}" th:with="card=${bank_cards[0]}">
-            <div class="row">
-                <h5 class="mt-2">Bank cards</h5>
-                <div class="row mt-2">
-                    <div class="dropdown col-8">
-                        <button class="btn btn-secondary dropdown-toggle custom-back-violet bold col-12"
-                                type="button"
-                                data-bs-toggle="dropdown" aria-expanded="false"
-                                id="selectedBankButton"
-                                th:text="${card.bankName}">
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li th:each="card : ${bank_cards}">
-                                <button id="bank-card-swithcer"
-                                        class="dropdown-item"
+        <div class="row">
+            <div class="col-sm-8" th:object="${bank_cards}">
+                <div class="my-container">
+                    <div class="card-body" th:if="${not #lists.isEmpty(bank_cards)}" th:with="card=${bank_cards[0]}">
+                        <div class="row pt-2">
+                            <div class="col-8">
+                                <button class="btn btn-secondary dropdown-toggle bold col-12"
                                         type="button"
-                                        onclick="selectBank(this)"
-                                        th:text="${card.bankName}"
-                                        th:classappend="${card == bank_cards[0] ? 'selected' : ''}"
-                                        th:attr="card-number=${card.cardNumber}">
+                                        data-bs-toggle="dropdown" aria-expanded="false"
+                                        id="selectedBankButton"
+                                        th:text="${bank_card != null ? bank_card.bankName : bank_cards[0].bankName}">
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="selectedBankButton">
+                                    <li th:each="card : ${bank_cards}">
+                                        <a class="dropdown-item"
+                                           th:href="@{/clients/dashboard(cardNumber=${card.cardNumber})}"
+                                           th:text="${card.bankName}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-4">
+                                <a style="width:100%;" th:href="@{'/clients/bank_cards/add/menu'}">
+                                    <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card
+                                    </button>
+                                </a>
+                            </div>
+
+                            <!-- Selected Bank Card Details Section -->
+                            <div id="bankCardDetails"
+                                 class="d-flex flex-column justify-content-between position-relative">
+                                <div th:if="${bank_card.bank != null and bank_card.bank == 'Monobank'}">
+                                    <div class="row pl-3 pt-4"
+                                         th:if="${(bank_card.type == 'black' or bank_card.type == 'madeInUkraine')}">
+                                        <!-- Card Content -->
+                                        <div class="monobank-card"
+                                             style="font-family: Arial, sans-serif; width: 350px; overflow: hidden">
+                                            <div th:if="${(bank_card.type == 'black' and bank_card.currencyCode == 840)}"
+                                                 style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background-color: #31BA70; border-radius: 10px 0 0 10px;"></div>
+                                            <div th:if="${(bank_card.type == 'black' and bank_card.currencyCode == 978)}"
+                                                 style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background-color: #DE4F55; border-radius: 10px 0 0 10px;"></div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                <div style="display: flex; flex-direction: column; width: fit-content; margin-bottom: 0;">
+                            <span class="bold"
+                                  style="font-size: 20px; margin-top: -5px;">monobank</span>
+                                                    <span style="font-size: 8px; text-align: right; margin-top: -4px;">Universal Bank</span>
+                                                </div>
+                                                <div style="font-size: 16px; margin-top: -5px; margin-right: 4px;">
+                                                    <span th:text="${bank_card.currency}"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="card-number-monobank"
+                                                 style="font-family: 'Courier New', monospace; letter-spacing: 5px; font-size: 18px; text-align: center; flex-grow: 1; display: flex; justify-content: center; align-items: center; width: 100%;"
+                                                 th:text="${bank_card.cardNumber.replaceAll('(.{4})', '$1 ')}">
+                                            </div>
+
+                                            <div th:if="${bank_card.type == 'black'}" class="card-holder"
+                                                 style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px; align-items: center;"
+                                                 th:text="${bank_card.holderName}">
+                                            </div>
+
+                                            <div th:if="${bank_card.type == 'madeInUkraine'}">
+                                                <img src="/images/client/national-cashback-logo.png"
+                                                     style="width: 100px;"/>
+                                            </div>
+
+                                            <div class="card-brand-monobank">
+                                                <div th:if="${bank_card.cardNumber.startsWith('4')}">
+                                                    <img src="/images/client/visa-logo.png"
+                                                         style="width: 50px; height: auto; background: transparent;"/>
+                                                </div>
+                                                <div th:if="${bank_card.cardNumber.startsWith('5')}">
+                                                    <img src="/images/client/mastercard-logo.png"
+                                                         style="width: 50px; height: auto; background: transparent;"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Card Info Section -->
+                                        <div class="ml-4"
+                                             style="width: 275px; border-left: 2px solid #ddd; font-family: 'Inter', Arial, sans-serif; display: flex; flex-direction: column; justify-content: center;">
+                                            <div>
+                                                <strong>
+                                                    <span>Monobank </span>(<span
+                                                        th:text="${bank_card.type}"></span><span
+                                                        style="font-size: 12px;"
+                                                        th:if="${bank_card.currencyCode == 840}">, USD</span><span
+                                                        style="font-size: 12px;"
+                                                        th:if="${bank_card.currencyCode == 978}">, EUR</span>)
+                                                </strong>
+                                            </div>
+                                            <div>
+                                                <span class="bold">Number:</span><span
+                                                    th:text="${bank_card.cardNumber}"
+                                                    style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 16px;"></span>
+                                            </div>
+                                            <div>
+                                                <span class="bold">Currency:</span>
+                                                <span th:text="${bank_card.currency}"
+                                                      style="font-family: 'Courier New', monospace; letter-spacing: 2px; font-size: 18px;"></span>
+                                            </div>
+                                            <div>
+                                                <span class="bold">Balance:</span>
+                                                <span th:text="${bank_card.balance}"
+                                                      class="accountBalance"
+                                                      style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px;"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!--                                <div class="col-sm-5">-->
+                        <!--                                    <div class="additional-info mt-4">-->
+                        <!--                                        <div> Balance: <span class="balance"-->
+                        <!--                                                             th:text="${card != null ? card.balance/card.delimiter : '-'}"></span>-->
+                        <!--                                        </div>-->
+                        <!--                                        <div> Exp date: <span class="expiringDate"-->
+                        <!--                                                              th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span>-->
+                        <!--                                        </div>-->
+                        <!--                                        <div> Holder: <span class="cardHolder"-->
+                        <!--                                                            th:text="${card != null ? card.cardHolder : '-'}"></span>-->
+                        <!--                                        </div>-->
+                        <!--                                        <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span>-->
+                        <!--                                        </div>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                    </div>
+                </div>
+                <div class="card-body" th:if="${#lists.isEmpty(bank_cards)}">
+                    <div class="row">
+                        <div class="col-sm-7">
+                            <h5 class="card-title mt-3">Bank cards</h5>
+                            <div class="bank-card mt-4">
+                                <div class="bank-name-and-currency-name">
+                                    <div class="bank-name" th:text="'Bank'"></div>
+                                    <div class="currency-name">Currency</div>
+                                </div>
+                                <div class="card-number" th:text="'xxxx xxxx xxxx xxxx'"></div>
+                                <div class="card-holder-and-expiry">
+                                    <div class="card-holder" th:text="'Card Holder'"></div>
+                                    <div class="expiry" th:text="'Expiry Date'"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-5">
+                            <div>
+                                <a th:href="@{'/clients/bank_cards/add/menu'}">
+                                    <button class="btn btn-primary custom-back-violet col-12 mt-2">
+                                        Add Card
+                                    </button>
+                                </a>
+                            </div>
+                            <div class="additional-info mt-5">
+                                <div> Balance: <span class="balance"
+                                                     th:text="${card != null ? card.balance : '-'}"></span>
+                                </div>
+                                <div> Exp date: <span
+                                        th:text="${card != null ? card.expiringDate : '-'}"></span>
+                                </div>
+                                <div> Holder: <span th:text="${card != null ? card.cardHolder : '-'}"></span>
+                                </div>
+                                <div> CVV: <span th:text="${card != null ? card.cvv : '-'}"></span></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <script th:inline="javascript">
+                function formatCardNumber(cardNumber) {
+                    return cardNumber.replace(/(\d{4})/g, '$1 ').trim();
+                }
+
+                function updateCardNumber() {
+                    var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
+                    var cards = [];
+                    if (cards.length > 0) {
+                        var formattedCardNumber = formatCardNumber(cards[0].cardNumber);
+
+                        for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
+                            elementsWithCardNumberClass[i].innerText = formattedCardNumber;
+                        }
+                    }
+                }
+
+                window.onload = function () {
+                    updateCardNumber();
+                };
+
+                function selectBank(button) {
+                    var selectedBankName = button.innerText;
+                    var cards = [];
+                    var selectedCard = cards.find(function (card) {
+                        return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
+                    });
+                    document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
+                    var elementsWithBalanceClass = document.getElementsByClassName('balance');
+                    for (var i = 0; i < elementsWithBalanceClass.length; i++) {
+                        elementsWithBalanceClass[i].innerText = selectedCard.balance;
+                    }
+
+                    var elementsWithCvvClass = document.getElementsByClassName('cvv');
+                    for (var i = 0; i < elementsWithCvvClass.length; i++) {
+                        elementsWithCvvClass[i].innerText = selectedCard.cvv;
+                    }
+
+                    var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
+                    for (var i = 0; i < elementsWithExpiringDateClass.length; i++) {
+                        var formattedDate = new Date(selectedCard.expiringDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit'
+                        });
+                        elementsWithExpiringDateClass[i].innerText = formattedDate;
+                    }
+                    var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
+                    for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
+                        var formattedCardNumber = formatCardNumber(selectedCard.cardNumber);
+                        elementsWithCardNumberClass[i].innerText = formattedCardNumber;
+                    }
+                    var elementsWithBankNameClass = document.getElementsByClassName('bankName');
+                    for (var i = 0; i < elementsWithBankNameClass.length; i++) {
+                        elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
+                    }
+                    var elementsWithcardHolderClass = document.getElementsByClassName('cardHolder');
+                    for (var i = 0; i < elementsWithcardHolderClass.length; i++) {
+                        elementsWithcardHolderClass[i].innerText = selectedCard.cardHolder;
+                    }
+                }
+            </script>
+            <div class="col-sm-4" th:object="${client_statistic}">
+                <div class="row">
+                    <div class="col-md-6 mb-4 justify-content-end">
+                        <div class="my-container info-card ">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <img th:src="@{/images/client/cc-primary.png}" class="info-card-img"/>
+                            </div>
+                            <div>Total balance</div>
+                            <div class="info-card-font bold"
+                                 th:text="${client_statistic!=null?client_statistic.totalBalance:'-'}">
+                                $
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.totalBalancePercentage > 0 }">
+                                <div class="custom-green">
+                                    <svg class="custom-green bi bi-arrow-up-short"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+                                    </svg>
+                                    +
+                                    <span th:text="${#numbers.formatDecimal(client_statistic.totalBalancePercentage, 2, 2)}">0.00</span>%
+                                </div>
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.totalBalancePercentage < 0 }">
+                                <div class="custom-red">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                         fill="currentColor"
+                                         class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                    <span th:text="${#numbers.formatDecimal(client_statistic.totalBalancePercentage, 2, 2)}">0.00</span>%
+                                </div>
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.totalBalancePercentage == 0}">
+                                <div>0%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-4 justify-content-end">
+                        <div class="my-container info-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <img th:src="@{/images/client/green-pie-diagram.png}" class="info-card-img"/>
+                            </div>
+                            <div>Income</div>
+                            <div class="info-card-font bold last_week_info_card"
+                                 th:text="${client_statistic.lastMonthIncomes}">
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.lastMonthIncomesPercentage > 0}">
+                                <div class="custom-green">
+                                    <svg class="custom-green bi bi-arrow-up-short"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+                                    </svg>
+                                    +
+                                    <span
+                                            th:text="${#numbers.formatDecimal(client_statistic.lastMonthIncomesPercentage, 2, 2)}">
+                                                                    </span>%
+                                </div>
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && (client_statistic.lastMonthIncomesPercentage == null || client_statistic.lastMonthIncomesPercentage == 0)}">
+                                <div>
+                                    <span>0</span>%
+                                </div>
+                            </div>
+                            <div class="last_month_info_card"
+                                 th:if="${client_statistic != null && client_statistic.lastMonthIncomesPercentage < 0}">
+                                <div class="custom-red">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                         fill="currentColor"
+                                         class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                    <span
+                                            th:text="${#numbers.formatDecimal(client_statistic.lastMonthIncomesPercentage, 2, 2)}"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 justify-content-end">
+                        <div class="my-container info-card" th:object="${client_statistic}">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <img th:src="@{/images/client/transfer.png}" class="info-card-img"/>
+                            </div>
+                            <div>Profit</div>
+                            <div class="info-card-font bold last_week_info_card"
+                                 th:text="${client_statistic.lastMonthProfit}"></div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.lastMonthProfitPercentage>0}">
+                                <div class="custom-green">
+                                    <svg class="custom-green bi bi-arrow-up-short"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+                                    </svg>
+                                    +
+                                    <span th:text="${#numbers.formatDecimal(client_statistic.lastMonthProfitPercentage, 2, 2)}"></span>%
+                                </div>
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null&& client_statistic.lastMonthProfitPercentage < 0 }">
+                                <div class="custom-red">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                         fill="currentColor"
+                                         class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                    <span
+                                            th:text="${#numbers.formatDecimal(client_statistic.lastMonthProfitPercentage, 2, 2)}"></span>%
+                                </div>
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.lastMonthProfitPercentage == 0}">
+                                <div>0%</div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="col-md-6 justify-content-end">
+                        <div class="my-container info-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <img th:src="@{/images/client/paypal.png}" class="info-card-img"/>
+                            </div>
+                            <div>Expenses</div>
+                            <div class="info-card-font bold last_week_info_card"
+                                 th:text="${client_statistic.lastMonthExpenses}"></div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && client_statistic.lastMonthExpensesPercentage > 0}">
+                                <div class="custom-red">
+                                    <svg class="custom-red bi bi-arrow-up-short"
+                                         xmlns="http://www.w3.org/2000/svg"
+                                         width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
+                                    </svg>
+                                    + <span
+                                        th:text="${#numbers.formatDecimal(client_statistic.lastMonthExpensesPercentage, 2, 2)}"></span>%
+                                </div>
+                            </div>
+                            <div class="last_week_info_card"
+                                 th:if="${client_statistic != null && (client_statistic.lastMonthExpenses == null || client_statistic.lastMonthExpensesPercentage == 0)}">
+                                <div>
+                                    <span>0</span>%
+                                </div>
+                            </div>
+                            <div class="last_month_info_card"
+                                 th:if="${client_statistic != null && client_statistic.lastMonthExpensesPercentage < 0}">
+                                <div class="custom-green">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+                                         fill="currentColor"
+                                         class="bi bi-arrow-down-short  " viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                              d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
+                                    </svg>
+                                    <span
+                                            th:text="${#numbers.formatDecimal(client_statistic.lastMonthExpensesPercentage, 2, 2)}"></span>%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <!-- Expense Overview -->
+            <div class="col-md-6 col-lg-8 order-1 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <ul class="nav nav-pills" role="tablist">
+                            <!--                            <li class="nav-item">-->
+                            <!--                                <button-->
+                            <!--                                        type="button"-->
+                            <!--                                        class="nav-link active"-->
+                            <!--                                        role="tab"-->
+                            <!--                                        data-bs-toggle="tab"-->
+                            <!--                                        data-bs-target="#navs-tabs-line-card-income"-->
+                            <!--                                        aria-controls="navs-tabs-line-card-income"-->
+                            <!--                                        aria-selected="true"-->
+                            <!--                                >-->
+                            <!--                                    Income-->
+                            <!--                                </button>-->
+                            <!--                            </li>-->
+                            <!--                            <li class="nav-item">-->
+                            <!--                                <button type="button" class="nav-link" role="tab">Expenses</button>-->
+                            <!--                            </li>-->
+                            <li class="btn-primary custom-back-violet card">
+                                <button type="button" class="nav-link" role="tab" style="color: white;">Total balance
                                 </button>
                             </li>
                         </ul>
-                    </div>   
-                  <div class="col-4">
-                    <a style="width:100%;" th:href="@{'/clients/bank_cards'}">
-                      <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card</button>
-                    </a>
-                  </div>
                     </div>
-                <div class="col-sm-7">
-                    <div class="bank-card card-container mt-4">
-                        <div class="bank-name-and-currency-name">
-                        <div class="bank-name bankName" th:text="${card != null ? #strings.length(card.bankName) > 22 ? #strings.substring(card.bankName, 0, 22) : card.bankName : '-'}"></div>
-                            <div class="currency-name">USD</div>
-                        </div>
-                        <div class="card-number" th:text="${card != null ? card.cardNumber : '-'}"></div>
+                    <div class="card-body px-0">
+                        <div class="tab-content p-0">
+                            <div class="tab-pane fade show active" id="navs-tabs-line-card-income"
+                                 role="tabpanel">
+                                <div class="d-flex p-4 pt-3">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../assets/img/icons/unicons/wallet.png" alt="User"/>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Total balance</small>
+                                        <div class="d-flex align-items-center">
+                                            <h6>
+                                                <span th:text="${client_statistic.totalBalance}"></span>$
+                                            </h6>
+                                            <small class="text-success fw-semibold">
+                                                <div class="last_week_info_card"
+                                                     th:if="${client_statistic != null && client_statistic.totalBalancePercentage>0}">
+                                                    <div class="custom-green">
+                                                        <i class="bx bx-chevron-up"></i>
+                                                        <span th:text="${#numbers.formatDecimal(client_statistic.totalBalancePercentage, 2, 1)}"></span>%
+                                                    </div>
+                                                </div>
+                                                <div class="last_week_info_card"
+                                                     th:if="${client_statistic != null&& client_statistic.totalBalancePercentage < 0 }">
+                                                    <div class="custom-red">
+                                                        <i class="bx bx-chevron-down"></i>
+                                                        <span
+                                                                th:text="${#numbers.formatDecimal(client_statistic.totalBalancePercentage, 2, 1)}"></span>%
+                                                    </div>
+                                                </div>
+                                                <div class="last_week_info_card"
+                                                     th:if="${client_statistic != null && client_statistic.totalBalancePercentage == 0}">
+                                                    <div>0%</div>
+                                                </div>
 
-                        <div class="card-holder-and-expiry">
-                            <div class="card-holder cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></div>
-                        <div class="expiry expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></div>
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="incomeChart"></div>
+                                <!--                                <div class="d-flex justify-content-center pt-4 gap-2">-->
+                                <!--                                    <div class="flex-shrink-0">-->
+                                <!--                                        <div id="expensesOfWeek"></div>-->
+                                <!--                                    </div>-->
+                                <!--                                    <div>-->
+                                <!--                                        <p class="mb-n1 mt-1">Expenses This Week</p>-->
+                                <!--                                        <small class="text-muted">$39 less than last week</small>-->
+                                <!--                                    </div>-->
+                                <!--                                </div>-->
+                            </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-sm-5">
-                    <div class="additional-info mt-4">        
-              <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div> 
-              <div> Exp date: <span class="expiringDate" th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span></div>
-              <div> Holder: <span class="cardHolder" th:text="${card != null ? card.cardHolder : '-'}"></span></div> 
-              <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span></div>
-                    </div>
-                </div>
             </div>
-        </div>
-        <div class="card-body" th:if="${#lists.isEmpty(bank_cards)}">
-            <div class="row">
-                <div class="col-sm-7">
-                    <h5 class="card-title mt-3">Bank cards</h5>
-                    <div class="bank-card mt-4">
-                        <div class="bank-name-and-currency-name">
-                            <div class="bank-name" th:text="'Bank'"></div>
-                            <div class="currency-name">USD</div>
+            <!-- Order Statistics -->
+            <div class="col-md-6 col-lg-4 col-xl-4 order-2 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center justify-content-between pb-0">
+                        <div class="card-title mb-0">
+                            <h5 class="m-0 me-2">Popular Categories</h5>
+                            <!--                            <small class="text-muted">42.82k Total Sales</small>-->
                         </div>
-                        <div class="card-number" th:text="'xxxx xxxx xxxx xxxx'"></div>
-                        <div class="card-holder-and-expiry">
-                            <div class="card-holder" th:text="'Card Holder'"></div>
-                            <div class="expiry" th:text="'Expiry Date'"></div>
+                        <!--                        <div class="dropdown">-->
+                        <!--                            <button-->
+                        <!--                                    class="btn p-0"-->
+                        <!--                                    type="button"-->
+                        <!--                                    id="orederStatistics"-->
+                        <!--                                    data-bs-toggle="dropdown"-->
+                        <!--                                    aria-haspopup="true"-->
+                        <!--                                    aria-expanded="false"-->
+                        <!--                            >-->
+                        <!--                                <i class="bx bx-dots-vertical-rounded"></i>-->
+                        <!--                            </button>-->
+                        <!--                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="orederStatistics">-->
+                        <!--                                <a class="dropdown-item" href="javascript:void(0);">Select All</a>-->
+                        <!--                                <a class="dropdown-item" href="javascript:void(0);">Refresh</a>-->
+                        <!--                                <a class="dropdown-item" href="javascript:void(0);">Share</a>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex flex-column align-items-start gap-1">
+                                <h2 class="mb-2"
+                                    th:text="${(client_statistic.categoriesDiagram != null and !client_statistic.categoriesDiagram.isEmpty()) ? client_statistic.categoriesDiagram.size() : 4}">
+                                </h2>
+                                <span>Last month categories</span>
+                            </div>
+                            <div id="orderStatisticsChart"></div>
                         </div>
+                        <ul class="p-0 m-0">
+                            <th:block
+                                    th:if="${client_statistic.categoriesDiagram != null and !client_statistic.categoriesDiagram.isEmpty()}">
+                                <th:block th:each="category, iterStat : ${client_statistic.categoriesDiagram}">
+                                    <th:block th:if="${iterStat.index < 4}">
+                                        <li class="d-flex mb-4 pb-1">
+                                            <div class="avatar flex-shrink-0 me-3">
+                <span class="avatar-initial rounded bg-label-primary">
+                    <i class="bx bx-category"></i>
+                </span>
+                                            </div>
+                                            <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                                <div class="me-2">
+                                                    <h6 class="mb-0"
+                                                        th:text="${category.categoryName.length() > 18} ? ${category.categoryName.substring(0,18)} + '…' : ${category.categoryName}">
+                                                        Category
+                                                    </h6>
+                                                    <small class="text-muted">Top category</small>
+                                                    <!-- Optional subtitle -->
+                                                </div>
+                                                <div class="user-progress">
+                                                    <small th:text="${#numbers.formatDecimal(category.sum, 1, 1, 'COMMA')}">0</small>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </th:block>
+                                </th:block>
+                            </th:block>
+                            <div th:if="${client_statistic.categoriesDiagram == null or client_statistic.categoriesDiagram.isEmpty()}">
+                                <li class="d-flex mb-4 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                                        <span class="avatar-initial rounded bg-label-primary"
+                                                        ><i class="bx bx-mobile-alt"></i
+                                                        ></span>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <h6 class="mb-0">Electronic</h6>
+                                            <small class="text-muted">Mobile, Earbuds, TV</small>
+                                        </div>
+                                        <div class="user-progress">
+                                            <small class="fw-semibold">82.5k</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex mb-4 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                                                <span class="avatar-initial rounded bg-label-success"><i
+                                                                        class="bx bx-closet"></i></span>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <h6 class="mb-0">Fashion</h6>
+                                            <small class="text-muted">T-shirt, Jeans, Shoes</small>
+                                        </div>
+                                        <div class="user-progress">
+                                            <small class="fw-semibold">23.8k</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex mb-4 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                                                <span class="avatar-initial rounded bg-label-info"><i
+                                                                        class="bx bx-home-alt"></i></span>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <h6 class="mb-0">Decor</h6>
+                                            <small class="text-muted">Fine Art, Dining</small>
+                                        </div>
+                                        <div class="user-progress">
+                                            <small class="fw-semibold">849k</small>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                                        <span class="avatar-initial rounded bg-label-secondary"
+                                                        ><i class="bx bx-football"></i
+                                                        ></span>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <h6 class="mb-0">Sports</h6>
+                                            <small class="text-muted">Football, Cricket Kit</small>
+                                        </div>
+                                        <div class="user-progress">
+                                            <small class="fw-semibold">99</small>
+                                        </div>
+                                    </div>
+                                </li>
+                            </div>
+                        </ul>
                     </div>
                 </div>
-                <div class="col-sm-5">
-                    <div> 
-                        <a th:href="@{'/clients/bank_cards'}">
-                            <button class="btn btn-primary custom-back-violet col-12 mt-2" >
-                                Add Card
-                            </button> 
-                        </a>
-                    </div>
-                    <div class="additional-info mt-5">
-                       <div> Balance: <span class="balance" th:text="${card != null ? card.balance : '-'}"></span></div>
-                        <div> Exp date: <span th:text="${card != null ? card.expiringDate : '-'}"></span></div>
-                        <div> Holder: <span th:text="${card != null ? card.cardHolder : '-'}"></span></div>
-                       <div>  CVV: <span th:text="${card != null ? card.cvv : '-'}"></span></div>
+            </div>
+            <!--/ Order Statistics -->
+            <!-- Total Revenue -->
+            <div class="col-12 col-lg-8 order-3 order-md-3 order-lg-2 mb-4">
+                <div class="card">
+                    <div class="row row-bordered g-0">
+                        <div class="col-md-12">
+                            <h5 class="card-header m-0 me-2 pb-3">Total Revenue</h5>
+                            <div id="totalRevenueChart" class="px-2"></div>
+                        </div>
+                        <!--                        <div class="col-md-4">-->
+                        <!--                            <div class="card-body">-->
+                        <!--                                <div class="text-center">-->
+                        <!--                                    <div class="dropdown">-->
+                        <!--                                        <button-->
+                        <!--                                                class="btn btn-sm btn-outline-primary dropdown-toggle"-->
+                        <!--                                                type="button"-->
+                        <!--                                                id="growthReportId"-->
+                        <!--                                                data-bs-toggle="dropdown"-->
+                        <!--                                                aria-haspopup="true"-->
+                        <!--                                                aria-expanded="false"-->
+                        <!--                                        >-->
+                        <!--                                            2022-->
+                        <!--                                        </button>-->
+                        <!--                                        <div class="dropdown-menu dropdown-menu-end"-->
+                        <!--                                             aria-labelledby="growthReportId">-->
+                        <!--                                            <a class="dropdown-item" href="javascript:void(0);">2021</a>-->
+                        <!--                                            <a class="dropdown-item" href="javascript:void(0);">2020</a>-->
+                        <!--                                            <a class="dropdown-item" href="javascript:void(0);">2019</a>-->
+                        <!--                                        </div>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                            <div id="growthChart"></div>-->
+                        <!--                            <div class="text-center fw-semibold pt-3 mb-2">62% Company Growth</div>-->
+
+                        <!--                            <div class="d-flex px-xxl-4 px-lg-2 p-4 gap-xxl-3 gap-lg-1 gap-3 justify-content-between">-->
+                        <!--                                <div class="d-flex">-->
+                        <!--                                    <div class="me-2">-->
+                        <!--                                        <span class="badge bg-label-primary p-2"><i-->
+                        <!--                                                class="bx bx-dollar text-primary"></i></span>-->
+                        <!--                                    </div>-->
+                        <!--                                    <div class="d-flex flex-column">-->
+                        <!--                                        <small>2022</small>-->
+                        <!--                                        <h6 class="mb-0">$32.5k</h6>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                                <div class="d-flex">-->
+                        <!--                                    <div class="me-2">-->
+                        <!--                                        <span class="badge bg-label-info p-2"><i-->
+                        <!--                                                class="bx bx-wallet text-info"></i></span>-->
+                        <!--                                    </div>-->
+                        <!--                                    <div class="d-flex flex-column">-->
+                        <!--                                        <small>2021</small>-->
+                        <!--                                        <h6 class="mb-0">$41.2k</h6>-->
+                        <!--                                    </div>-->
+                        <!--                                </div>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
                     </div>
                 </div>
             </div>
+            <!--/ Total Revenue -->
+            <!-- Transactions -->
+            <div class="col-md-6 col-lg-4 order-2 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex align-items-center justify-content-between">
+                        <h5 class="card-title m-0 me-2">Last Transactions</h5>
+                        <!--                        <div class="dropdown">-->
+                        <!--                            <button-->
+                        <!--                                    class="btn p-0"-->
+                        <!--                                    type="button"-->
+                        <!--                                    id="transactionID"-->
+                        <!--                                    data-bs-toggle="dropdown"-->
+                        <!--                                    aria-haspopup="true"-->
+                        <!--                                    aria-expanded="false"-->
+                        <!--                            >-->
+                        <!--                                <i class="bx bx-dots-vertical-rounded"></i>-->
+                        <!--                            </button>-->
+                        <!--                            <div class="dropdown-menu dropdown-menu-end" aria-labelledby="transactionID">-->
+                        <!--                                <a class="dropdown-item" href="javascript:void(0);">Last 28 Days</a>-->
+                        <!--                                <a class="dropdown-item" href="javascript:void(0);">Last Month</a>-->
+                        <!--                                <a class="dropdown-item" href="javascript:void(0);">Last Year</a>-->
+                        <!--                            </div>-->
+                        <!--                        </div>-->
+                    </div>
+                    <div class="card-body">
+                        <ul class="p-0 m-0">
+                            <li th:each="transaction : ${client_statistic.lastTransactions}" class="d-flex mb-3">
+                                <div class="avatar flex-shrink-0 me-3">
+                                    <img src="../assets/img/icons/unicons/wallet.png" alt="User" class="rounded"/>
+                                </div>
+                                <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                    <div class="me-2">
+                                        <small class="text-muted d-block mb-1"
+                                               th:text="${#strings.abbreviate(transaction.categoryName, 18)}">Category</small>
+                                        <h6 class="mb-0"
+                                            th:text="${#strings.abbreviate(transaction.description, 18)}">
+                                            Description</h6>
+                                    </div>
+                                    <div class="user-progress d-flex align-items-center gap-1">
+                                        <h6 class="mb-0" th:text="${transaction.sum}">0</h6>
+                                        <span class="text-muted" th:text="${transaction.currencyShortName}"></span>
+                                    </div>
+                                </div>
+                            </li>
+                            <div th:if="${#lists.isEmpty(client_statistic.lastTransactions)}">
+                                <li class="d-flex mb-3 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../assets/img/icons/unicons/wallet.png" alt="User"
+                                             class="rounded"/>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <small class="text-muted d-block mb-1">Wallet</small>
+                                            <h6 class="mb-0">Mac'D</h6>
+                                        </div>
+                                        <div class="user-progress d-flex align-items-center gap-1">
+                                            <h6 class="mb-0">+270.69</h6>
+                                            <span class="text-muted">USD</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex mb-3 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../assets/img/icons/unicons/paypal.png" alt="User"
+                                             class="rounded"/>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <small class="text-muted d-block mb-1">Paypal</small>
+                                            <h6 class="mb-0">Send money</h6>
+                                        </div>
+                                        <div class="user-progress d-flex align-items-center gap-1">
+                                            <h6 class="mb-0">+82.6</h6>
+                                            <span class="text-muted">USD</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex mb-3 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../assets/img/icons/unicons/chart.png" alt="User"
+                                             class="rounded"/>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <small class="text-muted d-block mb-1">Transfer</small>
+                                            <h6 class="mb-0">Refund</h6>
+                                        </div>
+                                        <div class="user-progress d-flex align-items-center gap-1">
+                                            <h6 class="mb-0">+637.91</h6>
+                                            <span class="text-muted">USD</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex mb-3 pb-1">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../assets/img/icons/unicons/cc-success.png" alt="User"
+                                             class="rounded"/>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <small class="text-muted d-block mb-1">Credit Card</small>
+                                            <h6 class="mb-0">Ordered Food</h6>
+                                        </div>
+                                        <div class="user-progress d-flex align-items-center gap-1">
+                                            <h6 class="mb-0">-838.71</h6>
+                                            <span class="text-muted">USD</span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="d-flex">
+                                    <div class="avatar flex-shrink-0 me-3">
+                                        <img src="../assets/img/icons/unicons/cc-warning.png" alt="User"
+                                             class="rounded"/>
+                                    </div>
+                                    <div class="d-flex w-100 flex-wrap align-items-center justify-content-between gap-2">
+                                        <div class="me-2">
+                                            <small class="text-muted d-block mb-1">Mastercard</small>
+                                            <h6 class="mb-0">Ordered Food</h6>
+                                        </div>
+                                        <div class="user-progress d-flex align-items-center gap-1">
+                                            <h6 class="mb-0">-92.45</h6>
+                                            <span class="text-muted">USD</span>
+                                        </div>
+                                    </div>
+                                </li>
+                            </div>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!--/ Transactions -->
         </div>
     </div>
-</div>
-<script th:inline="javascript"> 
-       function formatCardNumber(cardNumber) {
-        return cardNumber.replace(/(\d{4})/g, '$1 ').trim();
-    }
-
-    function updateCardNumber() {
-        var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
-        var cards = [];
-        if (cards.length > 0) {
-            var formattedCardNumber = formatCardNumber(cards[0].cardNumber);
-
-            for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
-                elementsWithCardNumberClass[i].innerText = formattedCardNumber;
-            }
-        }
-    }
-    window.onload = function () {
-        updateCardNumber();
-    };
-    function selectBank(button) {
-        var selectedBankName = button.innerText;
-        var cards = [];
-        var selectedCard = cards.find(function (card) {
-            return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
-        });
-        document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
-        var elementsWithBalanceClass = document.getElementsByClassName('balance');
-        for (var i = 0; i < elementsWithBalanceClass.length; i++) {
-            elementsWithBalanceClass[i].innerText = selectedCard.balance;
-        }
-
-        var elementsWithCvvClass = document.getElementsByClassName('cvv');
-        for (var i = 0; i < elementsWithCvvClass.length; i++) {
-            elementsWithCvvClass[i].innerText = selectedCard.cvv;
-        }
-
-        var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
-        for (var i = 0; i < elementsWithExpiringDateClass.length; i++) {
-            var formattedDate = new Date(selectedCard.expiringDate).toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit'
-            });
-            elementsWithExpiringDateClass[i].innerText = formattedDate;
-        }
-          var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
-        for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
-            var formattedCardNumber = formatCardNumber(selectedCard.cardNumber);
-            elementsWithCardNumberClass[i].innerText = formattedCardNumber;
-        }
-        var elementsWithBankNameClass = document.getElementsByClassName('bankName');
-        for (var i = 0; i < elementsWithBankNameClass.length; i++) {
-            elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
-        }
-        var elementsWithcardHolderClass = document.getElementsByClassName('cardHolder');
-        for (var i = 0; i < elementsWithcardHolderClass.length; i++) {
-            elementsWithcardHolderClass[i].innerText = selectedCard.cardHolder;
-        }
-    }
-</script>
-        <div class="col-sm-5" th:object = "${client_statistic}">
-          <div class="row">
-                 <div class="col-md-6 mb-3 justify-content-end">
-          <div class="my-container info-card ">
-            <div class="d-flex justify-content-between align-items-center">
-              <img th:src="@{/images/client/cc-primary.png}" class="info-card-img" />
-            </div>
-            <div>Total balance</div>
-            <div class="info-card-font bold" th:text="${client_statistic!=null?client_statistic.totalBalance:'-'}">$</div> 
-<div  class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) > 0 && client_statistic.totalBalance!=0}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${(client_statistic.lastWeekIncome - client_statistic.lastWeekExpense)/client_statistic.totalBalance * 100}"></span>%
-    </div>
-</div>
-<div  class="last_week_info_card"th:if="${client_statistic != null && (client_statistic.lastWeekExpense - client_statistic.lastWeekIncome) > 0 && client_statistic.totalBalance!=0}">
-    <div class="custom-red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-        </svg>
-        - <span th:text="${(client_statistic.lastWeekExpense - client_statistic.lastWeekIncome)/client_statistic.totalBalance * 100}"></span>%
-    </div>
-</div>
-<div  class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) == 0 || client_statistic.totalBalance == 0}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div>
-<div  class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) > 0 && client_statistic.totalBalance!=0}">
-    <div class="custom-green"> 
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span  th:text="${(client_statistic.lastMonthIncome - client_statistic.lastMonthExpense)/client_statistic.totalBalance * 100}"></span>%
-    </div>
-</div>
-
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) < 0 && client_statistic.totalBalance!=0}">
-    <div class="custom-red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-        </svg>
-        - <span th:text="${( client_statistic.lastMonthExpense - client_statistic.lastMonthIncome)/client_statistic.totalBalance * 100}"></span>%
-    </div>
-</div>
-
-<div class="last_month_info_card" style="display: none;"  th:if="${client_statistic != null && (client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) == 0 || client_statistic.totalBalance == 0}">
-    <div class=""> 
-       <span>0</span>%
-    </div>
-</div>
-
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastYearIncome - client_statistic.lastYearExpense) > 0 && client_statistic.totalBalance!=0}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${(client_statistic.lastYearIncome - client_statistic.lastYearExpense)/client_statistic.totalBalance * 100}"></span>%
-    </div>
-</div>
-
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastYearIncome - client_statistic.lastYearExpense) < 0 && client_statistic.totalBalance!=0}">
-    <div class="custom-red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-        </svg>
-        - <span th:text="${(client_statistic.lastYearExpense - client_statistic.lastYearIncome )/client_statistic.totalBalance * 100}"></span>%
-    </div>
-</div>
-
-<div class="last_year_info_card" style="display: none;"  th:if="${client_statistic != null && (client_statistic.lastYearIncome - client_statistic.lastYearExpense) == 0 || client_statistic.totalBalance == 0}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div>
-    </div>
-</div>
-            <div class="col-md-6 mb-3 justify-content-end">
-          <div class="my-container info-card">
-            <div class="d-flex justify-content-between align-items-center">
-              <img th:src="@{/images/client/green-pie-diagram.png}" class="info-card-img" />
-            </div>
-            <div>Income</div>
-            <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekIncome}"></div>
-            <div class="info-card-font bold last_month_info_card" th:text="${client_statistic.lastMonthIncome}" style="display: none;"></div>
-            <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearIncome}" style="display: none;"></div>
-<div class="last_week_info_card" th:if="${client_statistic != null && client_statistic.lastWeekIncome > 0 && client_statistic.totalIncomeSum!=0}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${client_statistic.lastWeekIncome/client_statistic.totalIncomeSum*100}"></span>%
-    </div>
-</div>  
-<div class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekIncome == null || client_statistic.lastWeekIncome == 0)}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div>
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && client_statistic.lastMonthIncome > 0 && client_statistic.totalIncomeSum!=0}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${client_statistic.lastMonthIncome/client_statistic.totalIncomeSum*100}"></span>%
-    </div>
-</div>  
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastMonthIncome == null || client_statistic.lastMonthIncome == 0)}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div>
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && client_statistic.lastYearIncome > 0 && client_statistic.totalIncomeSum!=0}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${client_statistic.lastYearIncome/client_statistic.totalIncomeSum*100}"></span>%
-    </div>
-</div>  
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastYearIncome == null || client_statistic.lastYearIncome == 0)}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div> 
-</div>
-</div>
-           <div class="col-md-6 justify-content-end">
-          <div class="my-container info-card" th:object="${client_statistic}">
-            <div class="d-flex justify-content-between align-items-center">
-              <img th:src="@{/images/client/transfer.png}" class="info-card-img" />
-            </div>
-            <div>Profit</div>
-            <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekIncome-client_statistic.lastWeekExpense}"></div>
-            <div class="info-card-font bold last_month_info_card" th:text="${client_statistic.lastMonthIncome-client_statistic.lastMonthExpense}" style="display: none;"></div>
-            <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearIncome-client_statistic.lastYearExpense}" style="display: none;"></div>
-<div class="last_week_info_card"  th:if="${client_statistic != null && ((client_statistic.lastWeekExpense >= 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekIncome > client_statistic.lastWeekExpense && ((client_statistic.totalBalance - client_statistic.lastWeekIncome)!=0)}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:if="${(client_statistic.totalBalance - client_statistic.lastWeekIncome) > 0}"> 
-            <span th:text="${( client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) / (client_statistic.totalBalance - client_statistic.lastWeekIncome)*100 }"></span>
-         </span>
-          <span th:if="${( client_statistic.lastWeekIncome - client_statistic.totalBalance) > 0}"> 
-            <span th:text="${( client_statistic.lastWeekIncome - client_statistic.lastWeekExpense) / (client_statistic.lastWeekIncome - client_statistic.totalBalance)*100}"></span>
-         </span>% 
-    </div>
-</div>
-<div class="last_week_info_card" th:if="${client_statistic != null&& ((client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome > 0)||(client_statistic.lastWeekExpense > 0 && client_statistic.lastWeekIncome >= 0)) && client_statistic.lastWeekExpense > client_statistic.lastWeekIncome  && ((client_statistic.totalBalance + client_statistic.lastWeekExpense)!=0)}">
-    <div class="custom-red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-        </svg>
-        - <span th:text="${(client_statistic.lastWeekExpense - client_statistic.lastWeekIncome) / (client_statistic.totalBalance+client_statistic.lastWeekExpense)*100}"></span>%
-    </div>
-</div>
-<div class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekExpense == 0 && client_statistic.lastWeekIncome == 0)}">
-    <div>0%</div>
-</div>
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastMonthExpense > 0 || client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome >= 0)) && client_statistic.lastMonthIncome > client_statistic.lastMonthExpense && ((client_statistic.totalBalance - client_statistic.lastMonthExpense)!=0)}">
-     <span th:if="${(client_statistic.totalBalance - client_statistic.lastMonthIncome) != 0}" || ( client_statistic.lastMonthIncome - client_statistic.totalBalance) != 0>
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:if="${(client_statistic.totalBalance - client_statistic.lastMonthIncome) != 0}">
-            <span th:text="${( client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) / (client_statistic.totalBalance - client_statistic.lastMonthIncome)*100 }"></span>
-         </span>
-          <span th:if="${( client_statistic.lastMonthIncome - client_statistic.totalBalance) != 0}">
-            <span th:text="${( client_statistic.lastMonthIncome - client_statistic.lastMonthExpense) / (client_statistic.lastMonthIncome - client_statistic.totalBalance)*100}"></span>
-         </span>%
-        </div>
-     </span>
-    <div class="custom-green">
-    <span th:if="${(client_statistic.totalBalance - client_statistic.lastMonthIncome) == 0}">
-                <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-          +  <span>100%</span>
-         </span>
-    </div>
-
-</div>
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null&& ((client_statistic.lastMonthExpense > 0 || client_statistic.lastMonthIncome > 0)||(client_statistic.lastMonthExpense > 0 && client_statistic.lastMonthIncome > 0)) && client_statistic.lastMonthExpense > client_statistic.lastMonthIncome  && ((client_statistic.totalBalance + client_statistic.lastMonthExpense)!=0)}">
-    <div class="custom-red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-        </svg>
-        - <span th:text="${(client_statistic.lastMonthExpense - client_statistic.lastMonthIncome) / (client_statistic.totalBalance+client_statistic.lastMonthExpense)*100}"></span>%
-    </div>
-</div>
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastMonthExpense-client_statistic.lastMonthIncome == 0 )}">
-    <div> 0%</div>
-</div>
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && ((client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense < client_statistic.lastYearIncome && ((client_statistic.totalBalance - client_statistic.lastYearExpense)!=0)}">
-    <div class="custom-green">
-        <svg class="custom-green bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>        + <span th:if="${(client_statistic.totalBalance - client_statistic.lastYearIncome) > 0}">
-            <span th:text="${( client_statistic.lastYearIncome - client_statistic.lastYearExpense) / (client_statistic.totalBalance-client_statistic.lastYearIncome)*100 }"></span>
-         </span>
-          <span th:if="${( client_statistic.lastYearIncome - client_statistic.totalBalance) > 0}"> 
-            <span th:text="${( client_statistic.lastYearIncome - client_statistic.lastYearExpense) / (client_statistic.lastYearIncome - client_statistic.totalBalance)*100}"></span>
-         </span>% 
-        </div>
-</div>
-
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null&& ((client_statistic.lastYearExpense >= 0 && client_statistic.lastYearIncome > 0)||(client_statistic.lastYearExpense > 0 && client_statistic.lastYearIncome >= 0)) && client_statistic.lastYearExpense > client_statistic.lastYearIncome && ((client_statistic.totalBalance + client_statistic.lastYearExpense)!=0)}">
-    <div class="custom-red">
-        <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-arrow-down-short custom-red" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 4a.5.5 0 0 1 .5.5v5.793l2.146-2.147a.5.5 0 0 1 .708.708l-3 3a.5.5 0 0 1-.708 0l-3-3a.5.5 0 1 1 .708-.708L7.5 10.293V4.5A.5.5 0 0 1 8 4z"/>
-        </svg>
-        - <span th:text="${(client_statistic.lastYearExpense - client_statistic.lastYearIncome) / (client_statistic.totalBalance+client_statistic.lastYearExpense)*100}"></span>%
-    </div>
-</div>
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastYearExpense == 0)}">
-    <div> 0%</div>
-</div>
-          </div>
-          </div>
-           <div class="col-md-6 justify-content-end">
-          <div class="my-container info-card">
-            <div class="d-flex justify-content-between align-items-center">
-              <img th:src="@{/images/client/paypal.png}" class="info-card-img" />
-            </div>
-            <div>Expenses</div>
-            <div class="info-card-font bold last_week_info_card" th:text="${client_statistic.lastWeekExpense}"></div>
-            <div class="info-card-font bold last_month_info_card" th:text="${client_statistic.lastMonthExpense}" style="display: none;"></div>
-            <div class="info-card-font bold last_year_info_card" th:text="${client_statistic.lastYearExpense}" style="display: none;"></div>
-<div class="last_week_info_card" th:if="${client_statistic != null && client_statistic.lastWeekExpense > 0 && client_statistic.totalExpenseSum!=0}">
-    <div class="custom-red">
-        <svg class="custom-red bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${client_statistic.lastWeekExpense/client_statistic.totalExpenseSum*100}"></span>%
-    </div>
-</div>  
-<div class="last_week_info_card" th:if="${client_statistic != null && (client_statistic.lastWeekExpense == null || client_statistic.lastWeekExpense == 0)}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div>
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && client_statistic.lastMonthExpense > 0 && client_statistic.totalExpenseSum!=0}">
-    <div class="custom-red">
-        <svg class="custom-red bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${client_statistic.lastMonthExpense/client_statistic.totalExpenseSum*100}"></span>%
-    </div>
-</div>  
-<div class="last_month_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastMonthExpense == null || client_statistic.lastMonthExpense == 0)}">
-    <div> 
-       <span>0</span>%
-    </div>
-</div>
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && client_statistic.lastYearExpense > 0 && client_statistic.totalExpenseSum!=0}">
-    <div class="custom-red">
-        <svg class="custom-red bi bi-arrow-up-short" xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16">
-            <path fill-rule="evenodd" d="M8 12a.5.5 0 0 0 .5-.5V5.707l2.146 2.147a.5.5 0 0 0 .708-.708l-3-3a.5.5 0 0 0-.708 0l-3 3a.5.5 0 1 0 .708.708L7.5 5.707V11.5a.5.5 0 0 0 .5.5z"/>
-        </svg>
-        + <span th:text="${client_statistic.lastYearExpense/client_statistic.totalExpenseSum*100}"></span>%
-    </div>
-</div>  
-<div class="last_year_info_card" style="display: none;" th:if="${client_statistic != null && (client_statistic.lastYearExpense == null || client_statistic.lastYearExpense == 0)}">
-    <div > 
-       <span>0</span>%
-    </div>
-</div> 
-</div>
-</div>
-    </div>
-  </div>
-</div>
-</div>
- 
-<div class="container mt-4">
-  <div class="row">
-    <div class= "mb-3">
-      <div class="my-container p-2">
-                  <div><h5 class="card-title text-center mb-0 mt-3 h4">Statistics</h5></div>
-<div class="card-body justify-content-center">
-    <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur1" autocomplete="off" checked>
-    <label class="btn h3 mx-3" style="width: 20%;" for="dur1">Last week</label>
-    <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur2" autocomplete="off">
-    <label class="btn h3 mx-3" style="width: 20%;" for="dur2">Last month</label>
-    <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur3" autocomplete="off">
-    <label class="btn h3 mx-3" style="width: 20%;" for="dur3">Last year</label>
-</div>
-      </div> 
-    </div> 
-                  <script> 
+    <div class="container">
+        <div class="row">
+            <!--    <div class= "mb-3">-->
+            <!--      <div class="my-container p-2">-->
+            <!--                  <div><h5 class="card-title text-center mb-0 mt-3 h4">Statistics</h5></div>-->
+            <!--<div class="card-body justify-content-center">-->
+            <!--    <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur1" autocomplete="off" checked>-->
+            <!--    <label class="btn h3 mx-3" style="width: 20%;" for="dur1">Last week</label>-->
+            <!--    <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur2" autocomplete="off">-->
+            <!--    <label class="btn h3 mx-3" style="width: 20%;" for="dur2">Last month</label>-->
+            <!--    <input type="radio" class="btn-check custom-back-white btn-lg" name="duration" id="dur3" autocomplete="off">-->
+            <!--    <label class="btn h3 mx-3" style="width: 20%;" for="dur3">Last year</label>-->
+            <!--</div>-->
+            <!--      </div>-->
+            <!--    </div>-->
+            <script>
                 var dur1 = document.getElementById('dur1');
                 var dur2 = document.getElementById('dur2');
-                var dur3 = document.getElementById('dur3'); 
-                
+                var dur3 = document.getElementById('dur3');
+
                 dur1.addEventListener('change', function () {
                     toggleVisibility('last_week_info_card');
                 });
@@ -471,92 +853,123 @@
                 dur3.addEventListener('change', function () {
                     toggleVisibility('last_year_info_card');
                 });
+
                 function toggleVisibility(selectedDiv) {
                     document.querySelectorAll('.last_week_info_card, .last_month_info_card, .last_year_info_card')
                         .forEach(function (div) {
                             div.style.display = 'none';
                         });
                     var divsWithClass = document.querySelectorAll('.' + selectedDiv);
-                    divsWithClass.forEach(function(div) {
-                      div.style.display = 'block';
+                    divsWithClass.forEach(function (div) {
+                        div.style.display = 'block';
                     });
                 }
             </script>
 
-      <div class="col-sm-12 mb-5">
-      <div class="my-container">
-        <div class="card-body">
-          <h5 class="card-title text-center">Transactions</h5>
-              <div class="disp d-flex justify-content-center">
-                  <input type="radio" class="btn-check custom-back-white" name="options" id="income_switch" autocomplete="off" checked>
-                  <label class="btn" style="width: 25%;" for="income_switch">Income</label>
-                  <input type="radio" class="btn-check custom-back-white" name="options" id="expenses_switch" autocomplete="off">
-                  <label class="btn" style="width: 25%;"  for="expenses_switch">Expenses</label> 
+            <div class="col-sm-12 mb-4">
+                <div class="my-container">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Transactions</h5>
+                        <div class="disp d-flex justify-content-center">
+                            <input type="radio" class="btn-check custom-back-white" name="options"
+                                   id="income_switch"
+                                   autocomplete="off" checked>
+                            <label class="btn" style="width: 25%;" for="income_switch">Income</label>
+                            <input type="radio" class="btn-check custom-back-white" name="options"
+                                   id="expenses_switch"
+                                   autocomplete="off">
+                            <label class="btn" style="width: 25%;" for="expenses_switch">Expenses</label>
+                        </div>
+                        <div class="income_transactions">
+                            <div class="mb-2 "
+                                 style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
+                            <div th:each="income : ${client_statistic.incomes}">
+                                <div class="mb-2"
+                                     style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+                                    <img th:src="@{/images/client/cc-primary.png}"
+                                         style="width: 30px; height: 30px;"
+                                         class="info-card-img"/>
+                                    <span th:text="${income.name}"></span><br>
+                                    <span th:text="${income.sum}" class="info-card-font bold"
+                                          style="margin-left: auto;"></span>
+                                    <div style="margin-right: 30px;">
+                                        <span class="info-card-font bold" th:if="${income.currencyCode == 840}">$</span>
+                                        <span class="info-card-font bold" th:if="${income.currencyCode == 978}">€</span>
+                                    </div>
+                                    <br>
+                                    <span th:text="${#temporals.format(income.time, 'dd.MM.yy')}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="expense_transactions" style="display: none">
+                            <div class="mb-2"
+                                 style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
+                            <div th:each="expense : ${client_statistic.expenses}">
+                                <div class="mb-2"
+                                     style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;">
+                                    <img th:src="@{/images/client/cc-primary.png}"
+                                         style="width: 30px; height: 30px;"
+                                         class="info-card-img"/>
+                                    <span th:text="${expense.name}"></span><br>
+                                    <span th:text="${expense.sum}" class="info-card-font bold"
+                                          style="margin-left: auto;"></span>
+                                    <div style="margin-right: 30px;">
+                                        <span class="info-card-font bold"
+                                              th:if="${expense.currencyCode == 840}">$</span>
+                                        <span class="info-card-font bold"
+                                              th:if="${expense.currencyCode == 978}">€</span></div>
+                                    <br>
+                                    <span th:text="${#temporals.format(expense.time, 'dd.MM.yy')}"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions">
+                            <div class="d-flex justify-content-center align-items-center ">
+                                <a th:href="@{'/clients/categories'}">
+                                    <button class="btn btn-primary custom-back-violet" style="width: 160px;">
+                                        Details
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                        <div th:if="${client_statistic.expenses.size() > 0} " class="expense_transactions"
+                             style="display: none;">
+                            <div class="d-flex justify-content-center align-items-center ">
+                                <a th:href="@{'/clients/categories'}">
+                                    <button class="btn btn-primary custom-back-violet" style="width: 160px;">
+                                        Details
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="income_transactions">
-                <div class="mb-2 "  style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
-                <div  th:each="income : ${client_statistic.incomes}">
-                    <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
-                    <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
-                    <span th:text="${income.bankTransaction.name}"></span><br>
-                    <span th:text="${income.bankTransaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br>
-                    <span th:text="${#temporals.format(income.bankTransaction.time, 'dd.MM.yy')}"></span>
-                    </div> 
-                </div>
-                </div>
-                <div class="expense_transactions" style="display: none;">
-                <div class="mb-2"  style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"></div>
-                <div th:each="expense : ${client_statistic.expenses}">
-                    <div class="mb-2" style="display: flex; align-items: center; border-bottom: 1px solid #ccc; padding-bottom: 5px;"> 
-                    <img th:src="@{/images/client/cc-primary.png}" style="width: 30px; height: 30px;" class="info-card-img"/> 
-                    <span th:text="${expense.bankTransaction.name}"></span><br>
-                    <span th:text="${expense.bankTransaction.sum}" class="info-card-font bold" style="margin-left: auto; margin-right: 30px;"></span><br>
-                    <span th:text="${#temporals.format(expense.bankTransaction.time, 'dd.MM.yy')}"></span>
-                    </div> 
-                </div> 
-                </div>
-            <div th:if="${client_statistic.incomes.size()>0}" class="income_transactions" >
-           <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/clients/categories'}"  >
-                <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
-            </a> 
-           </div>
-           </div>
-           <div th:if="${client_statistic.expenses.size() > 0} "  class = "expense_transactions" style="display: none;">
-           <div class="d-flex justify-content-center align-items-center ">
-            <a th:href="@{'/clients/categories'}"  >
-                <button class="btn btn-primary custom-back-violet" style="width: 160px;">Details</button>
-            </a>
-           </div>
-          </div>
-          </div>
-      </div>
-      </div>
-      </div>
-      </div>
-      <script> 
-                var income = document.getElementById('income_switch');
-                var expense = document.getElementById('expenses_switch'); 
-                
-                income.addEventListener('change', function () {
-                    income_expense_switch('income_transactions');
+            </div>
+        </div>
+    </div>
+    <script>
+        var income = document.getElementById('income_switch');
+        var expense = document.getElementById('expenses_switch');
+
+        income.addEventListener('change', function () {
+            income_expense_switch('income_transactions');
+        });
+
+        expense.addEventListener('change', function () {
+            income_expense_switch('expense_transactions');
+        });
+
+        function income_expense_switch(selectedDiv) {
+            document.querySelectorAll('.income_transactions, .expense_transactions')
+                .forEach(function (div) {
+                    div.style.display = 'none';
                 });
-
-                expense.addEventListener('change', function () {
-                    income_expense_switch('expense_transactions');
-                }); 
-
-                function income_expense_switch(selectedDiv) {
-                    document.querySelectorAll('.income_transactions, .expense_transactions')
-                        .forEach(function (div) {
-                            div.style.display = 'none';
-                        });
-                    var divsWithClass = document.querySelectorAll('.' + selectedDiv);
-                    divsWithClass.forEach(function(div) {
-                      div.style.display = 'block';
-                    });
-                }
-            </script>
+            var divsWithClass = document.querySelectorAll('.' + selectedDiv);
+            divsWithClass.forEach(function (div) {
+                div.style.display = 'block';
+            });
+        }
+    </script>
 </main>
-  </body>
+</body>
 </html>

@@ -101,7 +101,7 @@ public class ManagerApiController {
     })
     @GetMapping(path = "/users/{userId}")
     public ResponseEntity<UserDto> getClientById(@PathVariable("userId") Long userId) {
-        UserDto user = userService.getUserById(userId);
+        UserDto user = userService.getUserDtoById(userId);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 

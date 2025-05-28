@@ -1,6 +1,9 @@
 package com.projects.oleksii.leheza.cashtruck.service.implemintation;
 
 import com.projects.oleksii.leheza.cashtruck.domain.*;
+import com.projects.oleksii.leheza.cashtruck.domain.Currency;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankAccount;
+import com.projects.oleksii.leheza.cashtruck.domain.monobank.MonobankIntegration;
 import com.projects.oleksii.leheza.cashtruck.dto.DtoMapper;
 import com.projects.oleksii.leheza.cashtruck.dto.PageDto;
 import com.projects.oleksii.leheza.cashtruck.dto.auth.LoginDto;
@@ -9,10 +12,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.*;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
@@ -45,16 +45,26 @@ import org.springframework.web.multipart.MultipartFile;
 import java.beans.Transient;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class UserServiceImpl implements UserService {
 
-    private static final TransactionType INCOME_TRANSACTION_TYPE = TransactionType.INCOME;
-    private static final TransactionType EXPENSE_TRANSACTION_TYPE = TransactionType.EXPENSE;
+    private static final List<TransactionType> INCOME_TRANSACTION_TYPE_LIST = List.of(
+            TransactionType.INCOME,
+            TransactionType.UNIVERSAL
+    );
+
+    private static final List<TransactionType> EXPENSE_TRANSACTION_TYPE_LIST = List.of(
+            TransactionType.EXPENSE,
+            TransactionType.UNIVERSAL
+    );
     public static final String SORT_PROPERTY_FIRST_NAME = "firstName";
 
     private final UserRepository userRepository;
@@ -72,6 +82,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder encoder;
     private final UserDetailsService userDetailsService;
     private final BankCardRepository bankCardRepository;
+    private final MonobankIntegrationRepository monobankIntegrationRepository;
+    private final CurrencyRepository currencyRepository;
 
     @Override
     public User save(User user) {
@@ -122,7 +134,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUserById(Long userId) {
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(new User());
+    }
+
+    @Override
+    public UserDto getUserDtoById(Long userId) {
         return dtoMapper.userToDto(userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with does not exist")));
     }
@@ -164,20 +181,22 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public TransactionDto addTransaction(Long userId, CreateTransactionDto createTransactionDto) {
-        BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto);
-        bankTransactionRepository.save(bankTransaction);
         Optional<Category> categoryOptional = categoryRepository.findByName(createTransactionDto.getCategoryName());
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User with id: " + userId + " does not found"));
-        BankCard bankCard = bankCardRepository.findCardByNumber(createTransactionDto.getCardNumber())
-                .orElseThrow(() -> new ResourceNotFoundException("Bank card with number" + createTransactionDto.getCardNumber() + "deos not found "));
+        BankCard bankCard = bankCardRepository.findCardByNumberAndUserId(createTransactionDto.getCardNumber(), userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank card with number: " + createTransactionDto.getCardNumber() + " deos not found "));
+        Currency currency = currencyRepository.findByShortName(createTransactionDto.getCurrencyShortName()).orElseThrow(() -> new ResourceNotFoundException("Currency with shortName: " + createTransactionDto.getCurrencyShortName() + " not found"));
+        BankTransaction bankTransaction = dtoMapper.transactionDtoToTransaction(createTransactionDto, currency);
+        if (!createTransactionDto.isIncome()) {
+            bankTransaction.setSum(bankTransaction.getSum() * (-1));
+        }
+        bankTransactionRepository.save(bankTransaction);
         if (categoryOptional.isPresent()) {
             Transaction transaction = Transaction.builder()
                     .bankCard(bankCard)
                     .bankTransaction(bankTransaction)
                     .category(categoryOptional.get())
                     .build();
-            Set<BankCard> bankCards = user.getBankCards();
+            List<BankCard> bankCards = bankCardRepository.getBankCardsByUserId(userId);
             if (bankCards.contains(bankCard)) {
                 transactionRepository.save(transaction);
                 return dtoMapper.transactionToDto(transaction);
@@ -207,8 +226,11 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserHeaderDto getHeaderClientData(Long userId) {
         byte[] avatar = userRepository.findAvatarByUserId(userId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         UserHeaderDto dto = UserHeaderDto.builder()
                 .id(userId)
+                .role(String.valueOf(user.getRole()))
                 .build();
         if (avatar != null && avatar.length > 0) {
             return dto.toBuilder()
@@ -295,6 +317,42 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<String> findUserEmailsWithExpiredSubscriptions() {
         return userRepository.findUserEmailsWithExpiredSubscriptions();
+    }
+
+    @Override
+    public List<DashboardBankCardDto> getDashboardBankCardsDtoByUserId(Long userId) {
+        return userRepository.findById(userId).map(user -> {
+            List<BankCard> bankCards = bankCardRepository.getBankCardsByUserId(userId);
+            List<DashboardBankCardDto> bankCardsDtos = bankCards.stream()
+                    .map(dtoMapper::bankCardToDashboardBankCardDto)
+                    .toList();
+            monobankIntegrationRepository.findByUserId(userId)
+                    .map(MonobankIntegration::getMonobankAccounts)
+                    .ifPresent(monoAccounts -> {
+                        bankCardsDtos.stream()
+                                .filter(dto -> monoAccounts.stream()
+                                        .map(MonobankAccount::getMaskedPan)
+                                        .anyMatch(maskedPan -> maskedPan.equals(dto.getCardNumber())))
+                                .forEach(dto -> {
+                                    dto.setBank("Monobank");
+                                    monoAccounts.stream()
+                                            .filter(acc -> acc.getMaskedPan().equals(dto.getCardNumber()))
+                                            .findFirst()
+                                            .ifPresent(acc -> dto.setType(acc.getType()));
+                                    Currency currency = currencyRepository.findByShortName(dto.getCurrency())
+                                            .orElseThrow(() -> new ResourceNotFoundException("Currency with shortName:" + dto.getCurrency() + " does not exist"));
+                                    double sum = transactionRepository.findByBankCardNumber(dto.getCardNumber()).stream()
+                                            .map(t -> t.getBankTransaction().getSum())
+                                            .mapToDouble(Long::doubleValue)
+                                            .map(number -> number / currency.getDelimiter())
+                                            .sum();
+                                    BigDecimal roundedSum = BigDecimal.valueOf(sum).setScale(2, RoundingMode.HALF_UP);
+                                    dto.setBalance(roundedSum.doubleValue());
+                                });
+                    });
+
+            return bankCardsDtos;
+        }).orElseGet(ArrayList::new);
     }
 
     @Override
@@ -399,80 +457,222 @@ public class UserServiceImpl implements UserService {
             log.warn("User with id:{} does not have enough bank cards size({}) limit to add card)", userId, user.getBankCards().size());
             throw new UserPlanException("Client plan does not maintain this functionality");
         }
-        user.getBankCards().add(bankCard);
-        userRepository.save(user);
+        if (!user.getBankCards().contains(bankCard)) {
+            user.getBankCards().add(bankCard);
+            userRepository.save(user);
+        }
+        if (bankCard.getUser() == null || !bankCard.getUser().equals(user)) {
+            bankCard.setUser(user);
+            bankCardRepository.save(bankCard);
+        }
     }
 
     private ClientStatisticDto createStatisticDto(User client) {
-        ClientStatisticDto clientStatisticDto = new ClientStatisticDto();
-        Long clientId = client.getId();
-        LocalDateTime endDate = LocalDateTime.now();
-        setLastYearTransactions(clientId, endDate, clientStatisticDto);
-        setLastMonthTransactions(clientId, endDate, clientStatisticDto);
-        setLastWeekTransactions(clientId, endDate, clientStatisticDto);
-        setTotalIncomeSum(clientId, endDate, clientStatisticDto);
-        setTotalExpenseSum(clientId, endDate, clientStatisticDto);
-        clientStatisticDto.setTotalBalance(getTotalBalance(client, clientStatisticDto));
+        boolean isPositiveTransactionSumIncome = true;
+        boolean isPositiveTransactionSumExpense = false;
+        String currencyName = "UAH";
+        Currency currency = currencyRepository.findByShortName(currencyName).orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneYear = now.minusYears(1);
+        LocalDateTime oneMonth = now.minusMonths(1);
+        LocalDateTime twoMonth = now.minusMonths(2);
+        List<TransactionDto> lastYearIncome = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneYear, now, isPositiveTransactionSumIncome)
+                .stream()
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        List<TransactionDto> lastYearExpense = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneYear, now, isPositiveTransactionSumExpense)
+                .stream()
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        List<BankCard> bankCards = bankCardRepository.getBankCardsByUserId(client.getId());
+        int delimiter = currency.getDelimiter();
+        long totalBalance = bankCards.stream()
+                .flatMap(card -> card.getTransactions().stream())
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(transaction -> transaction.getBankTransaction().getSum())
+                .sum();
+        long lastMonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumIncome).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long previous2MonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumIncome).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long lastMonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumExpense).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long previous2MonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumExpense).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long lastMonthProfit = lastMonthIncomes + lastMonthExpenses;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
+        int lastMonthAmount = 6;
+        Map<String, Double> totalBalanceGraphic = getTotalBalanceGraphic(client.getId(), lastMonthAmount, formatter, delimiter);
+        List<DashboardCategoryDto> categoriesDiagram = getUserCategorySummaryLast6Months(client.getId());
+        int lastTransactionsPageNumber = 0;
+        int lastTransactionsPageSize = 5;
+        List<DashboardTransactionDto> lastTransactions = getLastUserTransactions(client.getId(), lastTransactionsPageNumber, lastTransactionsPageSize);
+        DashboardIncomeExpensesDiagramDto incomeExpensesDiagramDto = DashboardIncomeExpensesDiagramDto.builder()
+                .incomes(getMonthSumMap(client.getId(), isPositiveTransactionSumIncome, formatter, lastMonthAmount, delimiter, currency))
+                .expenses(getMonthSumMap(client.getId(), isPositiveTransactionSumExpense, formatter, lastMonthAmount, delimiter, currency))
+                .build();
+        double totalBalanceDenominator = totalBalance - (lastMonthIncomes + lastMonthExpenses);
+        double totalBalancePercentage = totalBalanceDenominator != 0
+                ? ((totalBalance * 100.0) / totalBalanceDenominator) - 100
+                : 0.0;
+        double lastMonthIncomesPercentage = previous2MonthIncomes != 0
+                ? ((lastMonthIncomes * 100.0) / previous2MonthIncomes) - 100
+                : 0.0;
+        double lastMonthExpensesPercentage = previous2MonthExpenses != 0
+                ? ((lastMonthExpenses * 100.0) / previous2MonthExpenses) - 100
+                : 0.0;
+
+        double previousMonthProfit = previous2MonthIncomes + previous2MonthExpenses;
+        double currentMonthProfit = lastMonthIncomes + lastMonthExpenses;
+
+        double lastMonthProfitPercentage;
+        if (previousMonthProfit == 0) {
+            lastMonthProfitPercentage = 0;
+        } else {
+            lastMonthProfitPercentage =
+                    ((currentMonthProfit - previousMonthProfit) / Math.abs(previousMonthProfit)) * 100.0;
+        }
+
+        ClientStatisticDto clientStatisticDto = new ClientStatisticDto().toBuilder()
+                .expenses(lastYearExpense)
+                .incomes(lastYearIncome)
+                .totalBalance((double) totalBalance / delimiter)
+                .totalBalancePercentage(totalBalancePercentage)
+                .lastMonthIncomes((double) lastMonthIncomes / delimiter)
+                .lastMonthIncomesPercentage(lastMonthIncomesPercentage)
+                .lastMonthExpenses((double) lastMonthExpenses / delimiter)
+                .lastMonthExpensesPercentage(lastMonthExpensesPercentage)
+                .lastMonthProfit((double) lastMonthProfit / delimiter)
+                .lastMonthProfitPercentage(lastMonthProfitPercentage)
+                .totalBalanceGraphic(totalBalanceGraphic)
+                .categoriesDiagram(categoriesDiagram)
+                .lastTransactions(lastTransactions)
+                .incomeExpensesDiagram(incomeExpensesDiagramDto)
+                .delimiter(currency.getDelimiter())
+                .build();
         return clientStatisticDto;
     }
 
-    private void setTotalIncomeSum(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime tenYearsStartDate = endDate.minusYears(10);
-        List<Transaction> lastTenYearsIncome = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), INCOME_TRANSACTION_TYPE, tenYearsStartDate, endDate);
-        clientStatisticDto.setTotalIncomeSum(getAllTransactionSum(lastTenYearsIncome));
+    private List<DashboardTransactionDto> getLastUserTransactions(Long userId, int pageNumber, int pageSize) {
+        Pageable topFive = PageRequest.of(pageNumber, pageSize);
+        List<DashboardTransactionDto> transactions = transactionRepository.findLastTransactionsByUserId(userId, topFive);
+        transactions.forEach(t -> {
+            double dividedSum = (double) t.getSum() / t.getDelimiter();
+            double roundedSum = BigDecimal.valueOf(dividedSum)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            t.setSum(roundedSum);
+        });
+        return transactions;
     }
 
-    private void setTotalExpenseSum(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime tenYearsStartDate = endDate.minusYears(10);
-        List<Transaction> lastTenYearsExpense = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), EXPENSE_TRANSACTION_TYPE, tenYearsStartDate, endDate);
-        clientStatisticDto.setTotalExpenseSum(getAllTransactionSum(lastTenYearsExpense));
+    private List<DashboardCategoryDto> getUserCategorySummaryLast6Months(Long userId) {
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
+        return categoryRepository.getCategorySums(userId, sixMonthsAgo).stream()
+                .filter(t->t.getCurrencyShortName().equals("UAH"))
+                .sorted(Comparator.comparing(DashboardCategoryDto::getSum).reversed())
+                .peek(t -> {
+                    double divided = t.getSum() / currencyRepository.findByShortName(t.getCurrencyShortName()).orElseThrow(()->new ResourceNotFoundException("Currency with short name was not found")).getDelimiter();
+                    double rounded = BigDecimal.valueOf(divided)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue();
+                    t.setSum(rounded);
+                })
+                .collect(Collectors.toList());
     }
 
-    private BigDecimal getTotalBalance(User client, ClientStatisticDto clientStatisticDto) {
-        if (client == null || client.getBankCards() == null) {
-            return BigDecimal.ZERO;
+    private Map<String, Double> getTotalBalanceGraphic(
+            Long userId,
+            int lastMonthAmount,
+            DateTimeFormatter formatter,
+            int delimiter) {
+        String currencyName = "UAH";
+        Currency currency = currencyRepository.findByShortName(currencyName).orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
+
+        LocalDateTime periodStart = LocalDateTime.now().minusMonths(lastMonthAmount);
+        double initialIncome = sumTransactionsBefore(userId, true, periodStart, currency) / delimiter;
+        double initialExpense = sumTransactionsBefore(userId, false, periodStart, currency) / delimiter;
+        double runningBalance = initialIncome + initialExpense;
+
+        Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter, currency);
+        Map<String, Double> expenseByMonth = getMonthSumMap(userId, false, formatter, lastMonthAmount, delimiter, currency);
+
+        Map<String, Double> netByMonth = new HashMap<>();
+        for (String month : incomeByMonth.keySet()) {
+            double income = incomeByMonth.getOrDefault(month, 0.0);
+            double expense = expenseByMonth.getOrDefault(month, 0.0);
+            netByMonth.put(month, income + expense);
         }
-        BigDecimal incomeSum = clientStatisticDto.getTotalIncomeSum();
-        BigDecimal expenseSum = clientStatisticDto.getTotalExpenseSum();
-        BigDecimal sum = incomeSum.add(expenseSum);
-        return client.getBankCards().stream()
-                .map(BankCard::getBalance)
-                .filter(Objects::nonNull)
-                .reduce(sum, BigDecimal::add);
 
+        List<String> monthOrder = Arrays.asList(
+                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+        );
+        Map<String, Double> sortedNet = netByMonth.entrySet().stream()
+                .sorted(Comparator.comparingInt(e -> monthOrder.indexOf(e.getKey())))
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (a, b) -> a,
+                        LinkedHashMap::new
+                ));
+        Map<String, Double> cumulativeBalance = new LinkedHashMap<>();
+        for (Map.Entry<String, Double> e : sortedNet.entrySet()) {
+            runningBalance += e.getValue();
+            double roundedBalance = BigDecimal.valueOf(runningBalance)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            cumulativeBalance.put(e.getKey(), roundedBalance);
+        }
+
+        return cumulativeBalance;
     }
 
-    private void setLastYearTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime oneYearStartDate = endDate.minusYears(1);
-        List<Transaction> lastYearExpenses = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), EXPENSE_TRANSACTION_TYPE, oneYearStartDate, endDate);
-        clientStatisticDto.setExpenses(lastYearExpenses);
-        clientStatisticDto.setLastYearExpense(getAllTransactionSum(lastYearExpenses));
-        List<Transaction> lastYearIncomes = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), INCOME_TRANSACTION_TYPE, oneYearStartDate, endDate);
-        clientStatisticDto.setIncomes(lastYearIncomes);
-        clientStatisticDto.setLastYearIncome(getAllTransactionSum(lastYearIncomes));
+    private double sumTransactionsBefore(
+            Long userId,
+            boolean isIncome,
+            LocalDateTime before,
+            Currency currency) {
+        LocalDateTime startDate = LocalDateTime.of(1970, 1, 1, 0, 0);
+
+        return transactionRepository
+                .findByBankCardsAndDateRangeAndTransactionTypes(
+                        bankCardRepository.getBankCardsByUserId(userId),
+                        startDate,
+                        before,
+                        isIncome)
+                .stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToDouble(t -> (double) t.getBankTransaction().getSum())
+                .sum();
     }
 
-    private void setLastMonthTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime oneMonthStartDate = endDate.minusMonths(1);
-        List<Transaction> lastMonthExpenses = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), EXPENSE_TRANSACTION_TYPE, oneMonthStartDate, endDate);
-        clientStatisticDto.setLastMonthExpense(getAllTransactionSum(lastMonthExpenses));
-        List<Transaction> lastMonthIncomes = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), INCOME_TRANSACTION_TYPE, oneMonthStartDate, endDate);
-        clientStatisticDto.setLastMonthIncome(getAllTransactionSum(lastMonthIncomes));
-    }
 
-    private void setLastWeekTransactions(Long clientId, LocalDateTime endDate, ClientStatisticDto clientStatisticDto) {
-        LocalDateTime oneWeekStartDate = endDate.minusWeeks(1);
-        List<Transaction> lastWeekExpenses = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), EXPENSE_TRANSACTION_TYPE, oneWeekStartDate, endDate);
-        clientStatisticDto.setLastWeekExpense(getAllTransactionSum(lastWeekExpenses));
-        List<Transaction> lastWeekIncomes = transactionRepository.findTransactionForPeriod(bankCardRepository.getBankCardsByUserId(clientId), INCOME_TRANSACTION_TYPE, oneWeekStartDate, endDate);
-        clientStatisticDto.setLastWeekIncome(getAllTransactionSum(lastWeekIncomes));
-    }
-
-    private BigDecimal getAllTransactionSum(List<Transaction> transactions) {
-        return transactions.stream()
-                .map(Transaction::getBankTransaction)
-                .map(BankTransaction::getSum)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    private Map<String, Double> getMonthSumMap(Long userId, boolean isPositiveTransactionSum, DateTimeFormatter formatter, int lastMonthAmount, int delimiter, Currency currency) {
+        return transactionRepository
+                .findByBankCardsAndDateRangeAndTransactionTypes(
+                        bankCardRepository.getBankCardsByUserId(userId),
+                        LocalDateTime.now().minusMonths(lastMonthAmount),
+                        LocalDateTime.now(),
+                        isPositiveTransactionSum)
+                .stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .collect(Collectors.groupingBy(
+                        t -> t.getBankTransaction().getTime().format(formatter),
+                        TreeMap::new,
+                        Collectors.collectingAndThen(
+                                Collectors.summingDouble(t -> (double) t.getBankTransaction().getSum() / delimiter),
+                                sum -> BigDecimal.valueOf(sum).setScale(2, RoundingMode.HALF_UP).doubleValue()
+                        )
+                ));
     }
 
     private boolean isEmailTaken(String currentEmail, String updatedEmail) {
@@ -496,12 +696,15 @@ public class UserServiceImpl implements UserService {
         Set<BankCard> bankCards = new HashSet<>();
         Subscription subscription = subscriptionRepository.findBySubscriptionStatus(SubscriptionStatus.FREE)
                 .orElseThrow(() -> new ResourceNotFoundException("Subscription status does not found in the database"));
+        MonobankIntegration monobankIntegration = new MonobankIntegration();
+        monobankIntegrationRepository.save(monobankIntegration);
         return User.builder()
                 .email(loginDto.getLogin())
                 .password(encoder.encode(loginDto.getPassword()))
                 .bankCards(bankCards)
                 .role(Role.ROLE_CLIENT)
                 .subscription(subscription)
+                .monobankIntegration(monobankIntegration)
                 .status(ActiveStatus.INACTIVE)
                 .build();
     }

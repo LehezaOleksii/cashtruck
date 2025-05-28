@@ -11,10 +11,7 @@ import com.projects.oleksii.leheza.cashtruck.dto.create.CreateTransactionDto;
 import com.projects.oleksii.leheza.cashtruck.dto.filter.UserSearchCriteria;
 import com.projects.oleksii.leheza.cashtruck.dto.mail.EmailContext;
 import com.projects.oleksii.leheza.cashtruck.dto.update.UserUpdateDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.ClientStatisticDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.TransactionDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserDto;
-import com.projects.oleksii.leheza.cashtruck.dto.view.UserHeaderDto;
+import com.projects.oleksii.leheza.cashtruck.dto.view.*;
 import com.projects.oleksii.leheza.cashtruck.enums.ActiveStatus;
 import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.enums.SubscriptionStatus;
@@ -35,13 +32,16 @@ public interface UserService {
 
     PageDto<UserDto> findAll(Integer page, Integer size);
 
-    UserDto getUserById(Long userId);
+    UserDto getUserDtoById(Long userId);
+
+    User getUserById(Long userId);
 
     UserDto updateUserInfo(Long userId, UserUpdateDto userUpdateDto);
 
     UserUpdateDto getClientUpdateDto(Long clientId);
 
     UserDto getUserDto(Long userId);
+
     //For UI
     ClientStatisticDto getClientStatisticByUserId(Long userId);
 
@@ -85,7 +85,9 @@ public interface UserService {
 
     Subscription getUserSubscriptionById(Long userId);
 
-    void assignBankCardToClient(Long userId, BankCard bankCard) throws IllegalArgumentException;
+    void assignBankCardToClient(Long userId, BankCard bankCard);
 
     List<String> findUserEmailsWithExpiredSubscriptions();
+
+    List<DashboardBankCardDto> getDashboardBankCardsDtoByUserId(Long userId);
 }
