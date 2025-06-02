@@ -17,7 +17,15 @@
     const totalRevenueChartEl = document.querySelector('#totalRevenueChart');
 
     if (totalRevenueChartEl) {
-        fetch('/api/clients/statistics')
+        const urlParams = new URLSearchParams(window.location.search);
+        const cardNumber = urlParams.get('cardNumber');
+
+        let apiUrl = '/api/clients/statistics';
+        if (cardNumber) {
+            apiUrl += `?cardNumber=${encodeURIComponent(cardNumber)}`;
+        }
+
+        fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const diagram = data.incomeExpensesDiagram || {};
@@ -320,14 +328,21 @@
     const chartOrderStatistics = document.querySelector('#orderStatisticsChart');
 
     if (chartOrderStatistics) {
-        fetch('/api/clients/statistics')
+        const urlParams = new URLSearchParams(window.location.search);
+        const cardNumber = urlParams.get('cardNumber');
+
+        let apiUrl = '/api/clients/statistics';
+        if (cardNumber) {
+            apiUrl += `?cardNumber=${encodeURIComponent(cardNumber)}`;
+        }
+
+        fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const categoriesDiagram = data.categoriesDiagram || [];
 
                 let labelsFull = categoriesDiagram.map(item => item.categoryName);
                 let series = categoriesDiagram.map(item => item.sum < 0 ? -item.sum : item.sum);
-
                 // Fallback default data
                 const defaultLabels = ['Electronic', 'Sports', 'Decor', 'Fashion'];
                 const defaultSeries = [25, 15, 32, 28];
@@ -349,14 +364,14 @@
                 ];
 
                 const orderChartConfig = {
-                    chart: { height: 165, width: 145, type: 'donut' },
+                    chart: {height: 165, width: 145, type: 'donut'},
                     labels: labelsTruncated,
                     series: series,
                     colors: customColors,
-                    stroke: { width: 2 },
-                    dataLabels: { enabled: false },
-                    legend: { show: false },
-                    grid: { padding: { top: 0, bottom: 0, right: 15 } },
+                    stroke: {width: 2},
+                    dataLabels: {enabled: false},
+                    legend: {show: false},
+                    grid: {padding: {top: 0, bottom: 0, right: 15}},
                     tooltip: {
                         y: {
                             formatter: function (value, opts) {
@@ -409,16 +424,18 @@
 
     }
 
-    // if (typeof chartOrderStatistics !== undefined && chartOrderStatistics !== null) {
-    //   const statisticsChart = new ApexCharts(chartOrderStatistics, orderChartConfig);
-    //   statisticsChart.render();
-    // }
-    // Income Chart - Area chart
-    // --------------------------------------------------------------------
     const incomeChartEl = document.querySelector('#incomeChart');
 
     if (incomeChartEl) {
-        fetch('/api/clients/statistics')
+        const urlParams = new URLSearchParams(window.location.search);
+        const cardNumber = urlParams.get('cardNumber');
+
+        let apiUrl = '/api/clients/statistics';
+        if (cardNumber) {
+            apiUrl += `?cardNumber=${encodeURIComponent(cardNumber)}`;
+        }
+
+        fetch(apiUrl)
             .then(response => response.json())
             .then(data => {
                 const totalBalanceGraphic = data.totalBalanceGraphic || {};

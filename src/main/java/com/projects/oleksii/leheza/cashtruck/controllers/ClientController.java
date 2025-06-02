@@ -64,13 +64,16 @@ public class ClientController {
         List<DashboardBankCardDto> cards = userService.getDashboardBankCardsDtoByUserId(userId);
         modelAndView.addObject("bank_cards", cards);
         modelAndView.addObject("client", userService.getHeaderClientData(userId));
-        modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(userId));
 
         if (selectedCardNumber != null) {
             DashboardBankCardDto selectedCard = cards.stream().filter(c -> c.getCardNumber().equals(selectedCardNumber)).findFirst().orElse(null);
             modelAndView.addObject("bank_card", selectedCard);
-        } else if (!cards.isEmpty()) {
-            modelAndView.addObject("bank_card", cards.get(0));
+            modelAndView.addObject("client_statistic", userService.getClientStatisticByUserIdAndCardNumber(userId, selectedCardNumber));
+        } else {
+            modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(userId));
+            if (!cards.isEmpty()) {
+                modelAndView.addObject("bank_card", cards.get(0));
+            }
         }
         return modelAndView;
     }
@@ -207,7 +210,8 @@ public class ClientController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", "Unexpected error while fetching Monobank client info.");
             log.error("Unexpected error while fetching Monobank client info: {}", e.getMessage());
-        } if (redirectAttributes.containsAttribute("error")) {
+        }
+        if (redirectAttributes.containsAttribute("error")) {
             return new ModelAndView("redirect:/clients/bank_cards/add/monobank/cards");
         }
         return new ModelAndView("redirect:/clients/dashboard");

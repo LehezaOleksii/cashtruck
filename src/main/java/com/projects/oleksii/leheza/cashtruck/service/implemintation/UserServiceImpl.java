@@ -180,6 +180,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public ClientStatisticDto getClientStatisticByUserIdAndCardNumber(Long userId, String cardNumber) {
+        Optional<User> optionalClient = userRepository.findById(userId);
+        return optionalClient
+                .map(client -> createStatisticDto(client, cardNumber))
+                .orElseGet(ClientStatisticDto::new);
+    }
+
+    @Override
     public TransactionDto addTransaction(Long userId, CreateTransactionDto createTransactionDto) {
         Optional<Category> categoryOptional = categoryRepository.findByName(createTransactionDto.getCategoryName());
         BankCard bankCard = bankCardRepository.findCardByNumberAndUserId(createTransactionDto.getCardNumber(), userId)
@@ -561,6 +569,101 @@ public class UserServiceImpl implements UserService {
         return clientStatisticDto;
     }
 
+    private ClientStatisticDto createStatisticDto(User client, String cardNumber) {
+        boolean isPositiveTransactionSumIncome = true;
+        boolean isPositiveTransactionSumExpense = false;
+        String currencyName = "UAH";
+        Currency currency = currencyRepository.findByShortName(currencyName).orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime oneYear = now.minusYears(1);
+        LocalDateTime oneMonth = now.minusMonths(1);
+        LocalDateTime twoMonth = now.minusMonths(2);
+        List<TransactionDto> lastYearIncome = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneYear, now, isPositiveTransactionSumIncome, cardNumber)
+                .stream()
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        List<TransactionDto> lastYearExpense = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneYear, now, isPositiveTransactionSumExpense, cardNumber)
+                .stream()
+                .map(dtoMapper::transactionToDto)
+                .toList();
+        BankCard bankCard = bankCardRepository.getBankCardByCardNumber(client.getId(), cardNumber)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank card was no found with card number: " + cardNumber));
+        int delimiter = currency.getDelimiter();
+        long totalBalance = bankCard.getTransactions().stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(transaction -> transaction.getBankTransaction().getSum())
+                .sum();
+
+        long lastMonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumIncome, cardNumber).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long previous2MonthIncomes = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumIncome, cardNumber).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long lastMonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), oneMonth, now, isPositiveTransactionSumExpense, cardNumber).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long previous2MonthExpenses = transactionRepository.findByBankCardsAndDateRangeAndTransactionTypes(bankCardRepository.getBankCardsByUserId(client.getId()), twoMonth, oneMonth, isPositiveTransactionSumExpense, cardNumber).stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToLong(t -> t.getBankTransaction().getSum())
+                .sum();
+        long lastMonthProfit = lastMonthIncomes + lastMonthExpenses;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM", Locale.ENGLISH);
+        int lastMonthAmount = 6;
+        Map<String, Double> totalBalanceGraphic = getTotalBalanceGraphic(client.getId(), lastMonthAmount, formatter, delimiter, cardNumber);
+        List<DashboardCategoryDto> categoriesDiagram = getUserCategorySummaryLast6Months(client.getId(), cardNumber);
+        int lastTransactionsPageNumber = 0;
+        int lastTransactionsPageSize = 5;
+        List<DashboardTransactionDto> lastTransactions = getLastUserTransactions(client.getId(), lastTransactionsPageNumber, lastTransactionsPageSize, cardNumber);
+        DashboardIncomeExpensesDiagramDto incomeExpensesDiagramDto = DashboardIncomeExpensesDiagramDto.builder()
+                .incomes(getMonthSumMap(client.getId(), isPositiveTransactionSumIncome, formatter, lastMonthAmount, delimiter, cardNumber))
+                .expenses(getMonthSumMap(client.getId(), isPositiveTransactionSumExpense, formatter, lastMonthAmount, delimiter, cardNumber))
+                .build();
+        double totalBalanceDenominator = totalBalance - (lastMonthIncomes + lastMonthExpenses);
+        double totalBalancePercentage = totalBalanceDenominator != 0
+                ? ((totalBalance * 100.0) / totalBalanceDenominator) - 100
+                : 0.0;
+        double lastMonthIncomesPercentage = previous2MonthIncomes != 0
+                ? ((lastMonthIncomes * 100.0) / previous2MonthIncomes) - 100
+                : 0.0;
+        double lastMonthExpensesPercentage = previous2MonthExpenses != 0
+                ? ((lastMonthExpenses * 100.0) / previous2MonthExpenses) - 100
+                : 0.0;
+
+        double previousMonthProfit = previous2MonthIncomes + previous2MonthExpenses;
+        double currentMonthProfit = lastMonthIncomes + lastMonthExpenses;
+
+        double lastMonthProfitPercentage;
+        if (previousMonthProfit == 0) {
+            lastMonthProfitPercentage = 0;
+        } else {
+            lastMonthProfitPercentage =
+                    ((currentMonthProfit - previousMonthProfit) / Math.abs(previousMonthProfit)) * 100.0;
+        }
+
+        ClientStatisticDto clientStatisticDto = new ClientStatisticDto().toBuilder()
+                .expenses(lastYearExpense)
+                .incomes(lastYearIncome)
+                .totalBalance((double) totalBalance / delimiter)
+                .totalBalancePercentage(totalBalancePercentage)
+                .lastMonthIncomes((double) lastMonthIncomes / delimiter)
+                .lastMonthIncomesPercentage(lastMonthIncomesPercentage)
+                .lastMonthExpenses((double) lastMonthExpenses / delimiter)
+                .lastMonthExpensesPercentage(lastMonthExpensesPercentage)
+                .lastMonthProfit((double) lastMonthProfit / delimiter)
+                .lastMonthProfitPercentage(lastMonthProfitPercentage)
+                .totalBalanceGraphic(totalBalanceGraphic)
+                .categoriesDiagram(categoriesDiagram)
+                .lastTransactions(lastTransactions)
+                .incomeExpensesDiagram(incomeExpensesDiagramDto)
+                .delimiter(currency.getDelimiter())
+                .build();
+        return clientStatisticDto;
+    }
+
     private List<DashboardTransactionDto> getLastUserTransactions(Long userId, int pageNumber, int pageSize) {
         Pageable topFive = PageRequest.of(pageNumber, pageSize);
         List<DashboardTransactionDto> transactions = transactionRepository.findLastTransactionsByUserId(userId, topFive);
@@ -574,13 +677,43 @@ public class UserServiceImpl implements UserService {
         return transactions;
     }
 
+    private List<DashboardTransactionDto> getLastUserTransactions(Long userId, int pageNumber, int pageSize, String cardNumber) {
+        Pageable topFive = PageRequest.of(pageNumber, pageSize);
+        List<DashboardTransactionDto> transactions = transactionRepository.findLastTransactionsByUserId(userId, cardNumber, topFive);
+        transactions.forEach(t -> {
+            double dividedSum = (double) t.getSum() / t.getDelimiter();
+            double roundedSum = BigDecimal.valueOf(dividedSum)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            t.setSum(roundedSum);
+        });
+        return transactions;
+    }
+
     private List<DashboardCategoryDto> getUserCategorySummaryLast6Months(Long userId) {
         LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
         return categoryRepository.getCategorySums(userId, sixMonthsAgo).stream()
-                .filter(t->t.getCurrencyShortName().equals("UAH"))
+                .filter(t -> t.getCurrencyShortName().equals("UAH"))
                 .sorted(Comparator.comparing(DashboardCategoryDto::getSum).reversed())
                 .peek(t -> {
-                    double divided = t.getSum() / currencyRepository.findByShortName(t.getCurrencyShortName()).orElseThrow(()->new ResourceNotFoundException("Currency with short name was not found")).getDelimiter();
+                    double divided = t.getSum() / currencyRepository.findByShortName(t.getCurrencyShortName()).orElseThrow(() -> new ResourceNotFoundException("Currency with short name was not found")).getDelimiter();
+                    double rounded = BigDecimal.valueOf(divided)
+                            .setScale(2, RoundingMode.HALF_UP)
+                            .doubleValue();
+                    t.setSum(rounded);
+                })
+                .collect(Collectors.toList());
+    }
+
+    private List<DashboardCategoryDto> getUserCategorySummaryLast6Months(Long userId, String cardNumber) {
+        LocalDateTime sixMonthsAgo = LocalDateTime.now().minusMonths(6);
+        BankCard bankCard = bankCardRepository.findByCardNumber(cardNumber, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Card number was not found"));
+        return categoryRepository.getCategorySums(userId, cardNumber, sixMonthsAgo).stream()
+                .filter(t -> t.getCurrencyShortName().equals(bankCard.getCurrency().getShortName()))
+                .sorted(Comparator.comparing(DashboardCategoryDto::getSum).reversed())
+                .peek(t -> {
+                    double divided = t.getSum() / currencyRepository.findByShortName(t.getCurrencyShortName()).orElseThrow(() -> new ResourceNotFoundException("Currency with short name was not found")).getDelimiter();
                     double rounded = BigDecimal.valueOf(divided)
                             .setScale(2, RoundingMode.HALF_UP)
                             .doubleValue();
@@ -607,20 +740,59 @@ public class UserServiceImpl implements UserService {
         Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter, currency);
         Map<String, Double> expenseByMonth = getMonthSumMap(userId, false, formatter, lastMonthAmount, delimiter, currency);
 
-        // Build list of all months in the period
         List<String> months = new ArrayList<>();
-        LocalDateTime current = LocalDateTime.now().minusMonths(lastMonthAmount - 1); // start from oldest month
+        LocalDateTime current = LocalDateTime.now().minusMonths(lastMonthAmount - 1);
+        for (int i = 0; i < lastMonthAmount; i++) {
+            months.add(current.format(formatter));
+            current = current.plusMonths(1);
+        }
+        Map<String, Double> cumulativeBalance = new LinkedHashMap<>();
+        for (String month : months) {
+            double income = incomeByMonth.getOrDefault(month, 0.0);
+            double expense = expenseByMonth.getOrDefault(month, 0.0);
+            double net = income + expense;
+            runningBalance += net;
+
+            double roundedBalance = BigDecimal.valueOf(runningBalance)
+                    .setScale(2, RoundingMode.HALF_UP)
+                    .doubleValue();
+            cumulativeBalance.put(month, roundedBalance);
+        }
+
+        return cumulativeBalance;
+    }
+
+    private Map<String, Double> getTotalBalanceGraphic(
+            Long userId,
+            int lastMonthAmount,
+            DateTimeFormatter formatter,
+            int delimiter,
+            String cardNumber) {
+        BankCard bankCard = bankCardRepository.findByCardNumber(cardNumber, userId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bank card with number: " + cardNumber + " was not found"));
+        String currencyName = bankCard.getCurrency().getShortName();
+        Currency currency = currencyRepository.findByShortName(currencyName)
+                .orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
+        LocalDateTime periodStart = LocalDateTime.now().minusMonths(lastMonthAmount);
+        double initialIncome = sumTransactionsBefore(userId, true, periodStart, currency, cardNumber) / delimiter;
+        double initialExpense = sumTransactionsBefore(userId, false, periodStart, currency, cardNumber) / delimiter;
+        double runningBalance = initialIncome + initialExpense;
+
+        Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter, cardNumber);
+        Map<String, Double> expenseByMonth = getMonthSumMap(userId, false, formatter, lastMonthAmount, delimiter, cardNumber);
+
+        List<String> months = new ArrayList<>();
+        LocalDateTime current = LocalDateTime.now().minusMonths(lastMonthAmount - 1);
         for (int i = 0; i < lastMonthAmount; i++) {
             months.add(current.format(formatter));
             current = current.plusMonths(1);
         }
 
-        // Build net balance per month, filling 0.0 if no data
         Map<String, Double> cumulativeBalance = new LinkedHashMap<>();
         for (String month : months) {
             double income = incomeByMonth.getOrDefault(month, 0.0);
             double expense = expenseByMonth.getOrDefault(month, 0.0);
-            double net = income + expense; // expense is negative already
+            double net = income + expense;
             runningBalance += net;
 
             double roundedBalance = BigDecimal.valueOf(runningBalance)
@@ -651,6 +823,26 @@ public class UserServiceImpl implements UserService {
                 .sum();
     }
 
+    private double sumTransactionsBefore(
+            Long userId,
+            boolean isIncome,
+            LocalDateTime before,
+            Currency currency,
+            String cardNumber) {
+        LocalDateTime startDate = LocalDateTime.of(1970, 1, 1, 0, 0);
+
+        return transactionRepository
+                .findByBankCardsAndDateRangeAndTransactionTypes(
+                        bankCardRepository.getBankCardsByUserId(userId),
+                        startDate,
+                        before,
+                        isIncome,
+                        cardNumber)
+                .stream()
+                .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .mapToDouble(t -> (double) t.getBankTransaction().getSum())
+                .sum();
+    }
 
     private Map<String, Double> getMonthSumMap(Long userId, boolean isPositiveTransactionSum, DateTimeFormatter formatter, int lastMonthAmount, int delimiter, Currency currency) {
         return transactionRepository
@@ -661,6 +853,25 @@ public class UserServiceImpl implements UserService {
                         isPositiveTransactionSum)
                 .stream()
                 .filter(transaction -> transaction.getBankTransaction().getCurrency().equals(currency))
+                .collect(Collectors.groupingBy(
+                        t -> t.getBankTransaction().getTime().format(formatter),
+                        TreeMap::new,
+                        Collectors.collectingAndThen(
+                                Collectors.summingDouble(t -> (double) t.getBankTransaction().getSum() / delimiter),
+                                sum -> BigDecimal.valueOf(sum).setScale(2, RoundingMode.HALF_UP).doubleValue()
+                        )
+                ));
+    }
+
+    private Map<String, Double> getMonthSumMap(Long userId, boolean isPositiveTransactionSum, DateTimeFormatter formatter, int lastMonthAmount, int delimiter, String cardNumber) {
+        return transactionRepository
+                .findByBankCardsAndDateRangeAndTransactionTypes(
+                        bankCardRepository.getBankCardsByUserId(userId),
+                        LocalDateTime.now().minusMonths(lastMonthAmount),
+                        LocalDateTime.now(),
+                        isPositiveTransactionSum,
+                        cardNumber)
+                .stream()
                 .collect(Collectors.groupingBy(
                         t -> t.getBankTransaction().getTime().format(formatter),
                         TreeMap::new,

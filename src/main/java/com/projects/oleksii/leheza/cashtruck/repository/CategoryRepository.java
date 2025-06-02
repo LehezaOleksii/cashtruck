@@ -51,6 +51,25 @@ public interface CategoryRepository extends JpaRepository<Category, Long>,
     List<DashboardCategoryDto> getCategorySums(@Param("userId") Long userId,
                                                @Param("startDate") LocalDateTime startDate);
 
+    @Query("""
+            SELECT new com.projects.oleksii.leheza.cashtruck.dto.view.DashboardCategoryDto(
+                t.category.name,
+                SUM(ABS(bt.sum)),
+                c.shortName
+                )
+            FROM Transaction t
+            JOIN t.bankTransaction bt
+            JOIN t.bankCard bc
+            JOIN bc.currency c
+            WHERE bc.user.id = :userId
+            AND bt.time >= :startDate
+            AND bc.cardNumber = :cardNumber
+            GROUP BY t.category.name, c.shortName
+            """)
+    List<DashboardCategoryDto> getCategorySums(@Param("userId") Long userId,
+                                               @Param("cardNumber") String cardNumber,
+                                               @Param("startDate") LocalDateTime startDater);
+
     Page<Category> findAll(Pageable pageable);
 
     @Query("SELECT c FROM Category c WHERE c.mccs LIKE %:mcc%")

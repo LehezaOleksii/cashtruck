@@ -41,7 +41,6 @@ public interface UserService {
     UserUpdateDto getClientUpdateDto(Long clientId);
 
     UserDto getUserDto(Long userId);
-
     //For UI
     ClientStatisticDto getClientStatisticByUserId(Long userId);
 
@@ -90,4 +89,6 @@ public interface UserService {
     List<String> findUserEmailsWithExpiredSubscriptions();
 
     List<DashboardBankCardDto> getDashboardBankCardsDtoByUserId(Long userId);
+
+    ClientStatisticDto getClientStatisticByUserIdAndCardNumber(Long userId, String selectedCardNumber);
 }

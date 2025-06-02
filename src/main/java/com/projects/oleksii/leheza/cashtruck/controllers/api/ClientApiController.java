@@ -258,8 +258,15 @@ public class ClientApiController {
     }
 
     @GetMapping("/statistics")
-    public ResponseEntity<ClientStatisticDto> getClientStatistics(@AuthenticationPrincipal User user) {
+    public ResponseEntity<ClientStatisticDto> getClientStatistics(@AuthenticationPrincipal User user,
+                                                                  @RequestParam(value = "cardNumber", required = false) String selectedCardNumber) {
         Long userId = user.getId();
-        return ResponseEntity.ok(userService.getClientStatisticByUserId(userId));
+        ClientStatisticDto clientStatisticDto;
+        if (selectedCardNumber != null) {
+            clientStatisticDto = userService.getClientStatisticByUserIdAndCardNumber(userId, selectedCardNumber);
+        } else {
+            clientStatisticDto = userService.getClientStatisticByUserId(userId);
+        }
+        return ResponseEntity.ok(clientStatisticDto);
     }
 }

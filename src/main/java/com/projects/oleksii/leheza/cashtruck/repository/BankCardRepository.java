@@ -23,4 +23,7 @@ public interface BankCardRepository extends JpaRepository<BankCard, Long> {
     Optional<BankCard> findByCardNumber(String cardNumber, Long userId);
 
     List<BankCard> user(User user);
+
+    @Query("SELECT bc FROM BankCard bc JOIN bc.user u WHERE u.id =:userId AND bc.cardNumber =:cardNumber")
+    Optional<BankCard> getBankCardByCardNumber(Long userId, String cardNumber);
 }
