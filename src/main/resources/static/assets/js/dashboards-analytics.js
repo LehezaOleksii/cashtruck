@@ -169,11 +169,6 @@
             });
     }
 
-    // if (typeof totalRevenueChartEl !== undefined && totalRevenueChartEl !== null) {
-    //   const totalRevenueChart = new ApexCharts(totalRevenueChartEl, totalRevenueChartOptions);
-    //   totalRevenueChart.render();
-    // }
-
     // Growth Chart - Radial Bar Chart
     // --------------------------------------------------------------------
     const growthChartEl = document.querySelector('#growthChart'),
@@ -455,8 +450,18 @@
                         }
                     });
 
+                    // Extract data
                     categories = last6Months;
                     seriesData = last6Months.map(month => totalBalanceGraphic[month]);
+
+                    // Check if all values are 0
+                    const allZero = seriesData.every(value => value === 0);
+
+                    // Use default if all are zero
+                    if (allZero) {
+                        categories = defaultCategories;
+                        seriesData = defaultSeriesData;
+                    }
                 }
 
                 const incomeChartConfig = {

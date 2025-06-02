@@ -83,7 +83,6 @@ body {
 .bank-card {
     width: 350px;
     height: 210px;
-    margin: 0 auto;
     background: linear-gradient(135deg, #ff758c, #ff7eb3, #9face6, #6dd5fa);
     border-radius: 20px;
     padding: 20px;
@@ -93,6 +92,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    position: relative;
 }
 
 

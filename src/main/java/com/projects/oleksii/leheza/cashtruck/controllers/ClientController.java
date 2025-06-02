@@ -75,7 +75,6 @@ public class ClientController {
         return modelAndView;
     }
 
-
     @GetMapping({"/bank_cards"})
     public ModelAndView clientBankCardsForm(@RequestParam(required = false) Long bankCardId, @AuthenticationPrincipal User user) {
         Long userId = user.getId();

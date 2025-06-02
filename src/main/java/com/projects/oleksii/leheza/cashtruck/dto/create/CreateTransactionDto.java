@@ -20,7 +20,6 @@ public class CreateTransactionDto {
     @NotEmpty
     @NotBlank
     private String transactionName;
-    @CreditCardNumber(message = "Invalid credit card number")
     private String cardNumber;
     @PastOrPresent
     private String time;

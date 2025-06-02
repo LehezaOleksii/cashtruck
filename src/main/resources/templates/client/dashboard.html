@@ -19,6 +19,183 @@
                             <div class="col-8">
                                 <button class="btn btn-secondary dropdown-toggle bold col-12"
                                         type="button"
+                                        data-bs-toggle="dropdown"
+                                        aria-expanded="false"
+                                        id="selectedBankButton"
+                                        th:text="${#strings.isEmpty(param.cardNumber) ? 'All cards' : bank_card.bankName}">
+                                </button>
+                                <ul class="dropdown-menu" aria-labelledby="selectedBankButton">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           th:href="@{/clients/dashboard}"
+                                           th:text="'All cards'">
+                                        </a>
+                                    </li>
+                                    <li th:each="card : ${bank_cards}">
+                                        <a class="dropdown-item"
+                                           th:href="@{/clients/dashboard(cardNumber=${card.cardNumber})}"
+                                           th:text="${card.bankName}">
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-4">
+                                <a style="width:100%;" th:href="@{'/clients/bank_cards/add/menu'}">
+                                    <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card
+                                    </button>
+                                </a>
+                            </div>
+                            <div id="bankCardDetails"
+                                 class="d-flex flex-column justify-content-between position-relative">
+                                <div th:if="${bank_card.bank != null and bank_card.bank == 'Monobank'}">
+                                    <div class="row pl-3 pt-4"
+                                         th:if="${(bank_card.type == 'black' or bank_card.type == 'madeInUkraine')}">
+                                        <!-- Card Content -->
+                                        <div class="monobank-card"
+                                             style="font-family: Arial, sans-serif; width: 350px; overflow: hidden">
+                                            <div th:if="${(bank_card.type == 'black' and bank_card.currencyCode == 840)}"
+                                                 style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background-color: #31BA70; border-radius: 10px 0 0 10px;"></div>
+                                            <div th:if="${(bank_card.type == 'black' and bank_card.currencyCode == 978)}"
+                                                 style="position: absolute; top: 0; left: 0; width: 6px; height: 100%; background-color: #DE4F55; border-radius: 10px 0 0 10px;"></div>
+                                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                <div style="display: flex; flex-direction: column; width: fit-content; margin-bottom: 0;">
+                            <span class="bold"
+                                  style="font-size: 20px; margin-top: -5px;">monobank</span>
+                                                    <span style="font-size: 8px; text-align: right; margin-top: -4px;">Universal Bank</span>
+                                                </div>
+                                                <div style="font-size: 16px; margin-top: -5px; margin-right: 4px;">
+                                                    <span th:text="${bank_card.currency}"></span>
+                                                </div>
+                                            </div>
+
+                                            <div class="card-number-monobank"
+                                                 style="font-family: 'Courier New', monospace; letter-spacing: 5px; font-size: 18px; text-align: center; flex-grow: 1; display: flex; justify-content: center; align-items: center; width: 100%;"
+                                                 th:text="${bank_card.cardNumber.replaceAll('(.{4})', '$1 ')}">
+                                            </div>
+
+                                            <div th:if="${bank_card.type == 'black'}" class="card-holder"
+                                                 style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px; align-items: center;"
+                                                 th:text="${bank_card.holderName}">
+                                            </div>
+
+                                            <div th:if="${bank_card.type == 'madeInUkraine'}">
+                                                <img src="/images/client/national-cashback-logo.png"
+                                                     style="width: 100px;"/>
+                                            </div>
+
+                                            <div class="card-brand-monobank">
+                                                <div th:if="${bank_card.cardNumber.startsWith('4')}">
+                                                    <img src="/images/client/visa-logo.png"
+                                                         style="width: 50px; height: auto; background: transparent;"/>
+                                                </div>
+                                                <div th:if="${bank_card.cardNumber.startsWith('5')}">
+                                                    <img src="/images/client/mastercard-logo.png"
+                                                         style="width: 50px; height: auto; background: transparent;"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Card Info Section -->
+                                        <div class="ml-4"
+                                             style="width: 275px; border-left: 2px solid #ddd; font-family: 'Inter', Arial, sans-serif; display: flex; flex-direction: column; justify-content: center;">
+                                            <div>
+                                                <strong>
+                                                    <span>Monobank </span>(<span
+                                                        th:text="${bank_card.type}"></span><span
+                                                        style="font-size: 12px;"
+                                                        th:if="${bank_card.currencyCode == 840}">, USD</span><span
+                                                        style="font-size: 12px;"
+                                                        th:if="${bank_card.currencyCode == 978}">, EUR</span>)
+                                                </strong>
+                                            </div>
+                                            <div>
+                                                <span class="bold">Number:</span><span
+                                                    th:text="${bank_card.cardNumber}"
+                                                    style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 16px;"></span>
+                                            </div>
+                                            <div>
+                                                <span class="bold">Currency:</span>
+                                                <span th:text="${bank_card.currency}"
+                                                      style="font-family: 'Courier New', monospace; letter-spacing: 2px; font-size: 18px;"></span>
+                                            </div>
+                                            <div>
+                                                <span class="bold">Balance:</span>
+                                                <span th:text="${bank_card.balance}"
+                                                      class="accountBalance"
+                                                      style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px;"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div th:if="${bank_cards == null or #lists.isEmpty(bank_cards) or bank_card.bank != 'Monobank'}">
+                                    <div class="row pl-3 pt-4">
+                                        <div class="bank-card"
+                                             style="font-family: Arial, sans-serif; width: 350px; overflow: hidden">
+                                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                                <div style="display: flex; flex-direction: column; width: fit-content; margin-bottom: 0;">
+                                                    <span class="bold"
+                                                          style="font-size: 20px; margin-top: -5px;"
+                                                          th:if="${bank_card.bankName != null and !#strings.isEmpty(bank_card.bankName)}"
+                                                          th:text="${bank_card.bankName}"></span>
+                                                </div>
+                                                <div style="font-size: 16px; margin-top: -5px; margin-right: 4px;">
+                                                    <span th:text="${bank_card.currencyShortName != null and !#strings.isEmpty(bank_card.currencyShortName) ? bank_card.currencyShortName : 'USD'}"></span>
+                                                </div>
+                                            </div>
+                                            <div class="card-number-monobank"
+                                                 style="font-family: 'Courier New', monospace; letter-spacing: 5px; font-size: 18px; text-align: center; flex-grow: 1; display: flex; justify-content: center; align-items: center; width: 100%;"
+                                                 th:text="${bank_card.cardNumber != null and !#strings.isEmpty(bank_card.cardNumber) ? bank_card.cardNumber.replaceAll('(.{4})', '$1 ') : 'xxxx xxxx xxxx xxxx'}">
+                                            </div>
+                                            <div class="card-holder"
+                                                 style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px; align-items: center;"
+                                                 th:text="${bank_card.holderName != null and !#strings.isEmpty(bank_card.holderName) ? bank_card.holderName : 'Holder name'}">
+                                            </div>
+                                            <div class="card-brand-monobank">
+                                                <div th:if="${bank_card.cardNumber.startsWith('4')}">
+                                                    <img src="/images/client/visa-logo.png"
+                                                         style="width: 50px; height: auto; background: transparent;"/>
+                                                </div>
+                                                <div th:if="${bank_card.cardNumber.startsWith('5')}">
+                                                    <img src="/images/client/mastercard-logo.png"
+                                                         style="width: 50px; height: auto; background: transparent;"/>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Card Info Section -->
+                                        <div class="ml-4"
+                                             style="width: 275px; border-left: 2px solid #ddd; font-family: 'Inter', Arial, sans-serif; display: flex; flex-direction: column; justify-content: center;">
+                                            <div>
+                                                <strong>Bank:</strong> <span style="font-family: 'Courier New'; font-size: 18px;"
+                                                    th:text="${bank_card.bankName != null and !#strings.isEmpty(bank_card.bankName) ? bank_card.bankName : 'Bank'}"></span>
+                                            </div>
+                                            <div>
+                                                <strong>Number:</strong>
+                                                <span style="font-family: 'Courier New'; font-size: 16px;"th:text="${bank_card.cardNumber != null and !#strings.isEmpty(bank_card.cardNumber) ? bank_card.cardNumber : 'xxxxxxxxxxxxxxxx'}"></span>
+                                                <span
+                                                        style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 16px;"></span>
+                                            </div>
+                                            <div>
+                                                <strong>Currency:</strong>
+                                                <span style="font-family: 'Courier New'; font-size: 18px;" th:text="${bank_card.currencyShortName != null and !#strings.isEmpty(bank_card.currencyShortName) ? bank_card.currencyShortName : 'Currency'}"></span>
+                                                <span
+                                                        style="font-family: 'Courier New', monospace; letter-spacing: 2px; font-size: 18px;"></span>
+                                            </div>
+                                            <div>
+                                                <strong>Balance:</strong>
+                                                <span style="font-family: 'Courier New'; font-size: 18px;"th:text="${bank_card.balance != null and !#strings.isEmpty(bank_card.balance) ? bank_card.balance : '0.0'}"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body"
+                         th:if="${not #lists.isEmpty(bank_cards) and bank_cards[0].bank != null and bank_cards[0].bank != 'Monobank'}"
+                         th:with="card=${bank_cards[0]}">
+                        <div class="row pt-2">
+                            <div class="col-8">
+                                <button class="btn btn-secondary dropdown-toggle bold col-12"
+                                        type="button"
                                         data-bs-toggle="dropdown" aria-expanded="false"
                                         id="selectedBankButton"
                                         th:text="${bank_card != null ? bank_card.bankName : bank_cards[0].bankName}">
@@ -38,7 +215,6 @@
                                     </button>
                                 </a>
                             </div>
-
                             <!-- Selected Bank Card Details Section -->
                             <div id="bankCardDetails"
                                  class="d-flex flex-column justify-content-between position-relative">
@@ -122,58 +298,72 @@
                                     </div>
                                 </div>
                             </div>
+
                         </div>
-                        <!--                                <div class="col-sm-5">-->
-                        <!--                                    <div class="additional-info mt-4">-->
-                        <!--                                        <div> Balance: <span class="balance"-->
-                        <!--                                                             th:text="${card != null ? card.balance/card.delimiter : '-'}"></span>-->
-                        <!--                                        </div>-->
-                        <!--                                        <div> Exp date: <span class="expiringDate"-->
-                        <!--                                                              th:text="${card != null ? #dates.format(card.expiringDate, 'MM/yyyy') : '-'}"></span>-->
-                        <!--                                        </div>-->
-                        <!--                                        <div> Holder: <span class="cardHolder"-->
-                        <!--                                                            th:text="${card != null ? card.cardHolder : '-'}"></span>-->
-                        <!--                                        </div>-->
-                        <!--                                        <div> CVV: <span class="cvv" th:text="${card != null ? card.cvv : '-'}"></span>-->
-                        <!--                                        </div>-->
-                        <!--                                    </div>-->
-                        <!--                                </div>-->
                     </div>
-                </div>
-                <div class="card-body" th:if="${#lists.isEmpty(bank_cards)}">
-                    <div class="row">
-                        <div class="col-sm-7">
-                            <h5 class="card-title mt-3">Bank cards</h5>
-                            <div class="bank-card mt-4">
-                                <div class="bank-name-and-currency-name">
-                                    <div class="bank-name" th:text="'Bank'"></div>
-                                    <div class="currency-name">Currency</div>
-                                </div>
-                                <div class="card-number" th:text="'xxxx xxxx xxxx xxxx'"></div>
-                                <div class="card-holder-and-expiry">
-                                    <div class="card-holder" th:text="'Card Holder'"></div>
-                                    <div class="expiry" th:text="'Expiry Date'"></div>
-                                </div>
-                            </div>
+                    <div class="card-body" th:if="${bank_cards == null or #lists.isEmpty(bank_cards)}">
+                        <div class="col-4">
+                            <a style="width:100%;" th:href="@{'/clients/bank_cards/add/menu'}">
+                                <button class="btn btn-primary custom-back-violet" style=" width: 100%;">Add Card
+                                </button>
+                            </a>
                         </div>
-                        <div class="col-sm-5">
-                            <div>
-                                <a th:href="@{'/clients/bank_cards/add/menu'}">
-                                    <button class="btn btn-primary custom-back-violet col-12 mt-2">
-                                        Add Card
-                                    </button>
-                                </a>
+                        <div class="row pl-3 pt-4">
+                            <div class="bank-card"
+                                 style="font-family: Arial, sans-serif; width: 350px; overflow: hidden">
+                                <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                    <div style="display: flex; flex-direction: column; width: fit-content; margin-bottom: 0;">
+                                                    <span class="bold"
+                                                          style="font-size: 20px; margin-top: -5px;">Bank</span>
+                                    </div>
+                                    <div style="font-size: 16px; margin-top: -5px; margin-right: 4px;">
+                                                    <span>
+                                                        USD
+                                                    </span>
+                                    </div>
+                                </div>
+                                <div class="card-number-monobank"
+                                     style="font-family: 'Courier New', monospace; letter-spacing: 5px; font-size: 18px; text-align: center; flex-grow: 1; display: flex; justify-content: center; align-items: center; width: 100%;"
+                                >
+                                    xxxx xxxx xxxx xxxx
+                                </div>
+                                <div class="card-holder"
+                                     style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 18px; align-items: center;"
+                                >
+                                    Holder name
+                                </div>
+                                <div class="card-brand-monobank">
+
+                                </div>
                             </div>
-                            <div class="additional-info mt-5">
-                                <div> Balance: <span class="balance"
-                                                     th:text="${card != null ? card.balance : '-'}"></span>
+                            <!-- Card Info Section -->
+                            <div class="ml-4"
+                                 style="width: 275px; border-left: 2px solid #ddd; font-family: 'Inter', Arial, sans-serif; display: flex; flex-direction: column; justify-content: center;">
+                                <div>
+
+                                    <div>
+                                        <strong>Bank:</strong> Bank
+                                    </div>
                                 </div>
-                                <div> Exp date: <span
-                                        th:text="${card != null ? card.expiringDate : '-'}"></span>
+                                <div>
+                                    <div>
+                                        <strong>Number:</strong>xxxxxxxxxxxxxxxx
+                                    </div>
+                                    <span
+                                            style="font-family: 'Courier New', monospace; letter-spacing: 1px; font-size: 16px;"></span>
                                 </div>
-                                <div> Holder: <span th:text="${card != null ? card.cardHolder : '-'}"></span>
+                                <div>
+                                    <div>
+                                        <strong>Currency:</strong>USD
+                                    </div>
+                                    <span
+                                            style="font-family: 'Courier New', monospace; letter-spacing: 2px; font-size: 18px;"></span>
                                 </div>
-                                <div> CVV: <span th:text="${card != null ? card.cvv : '-'}"></span></div>
+                                <div>
+                                    <div>
+                                        <strong>Balance:</strong> 0.0
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -195,50 +385,9 @@
                         }
                     }
                 }
-
                 window.onload = function () {
                     updateCardNumber();
                 };
-
-                function selectBank(button) {
-                    var selectedBankName = button.innerText;
-                    var cards = [];
-                    var selectedCard = cards.find(function (card) {
-                        return card.bankName === selectedBankName && card.cardNumber === button.getAttribute('card-number');
-                    });
-                    document.getElementById('selectedBankButton').innerText = selectedCard.bankName;
-                    var elementsWithBalanceClass = document.getElementsByClassName('balance');
-                    for (var i = 0; i < elementsWithBalanceClass.length; i++) {
-                        elementsWithBalanceClass[i].innerText = selectedCard.balance;
-                    }
-
-                    var elementsWithCvvClass = document.getElementsByClassName('cvv');
-                    for (var i = 0; i < elementsWithCvvClass.length; i++) {
-                        elementsWithCvvClass[i].innerText = selectedCard.cvv;
-                    }
-
-                    var elementsWithExpiringDateClass = document.getElementsByClassName('expiringDate');
-                    for (var i = 0; i < elementsWithExpiringDateClass.length; i++) {
-                        var formattedDate = new Date(selectedCard.expiringDate).toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit'
-                        });
-                        elementsWithExpiringDateClass[i].innerText = formattedDate;
-                    }
-                    var elementsWithCardNumberClass = document.getElementsByClassName('cardNumber');
-                    for (var i = 0; i < elementsWithCardNumberClass.length; i++) {
-                        var formattedCardNumber = formatCardNumber(selectedCard.cardNumber);
-                        elementsWithCardNumberClass[i].innerText = formattedCardNumber;
-                    }
-                    var elementsWithBankNameClass = document.getElementsByClassName('bankName');
-                    for (var i = 0; i < elementsWithBankNameClass.length; i++) {
-                        elementsWithBankNameClass[i].innerText = selectedCard.bankName.substring(0, 22);
-                    }
-                    var elementsWithcardHolderClass = document.getElementsByClassName('cardHolder');
-                    for (var i = 0; i < elementsWithcardHolderClass.length; i++) {
-                        elementsWithcardHolderClass[i].innerText = selectedCard.cardHolder;
-                    }
-                }
             </script>
             <div class="col-sm-4" th:object="${client_statistic}">
                 <div class="row">
@@ -366,7 +515,6 @@
                                  th:if="${client_statistic != null && client_statistic.lastMonthProfitPercentage == 0}">
                                 <div>0%</div>
                             </div>
-
                         </div>
                     </div>
                     <div class="col-md-6 justify-content-end">

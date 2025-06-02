@@ -594,8 +594,10 @@ public class UserServiceImpl implements UserService {
             int lastMonthAmount,
             DateTimeFormatter formatter,
             int delimiter) {
+
         String currencyName = "UAH";
-        Currency currency = currencyRepository.findByShortName(currencyName).orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
+        Currency currency = currencyRepository.findByShortName(currencyName)
+                .orElseThrow(() -> new ResourceNotFoundException("Currency with name: " + currencyName + " not found"));
 
         LocalDateTime periodStart = LocalDateTime.now().minusMonths(lastMonthAmount);
         double initialIncome = sumTransactionsBefore(userId, true, periodStart, currency) / delimiter;
@@ -605,32 +607,26 @@ public class UserServiceImpl implements UserService {
         Map<String, Double> incomeByMonth = getMonthSumMap(userId, true, formatter, lastMonthAmount, delimiter, currency);
         Map<String, Double> expenseByMonth = getMonthSumMap(userId, false, formatter, lastMonthAmount, delimiter, currency);
 
-        Map<String, Double> netByMonth = new HashMap<>();
-        for (String month : incomeByMonth.keySet()) {
-            double income = incomeByMonth.getOrDefault(month, 0.0);
-            double expense = expenseByMonth.getOrDefault(month, 0.0);
-            netByMonth.put(month, income + expense);
+        // Build list of all months in the period
+        List<String> months = new ArrayList<>();
+        LocalDateTime current = LocalDateTime.now().minusMonths(lastMonthAmount - 1); // start from oldest month
+        for (int i = 0; i < lastMonthAmount; i++) {
+            months.add(current.format(formatter));
+            current = current.plusMonths(1);
         }
 
-        List<String> monthOrder = Arrays.asList(
-                "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-        );
-        Map<String, Double> sortedNet = netByMonth.entrySet().stream()
-                .sorted(Comparator.comparingInt(e -> monthOrder.indexOf(e.getKey())))
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (a, b) -> a,
-                        LinkedHashMap::new
-                ));
+        // Build net balance per month, filling 0.0 if no data
         Map<String, Double> cumulativeBalance = new LinkedHashMap<>();
-        for (Map.Entry<String, Double> e : sortedNet.entrySet()) {
-            runningBalance += e.getValue();
+        for (String month : months) {
+            double income = incomeByMonth.getOrDefault(month, 0.0);
+            double expense = expenseByMonth.getOrDefault(month, 0.0);
+            double net = income + expense; // expense is negative already
+            runningBalance += net;
+
             double roundedBalance = BigDecimal.valueOf(runningBalance)
                     .setScale(2, RoundingMode.HALF_UP)
                     .doubleValue();
-            cumulativeBalance.put(e.getKey(), roundedBalance);
+            cumulativeBalance.put(month, roundedBalance);
         }
 
         return cumulativeBalance;
