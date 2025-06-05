@@ -6,12 +6,12 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-/log.txt
+#/log.txt
 /*.gz
 /out
-/src/main/resources/priv.key
-/src/main/resources/public.key
-/src/main/resources/application.properties
+#/src/main/resources/priv.key
+#/src/main/resources/public.key
+#/src/main/resources/application.properties
 ### STS ###
 .apt_generated
 .classpath
