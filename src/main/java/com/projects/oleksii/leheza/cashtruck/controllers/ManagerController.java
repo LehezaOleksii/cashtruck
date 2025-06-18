@@ -246,42 +246,6 @@ public class ManagerController {
         return new ModelAndView("redirect:/managers/emails");
     }
 
-    @PostMapping("/bank_cards/save")
-    public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") BankCardDto bankCardDto,
-                                             @AuthenticationPrincipal User user,
-                                             BindingResult bindingResult) {
-        Long userId = user.getId();
-        if (bindingResult.hasFieldErrors()) {
-            log.warn("validation problems were occurring at the save bank card process. userId:{} ,bank card number{}", userId, bankCardDto.getCardNumber());
-            return new ModelAndView("redirect:/managers/bank_cards");
-        }
-        BankCard bankCard = bankCardService.save(bankCardDto);
-        if (!bankCardService.isClientHasCard(userId, bankCardDto.getCardNumber())){
-            userService.assignBankCardToClient(userId, bankCard);
-        }
-        return new ModelAndView("redirect:/managers/dashboard");
-    }
-
-    @GetMapping("/bank_cards/update")
-    public ModelAndView updateBankCardForm(@AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        ModelAndView modelAndView = new ModelAndView("manager/update_delete_bank_card");
-        modelAndView.addObject("user", userService.getHeaderClientData(userId));
-        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
-        return modelAndView;
-    }
-
-    @GetMapping("/bank_cards/remove")
-    public ModelAndView removeBankCard(@RequestParam Long bankCardId,
-                                       @AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        if (!bankCardService.isClientHasCard(userId, bankCardId)) {
-            throw new SecurityException("user has not card with id:" + bankCardId);
-        }
-        bankCardService.removeBankCardForClient(bankCardId, userId);
-        return new ModelAndView("redirect:/managers/dashboard");
-    }
-
     @GetMapping("/categories/{categoryName}")
     public ModelAndView viewTransactionsByCategoryName(@PathVariable String categoryName,
                                                        @RequestParam(value = "page", defaultValue = "0") int page,
@@ -314,7 +278,7 @@ public class ManagerController {
                                  @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         userService.addTransaction(managerId, transaction);
-        return new ModelAndView("redirect:/managers/dashboard");
+        return new ModelAndView("redirect:/clients/dashboard");
     }
 
     @GetMapping(path = "/categories")
