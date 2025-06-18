@@ -9,7 +9,9 @@ import com.projects.oleksii.leheza.cashtruck.exception.ResourceNotFoundException
 import com.projects.oleksii.leheza.cashtruck.repository.BankCardRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.MonobankIntegrationRepository;
 import com.projects.oleksii.leheza.cashtruck.repository.UserRepository;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.BankCardService;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.MonobankIntegrationService;
+import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,7 @@ public class MonobankIntegrationServiceImpl implements MonobankIntegrationServic
     private final BankCardRepository bankCardRepository;
     private final DtoMapper dtoMapper;
     private final UserRepository userRepository;
+    private final UserService userService;
 
     @Override
     public void setMonobankRequestId(Long userId, String requestId) {
@@ -50,7 +53,9 @@ public class MonobankIntegrationServiceImpl implements MonobankIntegrationServic
                         }
                     }
                     if (!isExists) {
-                        bankCardRepository.save(bankCard);
+                        bankCard.setUser(null);
+                        bankCard = bankCardRepository.save(bankCard);
+                        userService.assignBankCardToClient(userId, bankCard);
                     }
                 });
     }

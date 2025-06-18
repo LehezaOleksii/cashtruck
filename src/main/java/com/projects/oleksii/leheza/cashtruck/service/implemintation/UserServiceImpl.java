@@ -456,7 +456,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void assignBankCardToClient(Long userId, BankCard bankCard) throws IllegalArgumentException {
+    public void assignBankCardToClient(Long userId, BankCard bankCard) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User with id:" + userId + " does not exist"));
         user.getBankCards().stream()

@@ -11,25 +11,26 @@
 <content layout:fragment="content">
     <div class="d-flex justify-content-center align-items-center mt-4">
         <div class="card p-0 col-sm-12 col-md-10 col-xl-6 mb-4 border-radius-16" style="overflow: hidden;">
-            <div class="card-header py-3" >
+            <div class="card-header py-3">
                 <h5 class="mb-0 text-center">Add your bank card</h5>
             </div>
             <div class="card-body">
                 <div class="add-bank-card-img-wrapper text-center">
-                <img th:src="@{/images/client/cards_photo.jpg}"
-                     class="add-bank-card-img img-fluid"
-                     style="max-width: 100%; height: auto;" />
+                    <img th:src="@{/images/client/cards_photo.jpg}"
+                         class="add-bank-card-img img-fluid"
+                         style="max-width: 100%; height: auto;"/>
                 </div>
                 <hr class="mt-0">
                 <div>
                     <a th:href="@{/clients/bank_cards/add/monobank}">
-                        <button class="monobank-label button-hover-shadow btn-primary mb-3" style="width: 100%; padding: 14px">
+                        <button class="monobank-label button-hover-shadow btn-primary mb-3"
+                                style="width: 100%; padding: 14px">
                             Monobank
                         </button>
                     </a>
-
                     <a th:href="@{/clients/bank_cards}">
-                        <button class="manually-add-card-label button-hover-shadow card-body card mb-3" style="width: 100%; padding: 14px">
+                        <button class="manually-add-card-label button-hover-shadow card-body card mb-3"
+                                style="width: 100%; padding: 14px">
                             Add card manually
                         </button>
                     </a>
@@ -37,7 +38,45 @@
             </div>
         </div>
     </div>
+    <!-- Premium Modal -->
+    <div class="modal fade"
+         id="premiumModal"
+         tabindex="-1"
+         aria-labelledby="premiumModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="premiumModalLabel">Upgrade Required</h5>
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close"
+                            onclick="window.location.href='/clients/bank_cards/add/menu'"></button>
+
+                </div>
+                <div class="modal-body text-center">
+                    <p>
+                        Your current plan does not maintain more bank cards. You need a premium plan to use this feature.
+                    </p>
+                    <a th:href="@{/clients/premium}"
+                       class="btn btn-primary custom-back-violet">
+                        <i class="bi bi-star-fill"></i> Buy Premium
+                    </a>
+                </div>
+            </div>
+        </div>
     </div>
+    <script th:inline="javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            let errorMessage = /*[[${param.errorMessage != null}]]*/ false;
+            if (errorMessage) {
+                const modalEl = document.getElementById('premiumModal');
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+    </script>
 </content>
 </body>
 </html>
