@@ -2,18 +2,18 @@
 <html
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="layout/manager/layout"
+  layout:decorator="layout/client/layout"
 >
   <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
-  </head> 
-  <body th:object="${maanger}">
+  </head>
+  <body th:object="${user}">
     <content layout:fragment="content" style="margin-left: 40px;">
         <h2>Income</h2>
 <div th:object="${incomes_categories}">
     <div th:if="${not #lists.isEmpty(incomes_categories)}">
-        <div class="row"> 
+        <div class="row">
             <div class="col-sm-6 mt-3" th:each="category : ${incomes_categories}">
                 <div class="my-container card-body" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="info-card-font bold">
@@ -25,7 +25,7 @@
                       <a th:href="@{'/managers/categories/' + ${category.name}}">
                         <button class="btn btn-primary custom-back-violet mr-2">
                           details
-                        </button> 
+                        </button>
                     </a>
                     </div>
                 </div>
@@ -36,7 +36,7 @@
 <h2 class="mt-4">Expense</h2>
 <div th:object="${expenses_categories}">
     <div th:if="${not #lists.isEmpty(expenses_categories)}">
-        <div class="row"> 
+        <div class="row">
             <div class="col-sm-6 mt-3" th:each="category : ${expenses_categories}">
                 <div class="my-container card-body" style="display: flex; justify-content: space-between; align-items: center;">
                     <div class="info-card-font bold">
@@ -47,7 +47,7 @@
                       <a th:href="@{'/managers/categories/' + ${category.name}}">
                         <button class="btn btn-primary custom-back-violet mr-2">
                           details
-                        </button> 
+                        </button>
                     </a>
                 </div>
             </div>

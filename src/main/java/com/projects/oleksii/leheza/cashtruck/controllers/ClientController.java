@@ -63,7 +63,7 @@ public class ClientController {
 
         List<DashboardBankCardDto> cards = userService.getDashboardBankCardsDtoByUserId(userId);
         modelAndView.addObject("bank_cards", cards);
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
 
         if (selectedCardNumber != null) {
             DashboardBankCardDto selectedCard = cards.stream().filter(c -> c.getCardNumber().equals(selectedCardNumber)).findFirst().orElse(null);
@@ -85,7 +85,7 @@ public class ClientController {
             throw new SecurityException("user has not card with id:" + bankCardId);
         }
         ModelAndView modelAndView = new ModelAndView("client/add_bank_card_manually");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("currency_short_names", currencyService.getCurrenciesShortNames());
         if (Optional.ofNullable(bankCardId).isPresent()) {
             modelAndView.addObject("bank_card", bankCardService.getById(bankCardId));
@@ -99,7 +99,7 @@ public class ClientController {
     public ModelAndView clientAddBankCard(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/add_bank_card");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         return modelAndView;
     }
 
@@ -107,7 +107,7 @@ public class ClientController {
     public ModelAndView addMonobankCardPage(@ModelAttribute("error") String error, RedirectAttributes redirectAttributes, @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/add_monobank_card");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         if (error != null && !error.isEmpty()) {
             return modelAndView;
         }
@@ -167,7 +167,7 @@ public class ClientController {
     public ModelAndView getMonobankCards(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/monobank_cards");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("monobank_cards", monobankAccountService.findByUserId(userId));
         return modelAndView;
     }
@@ -231,7 +231,7 @@ public class ClientController {
     public ModelAndView addUsaCanadaCardPage(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/add_usa_canada_card");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         return modelAndView;
     }
 
@@ -254,7 +254,7 @@ public class ClientController {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/update_delete_bank_card");
         UserHeaderDto userHeaderDto = userService.getHeaderClientData(userId);
-        modelAndView.addObject("client", userHeaderDto);
+        modelAndView.addObject("user", userHeaderDto);
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         return modelAndView;
     }
@@ -273,7 +273,7 @@ public class ClientController {
     public ModelAndView viewIncomeAndExpensesDashboard(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/categories");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(userId));
         modelAndView.addObject("expenses_categories", transactionService.findClientExpenseCategoriesByClientId(userId));
         return modelAndView;
@@ -283,7 +283,7 @@ public class ClientController {
     public ModelAndView viewTransactionsByCategoryName(@PathVariable String categoryName, @RequestParam(value = "page", defaultValue = "0") int page, @RequestParam(value = "size", defaultValue = "10") int size, @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/transactions_details");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("category", categoryService.findByName(categoryName));
         Page<TransactionDto> transactionPage = transactionService.findTransactionsByClientIdAndCategoryName(userId, categoryName, page, size);
         modelAndView.addObject("currentPage", transactionPage.getNumber());
@@ -296,7 +296,7 @@ public class ClientController {
     public ModelAndView updateClientAccountForm(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/profile");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
         modelAndView.addObject("clientDto", userService.getClientUpdateDto(userId));
         return modelAndView;
@@ -315,7 +315,7 @@ public class ClientController {
             userService.updateUserInfo(userId, userUpdateDto);
             log.info("update client information. client id:{}", userId);
             ModelAndView modelAndView = new ModelAndView("redirect:/clients/profile");
-            modelAndView.addObject("client", userService.getHeaderClientData(userId));
+            modelAndView.addObject("user", userService.getHeaderClientData(userId));
             return new ModelAndView("redirect:/clients/dashboard");
         }
     }
@@ -325,7 +325,7 @@ public class ClientController {
     public ModelAndView getPlansList(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/plans");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
         modelAndView.addObject("client_plan", userService.getUserSubscriptionById(userId).getSubscriptionStatus().name());
         modelAndView.addObject("payment_request", new PaymentCreateRequest());
@@ -336,7 +336,7 @@ public class ClientController {
     ModelAndView getEmailsMenu(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/emails");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("email", new EmailContext());
         modelAndView.addObject("managers", userService.getUsersByRole(Role.ROLE_MANAGER));
         return modelAndView;
@@ -353,7 +353,7 @@ public class ClientController {
     ModelAndView createTransactionForm(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("client/create_transaction");
-        modelAndView.addObject("client", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("incomes", categoryService.getIncomeAndUniversalCategories());
         modelAndView.addObject("expenses", categoryService.getExpenseAndUniversalCategories());
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));

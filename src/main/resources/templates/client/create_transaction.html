@@ -6,7 +6,7 @@
     <meta charset="utf-8"/>
     <title>Cash truck</title>
 </head>
-<body th:object="${client}">
+<body th:object="${user}">
 <content layout:fragment="content">
     <div class="card card-body" th:if="${bank_cards.isEmpty()}">
         <div class="alert alert-warning" role="alert">

@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div class="py-2 border-bottom" th:object="${client}">
+<div class="py-2 border-bottom" th:object="${user}">
    <div class="d-flex justify-content-between">
       <div class="flex-shrink-0 dropdown ml-auto">
          <a id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
                     <span class="ms-1 d-none d-sm-inline">
-                        <img class="rounded-circle text-decoration-none" th:if="${client.avatar != null}" th:src="'data:image/jpeg;base64,' + ${client.avatar}" width="40" height="40" style="cursor: pointer;">
+                        <img class="rounded-circle text-decoration-none" th:if="${user.avatar != null}" th:src="'data:image/jpeg;base64,' + ${user.avatar}" width="40" height="40" style="cursor: pointer;">
                     </span>
          </a>
          <ul class="dropdown-menu text-small shadow dropdown-menu-end" aria-labelledby="dropdownUser2">

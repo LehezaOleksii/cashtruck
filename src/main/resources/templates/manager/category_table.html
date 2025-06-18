@@ -2,15 +2,15 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorator="layout/manager/layout"
+        layout:decorator="layout/client/layout"
 >
 <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
 </head>
-<body th:object="${manager}">
+<body th:object="${user}">
 <main layout:fragment="content">
-    <div id="managerId" th:text="${manager.id}" style="display: none"></div>
+    <div id="managerId" th:text="${user.id}" style="display: none"></div>
     <div class="my-container mt-4">
         <div class="mx-auto">
             <table class="table mt-3">

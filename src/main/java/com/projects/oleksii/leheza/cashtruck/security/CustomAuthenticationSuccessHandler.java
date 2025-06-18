@@ -1,6 +1,5 @@
 package com.projects.oleksii.leheza.cashtruck.security;
 
-import com.projects.oleksii.leheza.cashtruck.enums.Role;
 import com.projects.oleksii.leheza.cashtruck.service.interfaces.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,20 +24,13 @@ public class CustomAuthenticationSuccessHandler implements AuthenticationSuccess
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
                                         Authentication authentication) throws IOException {
         Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
-        String redirectUrl;
+        String redirectUrl = "/clients/dashboard";
         if (authentication instanceof OAuth2AuthenticationToken oAuth2AuthenticationToken) {
             String email = oAuth2AuthenticationToken.getPrincipal().getAttributes().get("email").toString();
             if (!userService.existByEmail(email)) {
                 oAuth2UserService.saveNewUser(email);
             }
             userService.authenticateUser(email);
-            redirectUrl = "/clients/dashboard";
-        } else {
-            if (authorities.stream().anyMatch(authority -> authority.getAuthority().equals(Role.ROLE_CLIENT.getAuthority()))) {
-                redirectUrl = "/clients/dashboard";
-            } else {
-                redirectUrl = "/managers/dashboard";
-            }
         }
         response.sendRedirect(redirectUrl);
     }

@@ -27,7 +27,7 @@ public class PaymentController {
         Long clientId = user.getId();
         if (subscriptionService.isSubscriptionStatusExistByStatus(status)) {
             ModelAndView modelAndView = new ModelAndView("client/payment");
-            modelAndView.addObject("client", userService.getHeaderClientData(clientId));
+            modelAndView.addObject("user", userService.getHeaderClientData(clientId));
             modelAndView.addObject("clientId", clientId);
             modelAndView.addObject("payment_data", subscriptionService.getPaymentCreateRequest(status));
             return modelAndView;

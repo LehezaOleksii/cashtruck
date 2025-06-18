@@ -73,7 +73,7 @@ public class ManagerController {
             throw new SecurityException("User does not have enough permission for this action");
         }
         modelAndView.addObject("managerId", userId);
-        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         Page<UserDto> usersPage = userService.findAll(page, size);
         modelAndView.addObject("users", usersPage.getContent());
         modelAndView.addObject("currentPage", usersPage.getNumber());
@@ -103,7 +103,7 @@ public class ManagerController {
                                       @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/client_info_edit");
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         UserUpdateDto userUpdateDto = userService.getClientUpdateDto(userId);
         modelAndView.addObject("clientDto", userUpdateDto);
         modelAndView.addObject("statuses", ActiveStatus.values());
@@ -119,8 +119,8 @@ public class ManagerController {
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the update client account. userId:{}", userId);
             return new ModelAndView("manager/client_info_edit")
-                    .addObject("manager", userService.getHeaderClientData(managerId))
-                    .addObject("user", userService.getUserDtoById(userId))
+                    .addObject("user", userService.getHeaderClientData(managerId))
+                    .addObject("user_data", userService.getUserDtoById(userId))
                     .addObject("statuses", ActiveStatus.values());
 
         } else {
@@ -148,7 +148,7 @@ public class ManagerController {
     public ModelAndView updateClientAccountForm(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/profile");
-        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("userId", userId);
         modelAndView.addObject("clientDto", userService.getClientUpdateDto(userId));
         return modelAndView;
@@ -164,10 +164,10 @@ public class ManagerController {
             modelAndView.addObject("client", userService.getClientUpdateDto(userId));
         } else {
             modelAndView = new ModelAndView("manager/manager_info");
-            modelAndView.addObject("user", userService.getUserDtoById(userId));
+            modelAndView.addObject("user_data", userService.getUserDtoById(userId));
         }
-        modelAndView.addObject("user", userService.getUserDtoById(userId));
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user_data", userService.getUserDtoById(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         return modelAndView;
     }
 
@@ -180,7 +180,7 @@ public class ManagerController {
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the update client account. userId:{}", userId);
             return new ModelAndView("manager/profile")
-                    .addObject("manager", userService.getHeaderClientData(userId))
+                    .addObject("user", userService.getHeaderClientData(userId))
                     .addObject("userId", userId);
         } else {
             if (!avatar.isEmpty()) {
@@ -189,7 +189,7 @@ public class ManagerController {
             userService.updateUserInfo(userId, userUpdateDto);
             log.info("update client information. client id:{}", userId);
             ModelAndView modelAndView = new ModelAndView("redirect:/managers/profile");
-            modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+            modelAndView.addObject("user", userService.getHeaderClientData(userId));
             return new ModelAndView("redirect:/managers/dashboard");
         }
     }
@@ -202,7 +202,7 @@ public class ManagerController {
         if (bindingResult.hasFieldErrors()) {
             log.warn("validation problems were occurring at the update client account by manager. userId:{}", clientId);
             return new ModelAndView("manager/client_profile")
-                    .addObject("manager", userService.getHeaderClientData(clientId));
+                    .addObject("user", userService.getHeaderClientData(clientId));
         } else {
             log.info("Start changing user account. User id: {}", clientId);
             if (!avatar.isEmpty()) {
@@ -238,7 +238,7 @@ public class ManagerController {
         } else {
             throw new SecurityException("User does not have enough permission for this action");
         }
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         Page<UserDto> usersPage = userService.findUsersWithFilters(page, size, userFilterCriteria);
         modelAndView.addObject("users", usersPage);
         modelAndView.addObject("currentPage", usersPage.getNumber());
@@ -259,7 +259,7 @@ public class ManagerController {
     ModelAndView getEmailsMenu(@AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/emails");
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         modelAndView.addObject("email", new EmailContext());
         modelAndView.addObject("users", userService.findAll());
         return modelAndView;
@@ -285,26 +285,8 @@ public class ManagerController {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/dashboard");
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(managerId));
-        return modelAndView;
-    }
-
-    @GetMapping({"/bank_cards"})
-    public ModelAndView clientBankCardsForm(@RequestParam(required = false) Long bankCardId,
-                                            @AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        if (bankCardId != null && !bankCardService.isClientHasCard(userId, bankCardId)) {
-            throw new SecurityException("user has not card with id:" + bankCardId);
-        }
-        ModelAndView modelAndView = new ModelAndView("manager/add_bank_card");
-        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
-        modelAndView.addObject("userId", userService.getUserDtoById(userId).getId());
-        if (Optional.ofNullable(bankCardId).isPresent()) {
-            modelAndView.addObject("bank_card", bankCardService.getById(bankCardId));
-        } else {
-            modelAndView.addObject("bank_card", new BankCardDto());
-        }
         return modelAndView;
     }
 
@@ -328,7 +310,7 @@ public class ManagerController {
     public ModelAndView updateBankCardForm(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/update_delete_bank_card");
-        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         return modelAndView;
     }
@@ -348,7 +330,7 @@ public class ManagerController {
     public ModelAndView viewIncomeAndExpensesDashboard(@AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/categories");
-        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(userId));
         modelAndView.addObject("expenses_categories", transactionService.findClientExpenseCategoriesByClientId(userId));
         return modelAndView;
@@ -361,7 +343,7 @@ public class ManagerController {
                                                        @AuthenticationPrincipal User user) {
         Long userId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/transactions_details");
-        modelAndView.addObject("manager", userService.getHeaderClientData(userId));
+        modelAndView.addObject("user", userService.getHeaderClientData(userId));
         modelAndView.addObject("category", categoryService.findByName(categoryName));
         Page<TransactionDto> transactionPage = transactionService.findTransactionsByClientIdAndCategoryName(userId, categoryName, page, size);
         modelAndView.addObject("currentPage", transactionPage.getNumber());
@@ -375,7 +357,7 @@ public class ManagerController {
                                      @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/emails");
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         modelAndView.addObject("email", new EmailContext());
         modelAndView.addObject("users", userService.getUsersByEmailPattern(pattern));
         return modelAndView;
@@ -385,7 +367,7 @@ public class ManagerController {
     ModelAndView createTransactionForm(@AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/create_transaction");
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         modelAndView.addObject("incomes", categoryService.getIncomeAndUniversalCategories());
         modelAndView.addObject("expenses", categoryService.getExpenseAndUniversalCategories());
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
@@ -405,7 +387,7 @@ public class ManagerController {
     ModelAndView createNewCategoryForm(@AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/create_category");
-        modelAndView.addObject("manager", userService.getHeaderClientData(managerId));
+        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         modelAndView.addObject("category", new CreateCategoryDto());
         return modelAndView;
     }
@@ -420,7 +402,7 @@ public class ManagerController {
     ModelAndView GetCategoriesTable(@AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/category_table");
-        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("user", userService.getUserDto(managerId));
         modelAndView.addObject("categories", categoryService.findAllCategories());
         return modelAndView;
     }
@@ -430,7 +412,7 @@ public class ManagerController {
                                     @AuthenticationPrincipal User user) {
         Long managerId = user.getId();
         ModelAndView modelAndView = new ModelAndView("manager/create_category");
-        modelAndView.addObject("manager", userService.getUserDto(managerId));
+        modelAndView.addObject("user", userService.getUserDto(managerId));
         modelAndView.addObject("category", categoryService.findById(categoryId));
         return modelAndView;
     }

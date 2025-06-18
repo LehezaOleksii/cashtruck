@@ -2,23 +2,21 @@
 <html
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="layout/manager/layout"
+  layout:decorator="layout/client/layout"
 >
   <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
   </head>
-  <body th:object="${manager}">
+  <body th:object="${user}">
     <main layout:fragment="content">
-        <div id = "managerId" th:text="${manager.id}" style="display: none"></div>
+        <div id = "managerId" th:text="${user.id}" style="display: none"></div>
         <form th:action="@{/managers/users/filter}" method="get">
         <div class="my-container mt-4">
             <div class="pt-4 pl-4">
                 <h5 class="custom-dark-grey">Search filter</h5>
             </div>
-            <div>
-            </div>
-            <div class="mx-auto">
+            <div  >
                 <div class="pl-4 p-0">
                     <div class="row">
                         <div class="input-group col-md-4">

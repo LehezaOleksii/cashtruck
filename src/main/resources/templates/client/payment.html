@@ -9,7 +9,7 @@
     <meta name="_csrf" th:content="${_csrf.token}"/>
     <title>Cash truck</title>
 </head>
-<body th:object="${client}">
+<body th:object="${user}">
 <main layout:fragment="content">
     <div class="sr-root">
         <div class="sr-main">
@@ -17,7 +17,7 @@
             <form id="payment-form">
                 <div style="display: none" id="payment_data-price" th:text="${payment_data.price}"></div>
                 <div style="display: none" id="payment_data-plan" th:text="${payment_data.subscriptionPlan}"></div>
-                <div style="display: none" id="user_data-id" th:text="${client.id}"></div>
+                <div style="display: none" id="user_data-id" th:text="${user.id}"></div>
                 <div id="payment-element"></div>
                 <div id="error-messages"></div>
                 <button>Pay</button>

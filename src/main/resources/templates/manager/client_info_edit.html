@@ -2,13 +2,13 @@
 <html
         xmlns:th="http://www.thymeleaf.org"
         xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-        layout:decorator="layout/manager/layout"
+        layout:decorator="layout/client/layout"
 >
 <head>
     <meta charset="utf-8" />
     <title>Cash truck</title>
 </head>
-<body th:object="${manager}">
+<body th:object="${user}">
 <main layout:fragment="content">
     <form method="post" th:object="${clientDto}" th:action="@{'/managers/users/'+ ${clientDto.id}+'/update'}">
         <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">

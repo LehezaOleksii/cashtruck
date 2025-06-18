@@ -2,7 +2,7 @@
 <html
   xmlns:th="http://www.thymeleaf.org"
   xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="layout/manager/layout"
+  layout:decorator="layout/client/layout"
 >
   <head>
     <meta charset="utf-8" />
@@ -10,7 +10,7 @@
   </head> 
   <body>
         <main layout:fragment="content">
-        <form method="post" th:object="${client}" th:action="@{'/clients/' + ${client.id} + '/update'}" enctype="multipart/form-data">
+        <form method="post" th:object="${user}" th:action="@{'/clients/' + ${client.id} + '/update'}" enctype="multipart/form-data">
             <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
                 <span th:text="${errorMessage}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -40,7 +40,7 @@
                 </div>
                     <div class="d-flex justify-content-center">
                         <div>
-                            <p th:text="${user.role}"></p>
+                            <p th:text="${user_data.role}"></p>
                         </div>
                     </div>
                 <script>
