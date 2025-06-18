@@ -31,7 +31,7 @@ public final class BankCard {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-    @OneToMany(mappedBy = "bankCard")
+    @OneToMany(mappedBy = "bankCard", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<Transaction> transactions = new HashSet<>();
     @ManyToOne(fetch = FetchType.LAZY)
     private Currency currency;

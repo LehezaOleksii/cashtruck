@@ -101,6 +101,7 @@ public class BankCardServiceImpl implements BankCardService {
             client.getBankCards()
                     .removeIf(bc -> Objects.equals(bc.getId(), bankCardId));
             userRepository.save(client);
+            bankCardRepository.deleteById(bankCardId);
             log.info("remove bank card with id: {}", bankCardId);
         } else {
             log.warn("Error occurring bank card deleting, user with id {} does not exist ", userId);
