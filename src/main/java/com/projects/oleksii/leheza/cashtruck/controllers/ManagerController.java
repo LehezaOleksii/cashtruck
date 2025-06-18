@@ -144,16 +144,6 @@ public class ManagerController {
         return new RedirectView("/managers/users");
     }
 
-    @GetMapping("/profile")
-    public ModelAndView updateClientAccountForm(@AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        ModelAndView modelAndView = new ModelAndView("manager/profile");
-        modelAndView.addObject("user", userService.getHeaderClientData(userId));
-        modelAndView.addObject("userId", userId);
-        modelAndView.addObject("clientDto", userService.getClientUpdateDto(userId));
-        return modelAndView;
-    }
-
     @GetMapping(path = "/users/{userId}/profile")
     ModelAndView getClientProfileForm(@PathVariable("userId") Long userId,
                                       @AuthenticationPrincipal User user) {
@@ -169,29 +159,6 @@ public class ManagerController {
         modelAndView.addObject("user_data", userService.getUserDtoById(userId));
         modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         return modelAndView;
-    }
-
-    @PostMapping("/update")
-    public ModelAndView updateClientAccount(@Valid @ModelAttribute("clientDto") UserUpdateDto userUpdateDto,
-                                            BindingResult bindingResult,
-                                            @RequestParam("image") MultipartFile avatar,
-                                            @AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        if (bindingResult.hasFieldErrors()) {
-            log.warn("validation problems were occurring at the update client account. userId:{}", userId);
-            return new ModelAndView("manager/profile")
-                    .addObject("user", userService.getHeaderClientData(userId))
-                    .addObject("userId", userId);
-        } else {
-            if (!avatar.isEmpty()) {
-                userService.updateAvatar(userId, avatar);
-            }
-            userService.updateUserInfo(userId, userUpdateDto);
-            log.info("update client information. client id:{}", userId);
-            ModelAndView modelAndView = new ModelAndView("redirect:/managers/profile");
-            modelAndView.addObject("user", userService.getHeaderClientData(userId));
-            return new ModelAndView("redirect:/managers/dashboard");
-        }
     }
 
     @PostMapping(path = "/users/{clientId}/profile")
@@ -279,17 +246,6 @@ public class ManagerController {
         return new ModelAndView("redirect:/managers/emails");
     }
 
-
-    @GetMapping(path = "/dashboard")
-    public ModelAndView showClientDashboard(@AuthenticationPrincipal User user) {
-        Long managerId = user.getId();
-        ModelAndView modelAndView = new ModelAndView("manager/dashboard");
-        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
-        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
-        modelAndView.addObject("client_statistic", userService.getClientStatisticByUserId(managerId));
-        return modelAndView;
-    }
-
     @PostMapping("/bank_cards/save")
     public ModelAndView saveBankCardToClient(@Valid @ModelAttribute("bank_card") BankCardDto bankCardDto,
                                              @AuthenticationPrincipal User user,
@@ -326,16 +282,6 @@ public class ManagerController {
         return new ModelAndView("redirect:/managers/dashboard");
     }
 
-    @GetMapping("/income_expense_categories")
-    public ModelAndView viewIncomeAndExpensesDashboard(@AuthenticationPrincipal User user) {
-        Long userId = user.getId();
-        ModelAndView modelAndView = new ModelAndView("manager/categories");
-        modelAndView.addObject("user", userService.getHeaderClientData(userId));
-        modelAndView.addObject("incomes_categories", transactionService.findClientIncomeCategoriesByClientId(userId));
-        modelAndView.addObject("expenses_categories", transactionService.findClientExpenseCategoriesByClientId(userId));
-        return modelAndView;
-    }
-
     @GetMapping("/categories/{categoryName}")
     public ModelAndView viewTransactionsByCategoryName(@PathVariable String categoryName,
                                                        @RequestParam(value = "page", defaultValue = "0") int page,
@@ -360,18 +306,6 @@ public class ManagerController {
         modelAndView.addObject("user", userService.getHeaderClientData(managerId));
         modelAndView.addObject("email", new EmailContext());
         modelAndView.addObject("users", userService.getUsersByEmailPattern(pattern));
-        return modelAndView;
-    }
-
-    @GetMapping(path = "/transactions")
-    ModelAndView createTransactionForm(@AuthenticationPrincipal User user) {
-        Long managerId = user.getId();
-        ModelAndView modelAndView = new ModelAndView("manager/create_transaction");
-        modelAndView.addObject("user", userService.getHeaderClientData(managerId));
-        modelAndView.addObject("incomes", categoryService.getIncomeAndUniversalCategories());
-        modelAndView.addObject("expenses", categoryService.getExpenseAndUniversalCategories());
-        modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(managerId));
-        modelAndView.addObject("transaction", new CreateTransactionDto());
         return modelAndView;
     }
 
