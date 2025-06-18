@@ -12,11 +12,11 @@
         <div class="alert alert-warning" role="alert">
             You have no bank cards associated with your account. Please add bank cards.
         </div>
-        <a style="width:100%;" th:href="@{/clients/bank_cards/add/menu}">
-            <button class="custom-back-violet col-4 mx-auto">
-                <span>Add Bank Cards</span>
-            </button>
-        </a>
+        <div class="text-center">
+            <a th:href="@{/clients/bank_cards/add/menu}" class="btn btn-primary custom-back-violet col-4">
+                Add Bank Cards
+            </a>
+        </div>
     </div>
     <div th:unless="${bank_cards.isEmpty()}">
         <div id="transactionModal" tabindex="-1" aria-labelledby="transactionModalLabel" aria-hidden="true">
@@ -58,14 +58,11 @@
                                 <script>
                                     const select = document.getElementById('categoryName');
                                     const hidden = document.getElementById('income');
-
-                                    // whenever the user picks a category, grab its data-income attribute
                                     select.addEventListener('change', () => {
                                         const opt = select.options[select.selectedIndex];
                                         hidden.value = opt.getAttribute('data-income') === 'true';
                                     });
                                 </script>
-
                             </div>
                             <div class="mb-3">
                                 <label for="cardNumber" class="form-label">Credit Card Number</label>
