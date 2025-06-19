@@ -92,8 +92,8 @@ public class ManagerController {
         } else {
             modelAndView = new ModelAndView("manager/manager_info");
         }
-        modelAndView.addObject("user", userService.getUserDtoById(userId));
-        modelAndView.addObject("manager", userService.getUserDtoById(managerId));
+        modelAndView.addObject("user_data", userService.getUserDtoById(userId));
+        modelAndView.addObject("user", userService.getUserDtoById(managerId));
         modelAndView.addObject("bank_cards", userService.getBankCardsByUserId(userId));
         return modelAndView;
     }
@@ -293,7 +293,7 @@ public class ManagerController {
     @PostMapping(path = "/categories/create")
     ModelAndView createNewCategory(@ModelAttribute("category") CreateCategoryDto categoryDto) {
         categoryService.save(categoryDto);
-        return new ModelAndView("redirect:/managers/dashboard");
+        return new ModelAndView("redirect:/clients/dashboard");
     }
 
     @GetMapping(path = "/categories/table")

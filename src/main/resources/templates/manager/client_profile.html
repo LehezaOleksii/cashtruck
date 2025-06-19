@@ -1,16 +1,14 @@
 <!DOCTYPE html>
-<html
-  xmlns:th="http://www.thymeleaf.org"
-  xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
-  layout:decorator="layout/client/layout"
->
-  <head>
-    <meta charset="utf-8" />
-    <title>Cash truck</title> 
-  </head> 
-  <body>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/client/layout">
+<head>
+    <meta charset="utf-8"/>
+    <title>Cash truck</title>
+</head>
+<body th:object="${user}">
         <main layout:fragment="content">
-        <form method="post" th:object="${user}" th:action="@{'/clients/' + ${client.id} + '/update'}" enctype="multipart/form-data">
+        <form method="post" th:object="${user_data}" th:action="@{'/clients/' + ${client.id} + '/update'}" enctype="multipart/form-data">
             <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
                 <span th:text="${errorMessage}"></span>
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

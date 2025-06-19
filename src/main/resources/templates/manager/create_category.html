@@ -12,7 +12,7 @@
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title custom-dark-grey" id="transactionModalLabel">Create Transaction</h5>
+                    <h5 class="modal-title custom-dark-grey" id="transactionModalLabel">Create Category</h5>
                 </div>
                 <span class="modal-body">
                     <form method="post" th:object="${category}"
@@ -23,9 +23,7 @@
                             <label for="transactionType" class="form-label">Category name</label>
                             <select id="transactionType" class="form-select" th:field="*{transactionType}" required>
                                 <option value="" disabled selected>Select Category</option>
-                                <optgroup label="Incomes">
-                                </optgroup>
-                                <option value="INCOME">Income</option>
+                                 <option value="INCOME">Income</option>
                                 <option value="EXPENSE">Expense</option>
                                 <option value="UNIVERSAL">Universal</option>
                             </select>
