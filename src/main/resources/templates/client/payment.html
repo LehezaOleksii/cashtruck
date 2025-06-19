@@ -15,7 +15,7 @@
         <div class="sr-main">
             <h1>Accept a payment</h1>
             <form id="payment-form">
-                <div style="display: none" id="payment_data-price" th:text="${payment_data.price}"></div>
+                <div style="display: none" id="payment_data-price" th:text="${payment_data.price}/100"></div>
                 <div style="display: none" id="payment_data-plan" th:text="${payment_data.subscriptionPlan}"></div>
                 <div style="display: none" id="user_data-id" th:text="${user.id}"></div>
                 <div id="payment-element"></div>
