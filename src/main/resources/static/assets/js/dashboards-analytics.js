@@ -342,8 +342,9 @@
                 const categoriesDiagram = data.categoriesDiagram || [];
 
                 let labelsFull = categoriesDiagram.map(item => item.categoryName);
-                let series = categoriesDiagram.map(item => item.sum < 0 ? -item.sum : item.sum);
-                // Fallback default data
+                let series = categoriesDiagram.map(item => parseFloat(Math.abs(item.sum).toFixed(0)));
+
+// Fallback default data
                 const defaultLabels = ['Electronic', 'Sports', 'Decor', 'Fashion'];
                 const defaultSeries = [25, 15, 32, 28];
 
@@ -351,6 +352,7 @@
                     labelsFull = defaultLabels;
                     series = defaultSeries;
                 }
+
                 // Truncate labels to max 8 characters
                 const labelsTruncated = labelsFull.map(label =>
                     label.length > 8 ? label.substring(0, 8) + '…' : label
