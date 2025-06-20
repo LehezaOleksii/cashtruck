@@ -10,9 +10,9 @@
 </head>
 <body th:object="${user}">
 <main layout:fragment="content">
-    <div class="container">
+    <div class="card-body">
         <div class="row">
-            <div class="col-sm-8" th:object="${bank_cards}">
+            <div class="col-sm-12 col-md-12 col-lg-8" th:object="${bank_cards}">
                 <div class="my-container">
                     <div class="card-body" th:if="${not #lists.isEmpty(bank_cards)}" th:with="card=${bank_cards[0]}">
                         <div class="row pt-2">
@@ -453,10 +453,10 @@
                     updateCardNumber();
                 };
             </script>
-            <div class="col-sm-4" th:object="${client_statistic}">
+            <div class="col-md-12 col-sm-12 col-lg-4" th:object="${client_statistic}">
                 <div class="row">
-                    <div class="col-md-6 mb-4 justify-content-end">
-                        <div class="my-container info-card ">
+                    <div class="col-md-3 col-sm-3 col-lg-6 mt-mobile-4 justify-content-center">
+                    <div class="my-container info-card ">
                             <div class="d-flex justify-content-between align-items-center">
                                 <img th:src="@{/images/client/cc-primary.png}" class="info-card-img"/>
                             </div>
@@ -496,7 +496,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 mb-4 justify-content-end">
+                    <div class="col-md-3 col-sm-3 col-lg-6 justify-content-center mt-mobile-4">
                         <div class="my-container info-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <img th:src="@{/images/client/green-pie-diagram.png}" class="info-card-img"/>
@@ -541,7 +541,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 justify-content-end">
+                    <div class="col-md-3 col-sm-3 col-lg-6 justify-content-center mt-4 mt-mobile-4">
                         <div class="my-container info-card" th:object="${client_statistic}">
                             <div class="d-flex justify-content-between align-items-center">
                                 <img th:src="@{/images/client/transfer.png}" class="info-card-img"/>
@@ -581,7 +581,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-md-6 justify-content-end">
+                    <div class="col-md-3 col-sm-3 col-lg-6 justify-content-center mt-4">
                         <div class="my-container info-card">
                             <div class="d-flex justify-content-between align-items-center">
                                 <img th:src="@{/images/client/paypal.png}" class="info-card-img"/>
@@ -628,7 +628,7 @@
         </div>
         <div class="row mt-4">
             <!-- Expense Overview -->
-            <div class="col-md-6 col-lg-8 order-1 mb-4">
+            <div class="col-sm-12 col-md-12 col-lg-8 order-1 mb-4">
                 <div class="card h-100">
                     <div class="card-header">
                         <ul class="nav nav-pills" role="tablist">
@@ -700,7 +700,7 @@
                 </div>
             </div>
             <!-- Order Statistics -->
-            <div class="col-md-6 col-lg-4 col-xl-4 order-2 mb-4">
+            <div class="col-sm-12 col-md-12 col-lg-4 order-2 mb-4">
                 <div class="card h-100">
                     <div class="card-header d-flex align-items-center justify-content-between pb-0">
                         <div class="card-title mb-0">
@@ -876,7 +876,7 @@
             </div>
             <!--/ Total Revenue -->
             <!-- Transactions -->
-            <div class="col-md-6 col-lg-4 order-2 mb-4">
+            <div class="col-md-12 col-lg-4 order-2 mb-4">
                 <div class="card h-100">
                     <div class="card-header d-flex align-items-center justify-content-between">
                         <h5 class="card-title m-0 me-2">Last Transactions</h5>
@@ -1006,8 +1006,6 @@
             </div>
             <!--/ Transactions -->
         </div>
-    </div>
-    <div class="container">
         <div class="row">
             <!--    <div class= "mb-3">-->
             <!--      <div class="my-container p-2">-->
@@ -1050,12 +1048,11 @@
                     });
                 }
             </script>
-
             <div class="col-sm-12 mb-4">
                 <div class="my-container">
                     <div class="card-body">
                         <h5 class="card-title text-center">Transactions</h5>
-                        <div class="disp d-flex justify-content-center">
+                        <div class="d-flex justify-content-center">
                             <input type="radio" class="btn-check custom-back-white" name="options"
                                    id="income_switch"
                                    autocomplete="off" checked>

@@ -54,8 +54,7 @@
         <th:block th:if="${user.role == 'ROLE_MANAGER' or user.role == 'ROLE_ADMIN'}">
             <nav th:replace="fragments/manager/navigation"></nav>
         </th:block>
-
-        <div class="col-9 mt-3" style="margin-left: 2rem;">
+        <div class="col-sm-12 col-md-12 col-lg-10 mt-3">
             <main layout:fragment="content"></main>
         </div>
     </div>
